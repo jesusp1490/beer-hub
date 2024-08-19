@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http'; 
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { AppRoutingModule } from './app-routing.module';
@@ -25,6 +26,7 @@ import { FirebaseModule } from './firebase.module';
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,  // Asegúrate de incluirlo aquí
     AppRoutingModule,
     FirebaseModule
   ],
