@@ -11,6 +11,7 @@ import { BeerListComponent } from './components/beer-list/beer-list.component';
 import { BeerDetailComponent } from './components/beer-detail/beer-detail.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { MapComponent } from './components/map/map.component';
+import { FirebaseModule } from './firebase.module';
 
 @NgModule({
   declarations: [
@@ -25,8 +26,7 @@ import { MapComponent } from './components/map/map.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
-    provideFirestore(() => getFirestore())
+    FirebaseModule
   ],
   providers: [],
   bootstrap: [AppComponent]
