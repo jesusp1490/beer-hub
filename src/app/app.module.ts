@@ -10,6 +10,7 @@ import { BrandListComponent } from './components/brand-list/brand-list.component
 import { BeerListComponent } from './components/beer-list/beer-list.component';
 import { BeerDetailComponent } from './components/beer-detail/beer-detail.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { MapComponent } from './components/map/map.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { NavbarComponent } from './components/navbar/navbar.component';
     BrandListComponent,
     BeerListComponent,
     BeerDetailComponent,
-    NavbarComponent
+    NavbarComponent,
+    MapComponent
   ],
   imports: [
     BrowserModule,
