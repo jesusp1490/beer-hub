@@ -1,12 +1,15 @@
 <div class="profile">
     <h2>User Profile</h2>
-    <img [src]="user?.photoURL || 'assets/user-baseImg.png'" class="profile-avatar">
-    <p><strong>Name:</strong>{{ user?.name }}</p>
-    <p><strong>Last Name:</strong>{{ user?.lastName }}</p>
-    <p><strong>Email:</strong>{{ user?.email }}</p>
-    <h3>Favorites</h3>
+    <!-- Use async pipe to handle the observable -->
+    <ng-container *ngIf="user$ | async as user">
+      <img [src]="user.photoURL || 'assets/user-baseImg.png'" class="profile-avatar">
+      <p><strong>Name:</strong> {{ user.displayName }}</p>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <h3>Favorites</h3>
 
-    <ul>
-        <li *ngFor="let beer of favoriteBeers">{{ beer }}</li>
-    </ul>
+      <ul>
+          <!-- Display favorite beers (assuming you have a list in the component) -->
+          <li *ngFor="let beer of favoriteBeers">{{ beer }}</li>
+      </ul>
+    </ng-container>
 </div>

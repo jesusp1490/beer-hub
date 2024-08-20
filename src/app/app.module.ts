@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { MapComponent } from './components/map/map.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -23,8 +24,7 @@ export function HttpLoaderFactory(http: HttpClient) {
   declarations: [
     AppComponent,
     NavbarComponent,
-    
-
+    MapComponent
   ],
   imports: [
     HttpClientModule,
@@ -40,7 +40,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     AngularFireAuthModule,
     AppRoutingModule,
     RouterModule.forRoot([]),
-    FormsModule
+    FormsModule,
+    
   ],
   providers: [],
   bootstrap: [AppComponent]
