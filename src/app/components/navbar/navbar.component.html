@@ -1,24 +1,25 @@
+<!-- src/app/components/navbar/navbar.component.html -->
 <nav class="navbar">
-    <div class="navbar-left">
-        <a class="navbar-logo" routerLink="/">BH</a>
-        <a class="navbar-link" routerLink="/">Home</a>
-        <a class="navbar-link" routerLink="/about">About Us</a>
-        <a class="navbar-link" routerLink="/contact">Contact</a>
+  <div class="navbar-left">
+    <a class="navbar-logo" routerLink="/">BH</a>
+    <a class="navbar-link" routerLink="/">Home</a>
+    <a class="navbar-link" routerLink="/about">About Us</a>
+    <a class="navbar-link" routerLink="/contact">Contact</a>
+  </div>
+
+  <div class="navbar-right">
+    <div *ngIf="user$ | async as user; else loggedOut">
+      <img [src]="user.photoURL || 'assets/user-baseImg.png'" class="user-avatar" (click)="goToProfile()"/>
     </div>
 
-    <div class="navbar-right">
-        <div *ngIf="user as user; else loggedOut">
-            <img [src]="user?.photoURL || 'assets/user-baseImg.png'" class="user-avatar" (click)="goToProfile()"/>
-        </div>
+    <ng-template #loggedOut>
+      <button (click)="login()">Log In</button>
+      <button (click)="signUp()">Sign Up</button>
+    </ng-template>
 
-        <ng-template #loggedOut>
-            <button (click)="login()">Log In</button>
-            <button (click)="signUp()">Sign Up</button>
-        </ng-template>
-
-        <select [(ngModel)]="selectedLanguage" (change)="changeLanguage()">
-            <option value="en">English</option>
-            <option value="es">Español</option>
-        </select>
-    </div>
+    <select [(ngModel)]="selectedLanguage" (change)="changeLanguage($event)">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+    </select>
+  </div>
 </nav>

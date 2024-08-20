@@ -24,7 +24,7 @@ export class MapComponent implements OnInit {
       .select('.map-container')
       .append('svg')
       .attr('width', '100%')  // Make responsive
-      .attr('height', '99%') // Make responsive
+      .attr('height', '90%') // Make responsive
       .attr('viewBox', `0 0 ${this.width} ${this.height}`)
       .attr('preserveAspectRatio', 'xMidYMid meet'); // Maintain aspect ratio
   }
@@ -32,7 +32,7 @@ export class MapComponent implements OnInit {
   private drawMap(): void {
     const projection = geoMercator()
       .scale(180)
-      .translate([this.width / 2, this.height / 1.39]);
+      .translate([this.width / 2, this.height / 1.40]);
 
     const path = geoPath().projection(projection);
 
@@ -61,7 +61,7 @@ export class MapComponent implements OnInit {
         .on('mouseout', function (event: any, d: any) {
           d3.select(this)
             .transition()
-            .duration(200)
+            .duration(100)
             .attr('fill', '#BDC3C7')  // Original color
             .attr('filter', 'none');
         })
@@ -69,12 +69,8 @@ export class MapComponent implements OnInit {
           this.onCountrySelect(d.properties.name);
         });
     });
-
-    
   }
 
-
-  
   private onCountrySelect(country: string): void {
     console.log('Country selected:', country);
     // Navegar a la página de cervezas del país seleccionado o realizar otra acción

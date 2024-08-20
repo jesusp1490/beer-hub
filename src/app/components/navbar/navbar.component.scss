@@ -1,9 +1,12 @@
+@import 'src/styles/_variables.scss';
+
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
   color: white;
+  font-family: $font-family-primary;
 
   .navbar-left {
     display: flex;

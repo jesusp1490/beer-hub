@@ -1,8 +1,9 @@
+// src/app/components/navbar/navbar.component.ts
 import { Component, OnInit } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { AuthService } from '../../services/auth.service'; // Asegúrate de que esta ruta es correcta
+import { Observable } from 'rxjs';
 import firebase from 'firebase/compat/app';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -10,44 +11,55 @@ import firebase from 'firebase/compat/app';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
-  user: any;  // Define el tipo 'user' como 'any' por ahora
-  selectedLanguage = 'en';
+  user$: Observable<firebase.User | null>;
+  selectedLanguage: string = 'en'; // Valor predeterminado del idioma
 
-  constructor(
-    private afAuth: AngularFireAuth, 
-    private router: Router, 
-    private translate: TranslateService
-  ) {
-    this.afAuth.authState.subscribe(user => this.user = user);
-    this.translate.setDefaultLang(this.selectedLanguage);
+  constructor(private authService: AuthService, private router: Router) {
+    this.user$ = this.authService.user$;
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Puedes añadir lógica de inicialización aquí si es necesario
+  }
 
-  async login() {
-    try {
-      await this.afAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-      this.router.navigate(['/']);
-    } catch (error) {
-      console.error('Login failed', error);
+  signUp(): void {
+    const email = prompt('Enter your email:');
+    const password = prompt('Enter your password:');
+    if (email && password) {
+      this.authService.signUp(email, password).catch(error => {
+        console.error('Sign Up Error:', error);
+        alert('Error signing up: ' + error.message);
+      });
     }
   }
 
-  async signUp() {
-    try {
-      // Implementación para el registro de usuarios (esto es un ejemplo básico)
-      await this.afAuth.createUserWithEmailAndPassword('test@example.com', 'password');
-      this.router.navigate(['/']);
-    } catch (error) {
-      console.error('Sign Up failed', error);
+  login(): void {
+    const email = prompt('Enter your email:');
+    const password = prompt('Enter your password:');
+    if (email && password) {
+      this.authService.signIn(email, password).catch(error => {
+        console.error('Login Error:', error);
+        alert('Error logging in: ' + error.message);
+      });
     }
   }
 
-  goToProfile() {
+  signOut(): void {
+    this.authService.signOut().catch(error => {
+      console.error('Sign Out Error:', error);
+      alert('Error signing out: ' + error.message);
+    });
+  }
+
+  goToProfile(): void {
     this.router.navigate(['/profile']);
   }
 
-  changeLanguage() {
-    this.translate.use(this.selectedLanguage);
+  changeLanguage(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const language = select.value;
+    this.selectedLanguage = language;
+    // Aquí implementa la lógica para cambiar el idioma
+    console.log(`Language changed to: ${language}`);
   }
 }
