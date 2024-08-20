@@ -1,0 +1,60 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  color: white;
+
+  .navbar-left {
+    display: flex;
+    align-items: center;
+
+    .navbar-logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: white;
+      text-decoration: none;
+      margin-right: 40rem;
+      margin-left: 3rem;
+    }
+
+    .navbar-link {
+      margin-right: 3rem;
+      color: white;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .navbar-right {
+    display: flex;
+    align-items: center;
+
+    button {
+      margin-left: 1rem;
+      background-color: #555;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    select {
+      margin-left: 1rem;
+      background-color: #555;
+      color: white;
+      border: none;
+      padding: 0.5rem;
+    }
+  }
+}
