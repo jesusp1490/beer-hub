@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { AuthService } from '../../services/auth.service'; 
+import { Router } from '@angular/router';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { AuthService } from '../../services/auth.service';
+
 @Component({
   selector: 'app-log-in',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
   templateUrl: './log-in.component.html',
   styleUrls: ['./log-in.component.scss']
 })
@@ -13,23 +12,23 @@ export class LogInComponent {
   email: string = '';
   password: string = '';
 
-  constructor(private authService: AuthService) { }
+  constructor(private afAuth: AngularFireAuth, private router: Router, private authService: AuthService) { }
 
-  async login() {
+  async login(): Promise<void> {
     try {
       await this.authService.signIn(this.email, this.password);
-      window.alert('Login successful!');
+      this.router.navigate(['/profile']);
     } catch (error) {
-      window.alert(`Error: ${(error as any).message}`);
+      alert(`Error: ${(error as any).message}`);
     }
   }
 
-  async loginWithGoogle() {
+  async loginWithGoogle(): Promise<void> {
     try {
       await this.authService.signInWithGoogle();
-      window.alert('Login with Google successful!');
+      this.router.navigate(['/profile']);
     } catch (error) {
-      window.alert(`Error: ${(error as any).message}`);
+      alert(`Error: ${(error as any).message}`);
     }
   }
 }

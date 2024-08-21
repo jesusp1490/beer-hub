@@ -7,16 +7,23 @@
   </div>
 
   <div class="navbar-right">
+    <!-- Si el usuario está autenticado, muestra la imagen de perfil -->
     <div *ngIf="user$ | async as user; else loggedOut">
-      <img [src]="user.photoURL || 'assets/user-baseImg.png'" class="user-avatar" (click)="goToProfile()"/>
-      <button (click)="signOut()">Log Out</button>
+      <img 
+        [src]="user.photoURL || 'assets/user-baseImg.png'" 
+        class="user-avatar" 
+        (click)="goToProfile()" 
+        alt="User Avatar"
+      />
     </div>
 
+    <!-- Si no está autenticado, muestra los botones de iniciar sesión y registrarse -->
     <ng-template #loggedOut>
       <button (click)="goToLogin()">Log In</button>
       <button (click)="goToSignUp()">Sign Up</button>
     </ng-template>
 
+    <!-- Selector de idioma -->
     <select [(ngModel)]="selectedLanguage" (change)="changeLanguage($event)">
       <option value="en">English</option>
       <option value="es">Español</option>

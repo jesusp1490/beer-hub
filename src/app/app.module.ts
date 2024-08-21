@@ -6,7 +6,7 @@ import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
-import { ProfileComponent } from './components/profile/profile.component';
+import { ProfileModule } from './components/profile/profile.module';
 import { AboutComponent } from './components/about/about.component';
 import { ContactComponent } from './components/contact/contact.component';
 import { RouterModule } from '@angular/router';
@@ -30,6 +30,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AppComponent,
     NavbarComponent,
     MapComponent,
+    LogInComponent
   ],
   imports: [
     HttpClientModule,
@@ -46,8 +47,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     AppRoutingModule,
     RouterModule.forRoot([]),
     FormsModule,
-    LogInComponent,
     SignUpComponent,
+    ProfileModule,
     AngularFirestoreModule
   ],
   providers: [AuthService],
