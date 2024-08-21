@@ -18,6 +18,8 @@ import { MapComponent } from './components/map/map.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { LogInComponent } from './components/log-in/log-in.component';
 import { AuthService } from './services/auth.service';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -45,7 +47,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     RouterModule.forRoot([]),
     FormsModule,
     LogInComponent,
-    SignUpComponent
+    SignUpComponent,
+    AngularFirestoreModule
   ],
   providers: [AuthService],
   bootstrap: [AppComponent]
