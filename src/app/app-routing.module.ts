@@ -12,7 +12,7 @@ import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { LogInComponent } from './components/log-in/log-in.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: '', redirectTo: '/map', pathMatch: 'full' },
   { path: 'home', component: CountryListComponent },
   { path: 'about', component: AboutComponent },
   { path: 'contact', component: ContactComponent },
