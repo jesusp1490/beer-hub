@@ -15,6 +15,9 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { MapComponent } from './components/map/map.component';
+import { SignUpComponent } from './components/sign-up/sign-up.component';
+import { LogInComponent } from './components/log-in/log-in.component';
+import { AuthService } from './services/auth.service';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -24,7 +27,7 @@ export function HttpLoaderFactory(http: HttpClient) {
   declarations: [
     AppComponent,
     NavbarComponent,
-    MapComponent
+    MapComponent,
   ],
   imports: [
     HttpClientModule,
@@ -41,9 +44,10 @@ export function HttpLoaderFactory(http: HttpClient) {
     AppRoutingModule,
     RouterModule.forRoot([]),
     FormsModule,
-    
+    LogInComponent,
+    SignUpComponent
   ],
-  providers: [],
+  providers: [AuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

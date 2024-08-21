@@ -8,6 +8,8 @@ import { MapComponent } from './components/map/map.component';
 import { AboutComponent } from './components/about/about.component';
 import { ContactComponent } from './components/contact/contact.component';
 import { ProfileComponent } from './components/profile/profile.component';
+import { SignUpComponent } from './components/sign-up/sign-up.component';
+import { LogInComponent } from './components/log-in/log-in.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -19,8 +21,9 @@ const routes: Routes = [
   { path: 'beers', component: BeerListComponent },
   { path: 'beer/:id', component: BeerDetailComponent },
   { path: 'map', component: MapComponent },
+  { path: 'signup', component: SignUpComponent },
+  { path: 'login', component: LogInComponent },
   { path: '**', redirectTo: '' }
-  
 ];
 
 @NgModule({

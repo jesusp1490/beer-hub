@@ -1,4 +1,3 @@
-<!-- src/app/components/navbar/navbar.component.html -->
 <nav class="navbar">
   <div class="navbar-left">
     <a class="navbar-logo" routerLink="/">BH</a>
@@ -10,11 +9,12 @@
   <div class="navbar-right">
     <div *ngIf="user$ | async as user; else loggedOut">
       <img [src]="user.photoURL || 'assets/user-baseImg.png'" class="user-avatar" (click)="goToProfile()"/>
+      <button (click)="signOut()">Log Out</button>
     </div>
 
     <ng-template #loggedOut>
-      <button (click)="login()">Log In</button>
-      <button (click)="signUp()">Sign Up</button>
+      <button (click)="goToLogin()">Log In</button>
+      <button (click)="goToSignUp()">Sign Up</button>
     </ng-template>
 
     <select [(ngModel)]="selectedLanguage" (change)="changeLanguage($event)">

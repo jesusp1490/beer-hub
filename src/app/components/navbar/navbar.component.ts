@@ -1,6 +1,5 @@
-// src/app/components/navbar/navbar.component.ts
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../services/auth.service'; // Asegúrate de que esta ruta es correcta
+import { AuthService } from '../../services/auth.service'; 
 import { Observable } from 'rxjs';
 import firebase from 'firebase/compat/app';
 import { Router } from '@angular/router';
@@ -12,7 +11,7 @@ import { Router } from '@angular/router';
 })
 export class NavbarComponent implements OnInit {
   user$: Observable<firebase.User | null>;
-  selectedLanguage: string = 'en'; // Valor predeterminado del idioma
+  selectedLanguage: string = 'en'; 
 
   constructor(private authService: AuthService, private router: Router) {
     this.user$ = this.authService.user$;
@@ -44,10 +43,21 @@ export class NavbarComponent implements OnInit {
     }
   }
 
+  goToSignUp(): void {
+    this.router.navigate(['/signup']);
+  }
+
+  goToLogin(): void {
+    this.router.navigate(['/login']);
+  }
+
   signOut(): void {
-    this.authService.signOut().catch(error => {
+    this.authService.signOut().then(() => {
+      window.alert('Logged out successfully!');
+      this.router.navigate(['/']); // Redirige al usuario a la página de inicio o cualquier otra página
+    }).catch(error => {
       console.error('Sign Out Error:', error);
-      alert('Error signing out: ' + error.message);
+      window.alert('Error signing out: ' + error.message);
     });
   }
 
