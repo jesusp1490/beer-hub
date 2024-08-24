@@ -1,6 +1,7 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
 import * as d3 from 'd3';
 import { geoMercator, geoPath } from 'd3-geo';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-map',
@@ -12,7 +13,7 @@ export class MapComponent implements OnInit {
   private width = 1000;
   private height = 800;
 
-  constructor(private el: ElementRef) { }
+  constructor(private el: ElementRef, private router: Router) { }
 
   ngOnInit(): void {
     this.createSvg();
@@ -41,8 +42,7 @@ export class MapComponent implements OnInit {
         console.error('No data loaded');
         return;
       }
-      console.log('Data loaded', data);
-
+      
       this.svg.selectAll('path')
         .data(data.features)
         .enter()
@@ -74,5 +74,6 @@ export class MapComponent implements OnInit {
   private onCountrySelect(country: string): void {
     console.log('Country selected:', country);
     // Navegar a la página de cervezas del país seleccionado o realizar otra acción
+    this.router.navigate(['/country', country]);
   }
 }

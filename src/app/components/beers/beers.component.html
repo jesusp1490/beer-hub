@@ -1,0 +1,20 @@
+<div class="beers-container">
+  <div class="brand-header">
+    <h1>{{ brandName }}</h1>
+  </div>
+  <div class="beers-list">
+    <ul>
+      <li *ngFor="let beer of beers" (click)="selectBeer(beer.id)">
+        <img [src]="beer.imageUrl" alt="{{ beer.name }} image" class="beer-image">
+        <div class="beer-details">
+          <h3>{{ beer.name }}</h3>
+          <p>{{ beer.type }} - {{ beer.alcoholPercentage }}%</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="pagination">
+    <button (click)="prevPage()" [disabled]="page === 0">Previous</button>
+    <button (click)="nextPage()">Next</button>
+  </div>
+</div>

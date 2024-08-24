@@ -1,0 +1,29 @@
+<div class="beer-details-container">
+  <div class="beer-header">
+    <img [src]="beer?.imageUrl" alt="{{ beer?.name }} image" class="beer-image">
+    <div class="beer-info">
+      <h1>{{ beer?.name }}</h1>
+      <p>{{ beer?.type }} - {{ beer?.alcoholPercentage }}%</p>
+      <p>{{ beer?.description }}</p>
+    </div>
+  </div>
+  <div class="beer-ingredients">
+    <h2>Ingredients</h2>
+    <ul>
+      <li *ngFor="let ingredient of beer?.ingredients">
+        <img [src]="ingredient.iconUrl" alt="{{ ingredient.name }} icon" class="ingredient-icon">
+        <span>{{ ingredient.name }}</span>
+      </li>
+    </ul>
+  </div>
+  <div class="brand-info">
+    <h3>Brand</h3>
+    <img [src]="brandLogoUrl" alt="{{ brandName }} logo" class="brand-logo">
+    <p>{{ brandName }}</p>
+  </div>
+  <div class="country-info">
+    <h3>Country</h3>
+    <img [src]="countryFlagUrl" alt="{{ countryName }} flag" class="country-flag">
+    <p>{{ countryName }}</p>
+  </div>
+</div>

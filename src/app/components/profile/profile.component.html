@@ -1,18 +1,15 @@
 <div class="profile">
-  <h2>Hello!, Beer Master: {{ userProfile.username }}</h2>
-  
-  <!-- Mostrar usuario -->
+  <h2>Hello, Beer Master: {{ userProfile.username }}</h2>
   <ng-container *ngIf="user$ | async as user">
     <img [src]="user.photoURL || 'assets/user-baseImg.png'" class="profile-avatar">
+    <!-- Actualización de foto de perfil -->
+    <input type="file" (change)="onFileSelected($event)">
     <p><strong>Name:</strong> {{ userProfile.firstName }}</p>
     <p><strong>Last Name:</strong> {{ userProfile.lastName }}</p>
     <p><strong>Email:</strong> {{ user.email }}</p>
     <p><strong>Username:</strong> {{ userProfile.username }}</p>
     <p><strong>Country:</strong> {{ userProfile.country || 'Not specified' }}</p>
     <p><strong>Date of Birth:</strong> {{ userProfile.dateOfBirth || 'Not specified' }}</p>
-
-    <!-- Actualización de foto de perfil -->
-    <input type="file" (change)="onFileSelected($event)">
 
     <!-- Cambiar contraseña -->
     <form (ngSubmit)="updatePassword()">
@@ -25,17 +22,15 @@
       <button type="submit">Update Password</button>
     </form>
 
-    <!-- Botón para solicitar nueva cerveza -->
-    <button (click)="openNewBeerModal()">Request a New Beer</button>
-
-    <!-- Logout -->
-    <button (click)="signOut()">Logout</button>
+    <!-- Botón para abrir modal de nueva cerveza -->
+    <button (click)="openNewBeerModal()">Request New Beer</button>
   </ng-container>
 
-  <!-- Modal para solicitar una nueva cerveza -->
+  <!-- Modal para solicitar nueva cerveza -->
   <div *ngIf="showNewBeerModal" class="modal">
     <div class="modal-content">
-      <h3>Request a New Beer</h3>
+      <span (click)="closeNewBeerModal()" class="close">&times;</span>
+      <h2>Request New Beer</h2>
       <form (ngSubmit)="submitNewBeerRequest()">
         <label for="beerName">Beer Name:</label>
         <input type="text" id="beerName" [(ngModel)]="newBeer.name" name="beerName" required>
@@ -44,8 +39,9 @@
         <textarea id="beerDescription" [(ngModel)]="newBeer.description" name="beerDescription" required></textarea>
 
         <button type="submit">Submit Request</button>
-        <button type="button" (click)="closeNewBeerModal()">Cancel</button>
       </form>
     </div>
   </div>
+  <!-- Logout -->
+    <button (click)="signOut()">Logout</button>
 </div>
