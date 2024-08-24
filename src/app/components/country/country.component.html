@@ -1,7 +1,10 @@
-<!-- country.component.html -->
-
 <div class="country-container" *ngIf="countryName && countryFlagUrl">
-  <h1>Brands from {{ countryName }} <img [src]="countryFlagUrl" alt="{{ countryName }} flag" class="flag-image" /></h1>
+  <div class="title">
+    <h1>Brands from {{ countryName }}</h1>
+    <img [src]="countryFlagUrl" alt="{{ countryName }} flag" class="flag-image" />
+  </div>
+
+  <p>Select a brand to know more about their beers.</p>
 
   <div class="carousel-container">
     <button (click)="prevPage()" [disabled]="page === 0" class="carousel-button left">‹</button>

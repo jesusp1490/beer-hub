@@ -20,7 +20,7 @@ const routes: Routes = [
   { path: 'country/:country', component: CountryComponent },
   { path: 'country/:country/brands/:brandId/beers', component: BeersComponent },
   { path: 'country/:country/brands/:brandId/beers/:beerId', component: BeerDetailsComponent },
-  { path: '', redirectTo: '/country/spain', pathMatch: 'full' },
+  // { path: '', redirectTo: '/country/spain', pathMatch: 'full' },
   { path: 'signup', component: SignUpComponent },
   { path: 'login', component: LogInComponent },
   { path: '**', redirectTo: '' }

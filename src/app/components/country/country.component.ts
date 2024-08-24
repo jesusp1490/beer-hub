@@ -12,16 +12,14 @@ import { map } from 'rxjs/operators';
   styleUrls: ['./country.component.scss']
 })
 
-// country.component.ts
-
 export class CountryComponent implements OnInit {
   country$: Observable<Country | undefined>;
   countryName: string = '';
   countryFlagUrl: string = '';
   brands: Brand[] = [];
-  private countryId: string = ''; // Almacena el ID del país
+  private countryId: string = ''; 
   page: number = 0;
-  pageSize: number = 10; // Número total de marcas por página
+  pageSize: number = 10; 
   visibleBrands: Brand[] = [];
 
   constructor(
@@ -42,7 +40,7 @@ export class CountryComponent implements OnInit {
       if (country) {
         this.countryName = country.name;
         this.countryFlagUrl = country.flagUrl;
-        this.loadBrands(countryId); // Carga las marcas
+        this.loadBrands(countryId);
       } else {
         console.error('Country not found');
       }
