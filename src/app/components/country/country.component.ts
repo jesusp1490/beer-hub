@@ -11,6 +11,7 @@ import { map } from 'rxjs/operators';
   templateUrl: './country.component.html',
   styleUrls: ['./country.component.scss']
 })
+
 // country.component.ts
 
 export class CountryComponent implements OnInit {
@@ -20,7 +21,7 @@ export class CountryComponent implements OnInit {
   brands: Brand[] = [];
   private countryId: string = ''; // Almacena el ID del país
   page: number = 0;
-  pageSize: number = 10;
+  pageSize: number = 10; // Número total de marcas por página
   visibleBrands: Brand[] = [];
 
   constructor(
@@ -83,5 +84,13 @@ export class CountryComponent implements OnInit {
 
   get hasMoreBrands(): boolean {
     return (this.page + 1) * this.pageSize < this.brands.length;
+  }
+
+  getRows(): Brand[][] {
+    const rows: Brand[][] = [];
+    for (let i = 0; i < this.visibleBrands.length; i += 5) {
+      rows.push(this.visibleBrands.slice(i, i + 5));
+    }
+    return rows;
   }
 }

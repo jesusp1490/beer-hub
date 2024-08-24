@@ -1,17 +1,18 @@
 <!-- country.component.html -->
 
 <div class="country-container" *ngIf="countryName && countryFlagUrl">
-  <h1>Brands from {{ countryName }}</h1>
-  <img [src]="countryFlagUrl" alt="{{ countryName }} flag" class="flag-image" />
+  <h1>Brands from {{ countryName }} <img [src]="countryFlagUrl" alt="{{ countryName }} flag" class="flag-image" /></h1>
 
   <div class="carousel-container">
     <button (click)="prevPage()" [disabled]="page === 0" class="carousel-button left">‹</button>
 
     <div class="carousel">
-      <div class="carousel-track" [ngStyle]="{'transform': 'translateX(-' + (page * 100) + '%)'}">
-        <div *ngFor="let brand of visibleBrands" class="carousel-item">
-          <img [src]="brand.logoUrl" alt="{{ brand.name }}" class="brand-logo" (click)="selectBrand(brand.id)" />
-          <!-- <p>{{ brand.name }}</p> -->
+      <div class="carousel-track">
+        <div class="carousel-row" *ngFor="let row of getRows()">
+          <div *ngFor="let brand of row" class="carousel-item">
+            <img [src]="brand.logoUrl" alt="{{ brand.name }}" class="brand-logo" (click)="selectBrand(brand.id)" />
+            <!-- <p>{{ brand.name }}</p> -->
+          </div>
         </div>
       </div>
     </div>
