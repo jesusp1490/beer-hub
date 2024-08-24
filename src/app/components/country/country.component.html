@@ -1,15 +1,21 @@
-<div class="country-container">
-  <div class="country-header">
-    <img [src]="countryFlagUrl" alt="{{ countryName }} flag" class="country-flag">
-    <h1>{{ countryName }}</h1>
-  </div>
-  <div class="brands-list">
-    <h2>Brands</h2>
-    <ul>
-      <li *ngFor="let brand of brands" (click)="selectBrand(brand.id)">
-        <img [src]="brand.logoUrl" alt="{{ brand.name }} logo" class="brand-logo">
-        <span>{{ brand.name }}</span>
-      </li>
-    </ul>
+<!-- country.component.html -->
+
+<div class="country-container" *ngIf="countryName && countryFlagUrl">
+  <h1>Brands from {{ countryName }}</h1>
+  <img [src]="countryFlagUrl" alt="{{ countryName }} flag" class="flag-image" />
+
+  <div class="carousel-container">
+    <button (click)="prevPage()" [disabled]="page === 0" class="carousel-button left">‹</button>
+
+    <div class="carousel">
+      <div class="carousel-track" [ngStyle]="{'transform': 'translateX(-' + (page * 100) + '%)'}">
+        <div *ngFor="let brand of visibleBrands" class="carousel-item">
+          <img [src]="brand.logoUrl" alt="{{ brand.name }}" class="brand-logo" (click)="selectBrand(brand.id)" />
+          <!-- <p>{{ brand.name }}</p> -->
+        </div>
+      </div>
+    </div>
+
+    <button (click)="nextPage()" [disabled]="!hasMoreBrands" class="carousel-button right">›</button>
   </div>
 </div>

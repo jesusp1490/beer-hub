@@ -1,58 +1,70 @@
+/* country.component.scss */
+
 .country-container {
+    text-align: center;
     padding: 20px;
-    background-color: #f8f9fa;
+}
 
-    .country-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 20px;
+.flag-image {
+    width: 150px;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
 
-        .country-flag {
-            width: 50px;
-            height: auto;
-            margin-right: 20px;
-        }
+.carousel-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
 
-        h1 {
-            font-size: 2rem;
-            color: #333;
-        }
-    }
+.carousel {
+    display: flex;
+    overflow: hidden;
+    position: relative;
+}
 
-    .brands-list {
-        h2 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            color: #555;
-        }
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s ease;
+}
 
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+.carousel-item {
+    flex: 0 0 20%;
+    /* Show 5 items per page in a row */
+    box-sizing: border-box;
+    padding: 10px;
+    text-align: center;
+}
 
-            li {
-                display: flex;
-                align-items: center;
-                padding: 10px;
-                cursor: pointer;
-                border-bottom: 1px solid #ddd;
+.brand-logo {
+    width: 100px;
+    height: auto;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
 
-                &:hover {
-                    background-color: #e9ecef;
-                }
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 1;
+}
 
-                .brand-logo {
-                    width: 40px;
-                    height: auto;
-                    margin-right: 15px;
-                }
+.left {
+    left: 0;
+}
 
-                span {
-                    font-size: 1.2rem;
-                    color: #333;
-                }
-            }
-        }
-    }
+.right {
+    right: 0;
+}
+
+.carousel-button:disabled {
+    background-color: rgba(0, 0, 0, 0.2);
+    cursor: not-allowed;
 }

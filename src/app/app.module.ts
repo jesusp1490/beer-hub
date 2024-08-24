@@ -19,6 +19,8 @@ import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { LogInComponent } from './components/log-in/log-in.component';
 import { AuthService } from './services/auth.service';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { CountryComponent } from './components/country/country.component';
+import { CommonModule } from '@angular/common';
 
 
 export function HttpLoaderFactory(http: HttpClient) {
@@ -30,7 +32,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     AppComponent,
     NavbarComponent,
     MapComponent,
-    LogInComponent
+    LogInComponent,
+    CountryComponent
   ],
   imports: [
     HttpClientModule,
@@ -49,7 +52,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     FormsModule,
     SignUpComponent,
     ProfileModule,
-    AngularFirestoreModule
+    AngularFirestoreModule,
+    CommonModule
   ],
   providers: [AuthService],
   bootstrap: [AppComponent]
