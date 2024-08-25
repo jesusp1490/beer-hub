@@ -11,20 +11,22 @@
     <p>Loading beers...</p>
   </div>
 
-  <div class="beers-list" *ngIf="beers.length > 0 && !loading">
-    <ul>
-      <li *ngFor="let beer of beers" (click)="selectBeer(beer.id)" class="beer-item">
-        <img [src]="beer.beerImageUrl" alt="{{ beer.name }} image" class="beer-image" aria-label="Image of {{ beer.name }}">
-        <div class="beer-details">
-          <h3>{{ beer.name }}</h3>
-          <p>{{ beer.beerType }} - {{ beer.ABV }}% ABV</p>
+  <div class="beers-carousel" *ngIf="beers.length > 0 && !loading">
+    <button (click)="prevPage()" [disabled]="page === 0" class="carousel-button left">‹</button>
+    
+    <div class="carousel-container">
+      <div class="carousel-track">
+        <div class="carousel-item" *ngFor="let beer of currentBeers()">
+          <img [src]="beer.beerImageUrl" alt="{{ beer.name }} image" class="beer-image">
         </div>
-      </li>
-    </ul>
+      </div>
+    </div>
+    
+    <button (click)="nextPage()" [disabled]="!hasMoreBeers()" class="carousel-button right">›</button>
   </div>
 
-  <div class="pagination">
+  <div class="pagination" *ngIf="beers.length > 0 && !loading">
     <button (click)="prevPage()" [disabled]="page === 0" aria-label="Previous page">Previous</button>
-    <button (click)="nextPage()" aria-label="Next page">Next</button>
+    <button (click)="nextPage()" [disabled]="!hasMoreBeers()" aria-label="Next page">Next</button>
   </div>
 </div>
