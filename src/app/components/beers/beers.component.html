@@ -2,19 +2,29 @@
   <div class="brand-header">
     <h1>{{ brandName }}</h1>
   </div>
-  <div class="beers-list">
+
+  <div *ngIf="beers.length === 0 && !loading" class="no-beers-message">
+    <p>No beers found for this brand.</p>
+  </div>
+
+  <div *ngIf="loading" class="loading-message">
+    <p>Loading beers...</p>
+  </div>
+
+  <div class="beers-list" *ngIf="beers.length > 0 && !loading">
     <ul>
-      <li *ngFor="let beer of beers" (click)="selectBeer(beer.id)">
-        <img [src]="beer.imageUrl" alt="{{ beer.name }} image" class="beer-image">
+      <li *ngFor="let beer of beers" (click)="selectBeer(beer.id)" class="beer-item">
+        <img [src]="beer.beerImageUrl" alt="{{ beer.name }} image" class="beer-image" aria-label="Image of {{ beer.name }}">
         <div class="beer-details">
           <h3>{{ beer.name }}</h3>
-          <p>{{ beer.type }} - {{ beer.alcoholPercentage }}%</p>
+          <p>{{ beer.beerType }} - {{ beer.ABV }}% ABV</p>
         </div>
       </li>
     </ul>
   </div>
+
   <div class="pagination">
-    <button (click)="prevPage()" [disabled]="page === 0">Previous</button>
-    <button (click)="nextPage()">Next</button>
+    <button (click)="prevPage()" [disabled]="page === 0" aria-label="Previous page">Previous</button>
+    <button (click)="nextPage()" aria-label="Next page">Next</button>
   </div>
 </div>

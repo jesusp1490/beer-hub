@@ -6,14 +6,14 @@ export interface Ingredient {
 export interface Beer {
   id: string;
   name: string;
-  type: string;
-  alcoholPercentage: number;
+  beerType: string;
+  ABV: number;
   description: string;
-  imageUrl: string;
+  beerImageUrl: string;
   ingredients: Ingredient[];
   brandId: string;
   countryId: string;
   averageRating: number;
-   ratings: Record<string, number>; // Usa Record para una estructura de clave-valor
+  ratings: Record<string, number>; // Usa Record para una estructura de clave-valor
   favoriteUsers: Record<string, boolean>; // Usa Record para una estructura de clave-valor
 }

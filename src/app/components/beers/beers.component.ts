@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable } from 'rxjs';
-import { Beer } from './beers.interface'; 
-import { Brand } from '../country/brand.interface'; // Asegúrate de que la ruta es correcta
+import { Beer } from './beers.interface';
+import { Brand } from '../country/brand.interface';
 
 @Component({
   selector: 'app-beers',
@@ -15,6 +14,7 @@ export class BeersComponent implements OnInit {
   beers: Beer[] = [];
   page: number = 0;
   pageSize: number = 5;
+  loading: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -26,17 +26,28 @@ export class BeersComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       const countryId = params.get('country');
       const brandId = params.get('brandId');
+      console.log('Route Parameters:', params.keys);
+      console.log('Country ID:', countryId);
+      console.log('Brand ID:', brandId);
+
       if (countryId && brandId) {
+        this.loading = true;
         this.loadBrandData(brandId);
         this.loadBeers(countryId, brandId);
+      } else {
+        console.error('Country ID or Brand ID is missing.');
       }
     });
   }
 
+
   private loadBrandData(brandId: string): void {
     this.firestore.collection<Brand>('brands').doc(brandId).valueChanges().subscribe(brand => {
       if (brand) {
-        this.brandName = brand.name; // Accede a propiedades del tipo Brand
+        this.brandName = brand.name;
+        console.log('Brand data loaded:', brand);
+      } else {
+        console.error('Brand not found');
       }
     });
   }
@@ -49,8 +60,10 @@ export class BeersComponent implements OnInit {
       .limit(this.pageSize)
     ).valueChanges().subscribe(beers => {
       this.beers = beers;
+      this.loading = false;
     });
   }
+
 
   selectBeer(beerId: string): void {
     this.router.navigate([`/country/${this.route.snapshot.paramMap.get('country')}/brands/${this.route.snapshot.paramMap.get('brandId')}/beers/${beerId}`]);

@@ -4,14 +4,12 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Observable } from 'rxjs';
 import { Country } from './country.interface';
 import { Brand } from './brand.interface';
-import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-country',
   templateUrl: './country.component.html',
   styleUrls: ['./country.component.scss']
 })
-
 export class CountryComponent implements OnInit {
   country$: Observable<Country | undefined>;
   countryName: string = '';
@@ -77,7 +75,9 @@ export class CountryComponent implements OnInit {
   }
 
   selectBrand(brandId: string): void {
-    this.router.navigate([`/country/${this.countryId}/brands/${brandId}/beers`]);
+    const route = `/country/${this.countryId}/brands/${brandId}/beers`;
+    console.log('Navigating to:', route); // Verifica la URL generada
+    this.router.navigate([route]);
   }
 
   get hasMoreBrands(): boolean {

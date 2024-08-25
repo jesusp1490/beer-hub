@@ -1,9 +1,9 @@
 <div class="beer-details-container">
   <div class="beer-header">
-    <img [src]="beer?.imageUrl" alt="{{ beer?.name }} image" class="beer-image">
+    <img [src]="beer?.beerImageUrl" alt="{{ beer?.name }} image" class="beer-image">
     <div class="beer-info">
       <h1>{{ beer?.name }}</h1>
-      <p>{{ beer?.type }} - {{ beer?.alcoholPercentage }}%</p>
+      <p>{{ beer?.beerType }} - {{ beer?.ABV }}%</p>
       <p>{{ beer?.description }}</p>
     </div>
   </div>

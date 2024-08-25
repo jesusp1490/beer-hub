@@ -13,7 +13,7 @@
       <div class="carousel-track">
         <div class="carousel-row" *ngFor="let row of getRows()">
           <div *ngFor="let brand of row" class="carousel-item">
-            <img [src]="brand.logoUrl" alt="{{ brand.name }}" class="brand-logo" (click)="selectBrand(brand.id)" />
+            <img [src]="brand.logoUrl" alt="{{ brand.name }}" class="brand-logo" (click)="selectBrand(brand.brandId)" />
             <!-- <p>{{ brand.name }}</p> -->
           </div>
         </div>

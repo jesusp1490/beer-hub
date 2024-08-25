@@ -21,6 +21,7 @@ import { AuthService } from './services/auth.service';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { CountryComponent } from './components/country/country.component';
 import { CommonModule } from '@angular/common';
+import { BeersModule } from './components/beers/beers.module';
 
 
 export function HttpLoaderFactory(http: HttpClient) {
@@ -53,7 +54,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     SignUpComponent,
     ProfileModule,
     AngularFirestoreModule,
-    CommonModule
+    CommonModule,
+    BeersModule
   ],
   providers: [AuthService],
   bootstrap: [AppComponent]

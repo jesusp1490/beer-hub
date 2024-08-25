@@ -16,11 +16,12 @@ const routes: Routes = [
   { path: 'about', component: AboutComponent },
   { path: 'contact', component: ContactComponent },
   { path: 'profile', component: ProfileComponent },
+  { path: 'beers', component: BeersComponent },
   { path: 'map', component: MapComponent },
   { path: 'country/:country', component: CountryComponent },
+  { path: 'country/:country/brands/:brandId', component: BeersComponent },
   { path: 'country/:country/brands/:brandId/beers', component: BeersComponent },
   { path: 'country/:country/brands/:brandId/beers/:beerId', component: BeerDetailsComponent },
-  // { path: '', redirectTo: '/country/spain', pathMatch: 'full' },
   { path: 'signup', component: SignUpComponent },
   { path: 'login', component: LogInComponent },
   { path: '**', redirectTo: '' }
