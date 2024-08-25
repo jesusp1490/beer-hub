@@ -15,7 +15,7 @@ export class BeersComponent implements OnInit {
   brandName: string = '';
   beers: Beer[] = [];
   page: number = 0;
-  pageSize: number = 5; // Número de cervezas por página
+  pageSize: number = 6; // Número de cervezas por página
   loading: boolean = false;
   totalBeers: number = 0;
 
