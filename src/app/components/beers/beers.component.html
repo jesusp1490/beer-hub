@@ -3,30 +3,21 @@
     <h1>{{ brandName }}</h1>
   </div>
 
-  <div *ngIf="beers.length === 0 && !loading" class="no-beers-message">
+  <div *ngIf="beers.length === 0" class="no-beers-message">
     <p>No beers found for this brand.</p>
   </div>
 
-  <div *ngIf="loading" class="loading-message">
-    <p>Loading beers...</p>
-  </div>
-
-  <div class="beers-carousel" *ngIf="beers.length > 0 && !loading">
+  <div class="beers-carousel" *ngIf="beers.length > 0">
     <button (click)="prevPage()" [disabled]="page === 0" class="carousel-button left">‹</button>
     
     <div class="carousel-container">
       <div class="carousel-track">
-        <div class="carousel-item" *ngFor="let beer of currentBeers()">
+        <div class="carousel-item" *ngFor="let beer of visibleBeers">
           <img [src]="beer.beerImageUrl" alt="{{ beer.name }} image" class="beer-image">
         </div>
       </div>
     </div>
     
-    <button (click)="nextPage()" [disabled]="!hasMoreBeers()" class="carousel-button right">›</button>
-  </div>
-
-  <div class="pagination" *ngIf="beers.length > 0 && !loading">
-    <button (click)="prevPage()" [disabled]="page === 0" aria-label="Previous page">Previous</button>
-    <button (click)="nextPage()" [disabled]="!hasMoreBeers()" aria-label="Next page">Next</button>
+    <button (click)="nextPage()" [disabled]="!hasMoreBeers" class="carousel-button right">›</button>
   </div>
 </div>
