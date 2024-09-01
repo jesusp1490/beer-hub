@@ -1,6 +1,6 @@
 export interface Ingredient {
   name: string;
-  iconUrl: string;
+  ingImageUrl: string;
 }
 
 export interface Beer {
@@ -14,6 +14,6 @@ export interface Beer {
   brandId: string;
   countryId: string;
   averageRating: number;
-  ratings: Record<string, number>; 
-  favoriteUsers: Record<string, boolean>; 
+  ratings: Record<string, number>;
+  favoriteUsers: Record<string, boolean>;
 }

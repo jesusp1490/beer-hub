@@ -9,15 +9,15 @@
 
   <div class="beers-carousel" *ngIf="beers.length > 0">
     <button (click)="prevPage()" [disabled]="page === 0" class="carousel-button left">‹</button>
-    
+
     <div class="carousel-container">
       <div class="carousel-track">
         <div class="carousel-item" *ngFor="let beer of visibleBeers">
-          <img [src]="beer.beerImageUrl" alt="{{ beer.name }} image" class="beer-image">
+          <img [src]="beer.beerImageUrl" alt="{{ beer.name }} image" class="beer-image" (click)="selectBeer(beer.id)" />
         </div>
       </div>
     </div>
-    
+
     <button (click)="nextPage()" [disabled]="!hasMoreBeers" class="carousel-button right">›</button>
   </div>
 </div>

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable } from 'rxjs';
 import { Beer } from './beers.interface';
 import { Brand } from '../country/brand.interface';
 
@@ -23,14 +22,15 @@ export class BeersComponent implements OnInit {
     private route: ActivatedRoute,
     private firestore: AngularFirestore,
     private router: Router
-  ) {
-    this.countryId = this.route.snapshot.paramMap.get('country') || '';
-    this.brandId = this.route.snapshot.paramMap.get('brandId') || '';
-  }
+  ) { }
 
   ngOnInit(): void {
-    this.loadBrandData(this.brandId);
-    this.loadBeers(this.countryId, this.brandId);
+    this.route.paramMap.subscribe(params => {
+      this.countryId = params.get('country') || '';
+      this.brandId = params.get('brandId') || '';
+      this.loadBrandData(this.brandId);
+      this.loadBeers(this.countryId, this.brandId);
+    });
   }
 
   private loadBrandData(brandId: string): void {
@@ -75,9 +75,11 @@ export class BeersComponent implements OnInit {
   }
 
   selectBeer(beerId: string): void {
-    const route = `/country/${this.countryId}/brands/${this.brandId}/beers/${beerId}`;
-    this.router.navigate([route]);
-  }
+  console.log('Selecting beer with ID:', beerId); // Verifica que el ID es correcto
+  const route = `/country/${this.countryId}/brands/${this.brandId}/beers/${beerId}`;
+  this.router.navigate([route]);
+}
+
 
   get hasMoreBeers(): boolean {
     return (this.page + 1) * this.pageSize < this.beers.length;

@@ -1,58 +1,76 @@
 .beer-details-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
 }
 
-.beer-info {
-    flex: 3;
-    padding-right: 20px;
+.details-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
 }
 
-.brand-logo img {
-    width: 100px;
+.brand-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.brand-logo {
+    width: 300px;
     height: auto;
 }
 
 .country-info {
+    flex: 2;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    margin-top: 20px;
+    text-align: center;
 }
 
 .country-flag {
     width: 50px;
     height: auto;
-    margin-right: 10px;
 }
 
-.country-map img {
-    width: 100%;
+.country-map {
+    width: 400px;
     height: auto;
     margin-top: 20px;
 }
 
+.beer-info-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.beer-info {
+    flex: 2;
+    padding-right: 20px;
+}
+
 .beer-type {
-    margin-top: 20px;
+    margin-top: 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
 }
 
 .beer-description {
-    margin-top: 20px;
+    margin-top: 10px;
     font-size: 1.2rem;
     line-height: 1.6;
 }
 
 .beer-image-ingredients {
-    flex: 2;
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-left: 20px;
 }
 
-.beer-image img {
-    width: 100%;
+.beer-image {
+    width: 200px;
     max-width: 400px;
     height: auto;
 }
@@ -77,6 +95,7 @@
     align-items: center;
     justify-content: center;
     background-color: #f1f1f1;
+    margin-right: 10px;
 }
 
 .ingredient-icon img {
@@ -85,5 +104,5 @@
 }
 
 .ingredient-name {
-    margin-left: 10px;
+    font-size: 1.1rem;
 }

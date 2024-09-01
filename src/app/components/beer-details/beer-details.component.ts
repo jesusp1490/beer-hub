@@ -16,21 +16,26 @@ export class BeerDetailsComponent implements OnInit {
   brandLogoUrl: string = '';
   countryName: string = '';
   countryFlagUrl: string = '';
-  countryMapUrl: string = ''; 
+  countryMapUrl: string = '';
 
   constructor(
     private route: ActivatedRoute,
     private firestore: AngularFirestore
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const beerId = params.get('beerId');
+      console.log('Received beer ID:', beerId); // Depuración
       if (beerId) {
         this.loadBeerData(beerId);
+      } else {
+        console.error('No beer ID found in route params');
       }
     });
   }
+
+
 
   private loadBeerData(beerId: string): void {
     this.firestore.collection<Beer>('beers').doc(beerId).valueChanges().subscribe(beer => {
@@ -56,7 +61,7 @@ export class BeerDetailsComponent implements OnInit {
       if (country) {
         this.countryName = country.name;
         this.countryFlagUrl = country.flagUrl;
-        this.countryMapUrl = country.territoryImageUrl; 
+        this.countryMapUrl = country.territoryImageUrl;
       }
     });
   }
