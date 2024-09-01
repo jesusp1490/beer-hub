@@ -1,29 +1,40 @@
-<div class="beer-details-container">
-  <div class="beer-header">
-    <img [src]="beer?.beerImageUrl" alt="{{ beer?.name }} image" class="beer-image">
-    <div class="beer-info">
-      <h1>{{ beer?.name }}</h1>
-      <p>{{ beer?.beerType }} - {{ beer?.ABV }}%</p>
-      <p>{{ beer?.description }}</p>
+<!-- Mostrar la bandera del país y el nombre -->
+<div>
+  <img *ngIf="countryFlagUrl" [src]="countryFlagUrl" alt="{{ countryName }} flag" />
+  <h2>{{ countryName }}</h2>
+</div>
+
+<!-- Mostrar el logo de la marca -->
+<div>
+  <img *ngIf="brandLogoUrl" [src]="brandLogoUrl" alt="{{ brandName }} logo" />
+</div>
+
+<!-- Mostrar el mapa del país -->
+<div>
+  <img *ngIf="countryMapUrl" [src]="countryMapUrl" alt="{{ countryName }} map" />
+</div>
+
+<!-- Mostrar el tipo de cerveza -->
+<div>
+  <h4>{{ beer?.beerType }}</h4>
+</div>
+
+<!-- Mostrar la descripción de la cerveza -->
+<div>
+  <p>{{ beer?.description }}</p>
+</div>
+
+<!-- Mostrar la imagen de la cerveza -->
+<div>
+  <img *ngIf="beer?.beerImageUrl" [src]="beer?.beerImageUrl" alt="{{ beer?.name }} image" />
+</div>
+
+<!-- Mostrar ingredientes -->
+<div *ngFor="let ingredient of beer?.ingredients">
+  <div class="ingredient">
+    <div class="circle">
+      <img [src]="ingredient.iconUrl" alt="{{ ingredient.name }} icon" />
     </div>
-  </div>
-  <div class="beer-ingredients">
-    <h2>Ingredients</h2>
-    <ul>
-      <li *ngFor="let ingredient of beer?.ingredients">
-        <img [src]="ingredient.iconUrl" alt="{{ ingredient.name }} icon" class="ingredient-icon">
-        <span>{{ ingredient.name }}</span>
-      </li>
-    </ul>
-  </div>
-  <div class="brand-info">
-    <h3>Brand</h3>
-    <img [src]="brandLogoUrl" alt="{{ brandName }} logo" class="brand-logo">
-    <p>{{ brandName }}</p>
-  </div>
-  <div class="country-info">
-    <h3>Country</h3>
-    <img [src]="countryFlagUrl" alt="{{ countryName }} flag" class="country-flag">
-    <p>{{ countryName }}</p>
+    <p>{{ ingredient.name }}</p>
   </div>
 </div>

@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Beer } from '../beers/beers.interface'; // Asegúrate de que la ruta es correcta
-import { Brand } from '../country/brand.interface'; // Asegúrate de que la ruta es correcta
-import { Country } from '../country/country.interface'; // Asegúrate de que la ruta es correcta
+import { Beer } from '../beers/beers.interface';
+import { Brand } from '../country/brand.interface';
+import { Country } from '../country/country.interface';
 
 @Component({
   selector: 'app-beer-details',
@@ -13,14 +13,15 @@ import { Country } from '../country/country.interface'; // Asegúrate de que la 
 export class BeerDetailsComponent implements OnInit {
   beer: Beer | undefined;
   brandName: string = '';
+  brandLogoUrl: string = '';
   countryName: string = '';
   countryFlagUrl: string = '';
-  brandLogoUrl: string = '';
+  countryMapUrl: string = ''; 
 
   constructor(
     private route: ActivatedRoute,
     private firestore: AngularFirestore
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -35,8 +36,8 @@ export class BeerDetailsComponent implements OnInit {
     this.firestore.collection<Beer>('beers').doc(beerId).valueChanges().subscribe(beer => {
       if (beer) {
         this.beer = beer;
-        this.loadBrandData(this.beer.brandId);
-        this.loadCountryData(this.beer.countryId);
+        this.loadBrandData(beer.brandId);
+        this.loadCountryData(beer.countryId);
       }
     });
   }
@@ -44,7 +45,7 @@ export class BeerDetailsComponent implements OnInit {
   private loadBrandData(brandId: string): void {
     this.firestore.collection<Brand>('brands').doc(brandId).valueChanges().subscribe(brand => {
       if (brand) {
-        this.brandName = brand.name; // Accede a propiedades del tipo Brand
+        this.brandName = brand.name;
         this.brandLogoUrl = brand.logoUrl;
       }
     });
@@ -53,8 +54,9 @@ export class BeerDetailsComponent implements OnInit {
   private loadCountryData(countryId: string): void {
     this.firestore.collection<Country>('countries').doc(countryId).valueChanges().subscribe(country => {
       if (country) {
-        this.countryName = country.name; // Accede a propiedades del tipo Country
+        this.countryName = country.name;
         this.countryFlagUrl = country.flagUrl;
+        this.countryMapUrl = country.territoryImageUrl; 
       }
     });
   }

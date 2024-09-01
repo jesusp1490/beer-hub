@@ -1,81 +1,89 @@
 .beer-details-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
     padding: 20px;
-    background-color: #f8f9fa;
+}
 
-    .beer-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 20px;
+.beer-info {
+    flex: 3;
+    padding-right: 20px;
+}
 
-        .beer-image {
-            width: 100px;
-            height: auto;
-            margin-right: 20px;
-        }
+.brand-logo img {
+    width: 100px;
+    height: auto;
+}
 
-        .beer-info {
-            h1 {
-                font-size: 2rem;
-                color: #333;
-            }
+.country-info {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
 
-            p {
-                font-size: 1.2rem;
-                color: #666;
-            }
-        }
-    }
+.country-flag {
+    width: 50px;
+    height: auto;
+    margin-right: 10px;
+}
 
-    .beer-ingredients {
-        h2 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            color: #555;
-        }
+.country-map img {
+    width: 100%;
+    height: auto;
+    margin-top: 20px;
+}
 
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+.beer-type {
+    margin-top: 20px;
+}
 
-            li {
-                display: flex;
-                align-items: center;
-                padding: 10px;
-                border-bottom: 1px solid #ddd;
+.beer-description {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
 
-                .ingredient-icon {
-                    width: 30px;
-                    height: auto;
-                    margin-right: 10px;
-                }
+.beer-image-ingredients {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-left: 20px;
+}
 
-                span {
-                    font-size: 1.2rem;
-                    color: #333;
-                }
-            }
-        }
-    }
+.beer-image img {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+}
 
-    .brand-info,
-    .country-info {
-        margin-top: 20px;
+.ingredients-list {
+    margin-top: 20px;
+    width: 100%;
+}
 
-        h3 {
-            font-size: 1.5rem;
-            color: #333;
-        }
+.ingredient-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
 
-        img {
-            width: 50px;
-            height: auto;
-            margin-right: 10px;
-        }
+.ingredient-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f1f1f1;
+}
 
-        p {
-            font-size: 1.2rem;
-            color: #666;
-        }
-    }
+.ingredient-icon img {
+    width: 100%;
+    height: auto;
+}
+
+.ingredient-name {
+    margin-left: 10px;
 }

@@ -14,6 +14,6 @@ export interface Beer {
   brandId: string;
   countryId: string;
   averageRating: number;
-  ratings: Record<string, number>; // Usa Record para una estructura de clave-valor
-  favoriteUsers: Record<string, boolean>; // Usa Record para una estructura de clave-valor
+  ratings: Record<string, number>; 
+  favoriteUsers: Record<string, boolean>; 
 }
