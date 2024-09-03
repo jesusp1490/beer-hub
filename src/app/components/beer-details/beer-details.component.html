@@ -31,30 +31,30 @@
     </div>
   </div>
 
+
   <!-- Parte izquierda -->
-  <div class="left-section">
-    <!-- Cuadro 1: Imagen de la cerveza -->
-    <div class="beer-image">
-      <img *ngIf="beer?.beerImageUrl" [src]="beer?.beerImageUrl" alt="{{ beer?.name }} image" />
-    </div>
-
-    <!-- Cuadro 2: Ingredientes -->
-    <div class="ingredients">
-      <div *ngFor="let ingredient of beer?.ingredients" class="ingredient-item">
-        <div class="ingredient-icon">
-          <img [src]="ingredient.ingImageUrl" alt="{{ ingredient.name }} icon" />
-        </div>
-        <p class="ingredient-name">{{ ingredient.name }}</p>
-      </div>
-
-      <div class="abv">
-        <h2>ABV</h2>
-        <span>{{ beer?.ABV }}</span>
-      </div>
-
-    </div>
+ <div class="left-section">
+  <!-- Cuadro 1: Imagen de la cerveza -->
+  <div class="beer-image">
+    <img *ngIf="beer?.beerImageUrl" [src]="beer?.beerImageUrl" alt="{{ beer?.name }} image" />
   </div>
 
-  <!-- Cuadro 3: ABV -->
-
+  <!-- Cuadro 2: Ingredientes -->
+  <div class="ingredients-container">
+    <div *ngFor="let column of splitIngredients(beer?.ingredients ?? [])" class="ingredient-column">
+      <div class="ingredient-item" *ngFor="let ingredient of column">
+        <div class="ingredient-content">
+          <div class="ingredient-icon">
+            <img [src]="ingredient.ingImageUrl" alt="{{ ingredient.name }} icon" />
+          </div>
+          <p class="ingredient-name">{{ ingredient.name }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="abv">
+    <h2>ABV</h2>
+    <span>{{ beer?.ABV }}</span>
+  </div>
 </div>

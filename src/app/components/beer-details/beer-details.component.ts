@@ -26,7 +26,7 @@ export class BeerDetailsComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const beerId = params.get('beerId');
-      console.log('Received beer ID:', beerId); // Depuración
+      console.log('Received beer ID:', beerId);
       if (beerId) {
         this.loadBeerData(beerId);
       } else {
@@ -65,4 +65,15 @@ export class BeerDetailsComponent implements OnInit {
       }
     });
   }
+
+  splitIngredients(ingredients: any[]): any[][] {
+    if (!ingredients) return [];
+    const result = [];
+    for (let i = 0; i < ingredients.length; i += 6) {
+      result.push(ingredients.slice(i, i + 6));
+    }
+    return result;
+  }
+
+
 }
