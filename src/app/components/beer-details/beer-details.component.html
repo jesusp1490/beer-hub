@@ -41,7 +41,7 @@
 
   <!-- Cuadro 2: Ingredientes -->
   <div class="ingredients-container">
-    <div *ngFor="let column of splitIngredients(beer?.ingredients ?? [])" class="ingredient-column">
+    <div *ngFor="let column of splitIngredients(beer?.ingredients ?? []); let i = index" class="ingredient-column">
       <div class="ingredient-item" *ngFor="let ingredient of column">
         <div class="ingredient-content">
           <div class="ingredient-icon">
@@ -50,11 +50,11 @@
           <p class="ingredient-name">{{ ingredient.name }}</p>
         </div>
       </div>
+      <!-- Place ABV under the first column -->
+      <div *ngIf="i === 0" class="abv">
+        <h2>ABV</h2>
+        <span>{{ beer?.ABV }}</span>
+      </div>
     </div>
-  </div>
-  
-  <div class="abv">
-    <h2>ABV</h2>
-    <span>{{ beer?.ABV }}</span>
   </div>
 </div>
