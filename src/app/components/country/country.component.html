@@ -7,19 +7,14 @@
   <p>Select a brand to know more about their beers.</p>
 
   <div class="carousel-container">
-    <button (click)="prevPage()" [disabled]="page === 0" class="carousel-button left">‹</button>
+    <button class="carousel-button left">‹</button>
 
-    <div class="carousel">
-      <div class="carousel-track">
-        <div class="carousel-row" *ngFor="let row of getRows()">
-          <div *ngFor="let brand of row" class="carousel-item">
-            <img [src]="brand.logoUrl" alt="{{ brand.name }}" class="brand-logo" (click)="selectBrand(brand.brandId)" />
-            <!-- <p>{{ brand.name }}</p> -->
-          </div>
-        </div>
+    <div class="carousel-track" *ngIf="brands.length > 0">
+      <div *ngFor="let brand of visibleBrands" class="carousel-item">
+        <img [src]="brand.logoUrl" alt="{{ brand.name }}" class="brand-logo" (click)="selectBrand(brand.brandId)" />
       </div>
     </div>
 
-    <button (click)="nextPage()" [disabled]="!hasMoreBrands" class="carousel-button right">›</button>
+    <button class="carousel-button right">›</button>
   </div>
 </div>

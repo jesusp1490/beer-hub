@@ -17,59 +17,48 @@
     font-size: 4rem;
     font-weight: 600;
     color: $color-hover;
-    margin: 0; // Eliminar márgenes por defecto del h1
+    margin: 0; 
   }
 
   .flag-image {
     width: 80px;
     height: auto;
-    // border-radius: 8px;
   }
 }
 
 p {
   font-size: 1.2rem;
   color: $color-text;
-  margin-bottom: 20px; // Espacio debajo del párrafo
+  margin-bottom: 200px; // Espacio debajo del párrafo
 }
 
 .carousel-container {
   position: relative;
-  overflow: hidden;
-  width: 100%;
-}
+  
 
-.carousel {
-  display: flex;
-  flex-direction: column;
-  margin-top: 60px; // Espacio superior del carrusel
-  overflow: hidden;
-}
+  .slick-prev,
+  .slick-next {
+    background-color: #333;
+    border-radius: 50%;
+    color: white;
+    width: 30px;
+    height: 30px;
+  }
 
-.carousel-track {
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.5s ease;
-}
+  .carousel-item {
+    padding: 10px;
+  }
 
-.carousel-row {
-  display: flex;
-  justify-content: center;
-}
-
-.carousel-item {
-  flex: 0 0 17%;
-  /* Cada ítem ocupa el 18% del ancho de la fila */
-  box-sizing: border-box;
-  padding: 10px;
-  text-align: center;
+  .carousel-track {
+    // background-color: lightblue; // Para ver el fondo del track
+  }
 }
 
 .brand-logo {
-  width: 200px;
+  width: 300px;
   height: auto;
   cursor: pointer;
-  margin-bottom: 100px; // Espacio debajo de la imagen de la marca
+  // margin-çbottom: 100px; // Ajusta según sea necesario
 }
 
 .brand-logo:hover {
