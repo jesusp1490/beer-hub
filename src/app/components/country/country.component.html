@@ -9,8 +9,8 @@
   <div class="carousel-container">
     <button class="carousel-button left">‹</button>
 
-    <div class="carousel-track" *ngIf="brands.length > 0">
-      <div *ngFor="let brand of visibleBrands" class="carousel-item">
+    <div class="carousel-track">
+      <div *ngFor="let brand of brands" class="carousel-item">
         <img [src]="brand.logoUrl" alt="{{ brand.name }}" class="brand-logo" (click)="selectBrand(brand.brandId)" />
       </div>
     </div>

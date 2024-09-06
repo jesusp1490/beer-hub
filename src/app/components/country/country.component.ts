@@ -1,19 +1,19 @@
-import { Component, OnInit, AfterViewInit, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Observable } from 'rxjs';
 import { Country } from './country.interface';
 import { Brand } from './brand.interface';
+import { SlickCarouselComponent } from 'ngx-slick-carousel';
 import * as $ from 'jquery';
 import 'slick-carousel';
-import { ChangeDetectorRef } from '@angular/core'; // Importar ChangeDetectorRef
 
 @Component({
   selector: 'app-country',
   templateUrl: './country.component.html',
   styleUrls: ['./country.component.scss']
 })
-export class CountryComponent implements OnInit, AfterViewInit, AfterViewChecked {
+export class CountryComponent implements OnInit, AfterViewInit {
   country$: Observable<Country | undefined>;
   countryName: string = '';
   countryFlagUrl: string = '';
@@ -23,11 +23,13 @@ export class CountryComponent implements OnInit, AfterViewInit, AfterViewChecked
   pageSize: number = 10;
   visibleBrands: Brand[] = [];
 
+  
+
   constructor(
     private route: ActivatedRoute,
     private firestore: AngularFirestore,
     private router: Router,
-    private cdr: ChangeDetectorRef // Inyectar ChangeDetectorRef
+    private cdr: ChangeDetectorRef
   ) {
     this.countryId = this.route.snapshot.paramMap.get('country') || '';
     this.country$ = this.firestore.doc<Country>(`countries/${this.countryId}`).valueChanges();
@@ -57,7 +59,6 @@ export class CountryComponent implements OnInit, AfterViewInit, AfterViewChecked
         this.updateVisibleBrands();
         console.log('Visible brands:', this.visibleBrands);
         if (this.brands.length > 0) {
-          this.initializeSlick();
           this.cdr.detectChanges(); // Forzar detección de cambios
         } else {
           console.error('No brands found');
@@ -102,51 +103,54 @@ export class CountryComponent implements OnInit, AfterViewInit, AfterViewChecked
   }
 
   ngAfterViewInit(): void {
+  setTimeout(() => {
     this.initializeSlick();
-  }
+  }, 100); // Asegúrate de que el contenido esté disponible
+}
 
-  ngAfterViewChecked(): void {
-    this.initializeSlick();
-  }
 
   private initializeSlick(): void {
-    const $carouselTrack = $('.carousel-track');
+  const $carouselTrack = $('.carousel-track');
 
-    if ($carouselTrack.length && !$carouselTrack.hasClass('slick-initialized')) {
-      setTimeout(() => {
-        $carouselTrack.slick({
-          infinite: true,
-          slidesToShow: 5,
-          slidesToScroll: 1,
-          prevArrow: '.carousel-button.left',
-          nextArrow: '.carousel-button.right',
-          responsive: [
-            {
-              breakpoint: 1024,
-              settings: {
-                slidesToShow: 3,
-                slidesToScroll: 1
-              }
-            },
-            {
-              breakpoint: 600,
-              settings: {
-                slidesToShow: 2,
-                slidesToScroll: 1
-              }
-            },
-            {
-              breakpoint: 480,
-              settings: {
-                slidesToShow: 1,
-                slidesToScroll: 1
-              }
+  if ($carouselTrack.length && !$carouselTrack.hasClass('slick-initialized')) {
+    setTimeout(() => {
+      $carouselTrack.slick({
+        infinite: true,
+        slidesToShow: 5,
+        slidesToScroll: 3,
+        centerMode: true,
+        centerPadding: '0', // Ajusta según sea necesario
+        dots: true, // Habilita los puntos de navegación,
+        prevArrow: '.carousel-button.left',
+        nextArrow: '.carousel-button.right',
+        responsive: [
+          {
+            breakpoint: 1024,
+            settings: {
+              slidesToShow: 3,
+              slidesToScroll: 1
             }
-          ]
-        });
-
-        console.log('Carousel items:', $carouselTrack.children().length);
-      }, 100); // Ajusta el delay según sea necesario
-    }
+          },
+          {
+            breakpoint: 600,
+            settings: {
+              slidesToShow: 2,
+              slidesToScroll: 1
+            }
+          },
+          {
+            breakpoint: 480,
+            settings: {
+              slidesToShow: 1,
+              slidesToScroll: 1
+            }
+          }
+        ]
+      });
+    }, 100);
   }
+}
+
+
+
 }

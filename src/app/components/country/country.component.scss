@@ -1,9 +1,13 @@
 @import 'src/styles/_variables.scss';
 
 .country-container {
+  display: flex;
+  flex-direction: column;
   text-align: center;
   padding: 20px;
   font-family: $font-family-primary;
+  width: 100%;
+  overflow: hidden;
 }
 
 .title {
@@ -17,7 +21,7 @@
     font-size: 4rem;
     font-weight: 600;
     color: $color-hover;
-    margin: 0; 
+    margin: 0;
   }
 
   .flag-image {
@@ -29,40 +33,42 @@
 p {
   font-size: 1.2rem;
   color: $color-text;
-  margin-bottom: 200px; // Espacio debajo del párrafo
+  margin-bottom: 20px;
 }
 
 .carousel-container {
   position: relative;
-  
+  width: 100%;
+  overflow: hidden;
+}
 
-  .slick-prev,
-  .slick-next {
-    background-color: #333;
-    border-radius: 50%;
-    color: white;
-    width: 30px;
-    height: 30px;
-  }
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
 
-  .carousel-item {
-    padding: 10px;
-  }
+.carousel-item {
+  flex: 0 0 auto;
+  // opacity: 0.6;
+  // transition: opacity 0.8s ease;
+}
 
-  .carousel-track {
-    // background-color: lightblue; // Para ver el fondo del track
-  }
+.slick-center .carousel-item {
+  opacity: 1;
+  z-index: 2;
+}
+
+.slick-center .brand-logo {
+  transform: scale(1.6);
+  /* Increase the scale to make it larger */
+  transition: transform 0.3s ease;
+  width: 500px;
+  /* Increase the width */
 }
 
 .brand-logo {
   width: 300px;
   height: auto;
-  cursor: pointer;
-  // margin-çbottom: 100px; // Ajusta según sea necesario
-}
-
-.brand-logo:hover {
-  transform: scale(1.1);
   transition: transform 0.3s ease;
 }
 
@@ -78,15 +84,10 @@ p {
   z-index: 1;
 }
 
-.left {
-  left: 0;
+.carousel-button.left {
+  left: 10px;
 }
 
-.right {
-  right: 0;
-}
-
-.carousel-button:disabled {
-  background-color: rgba(0, 0, 0, 0.2);
-  cursor: not-allowed;
+.carousel-button.right {
+  right: 10px;
 }

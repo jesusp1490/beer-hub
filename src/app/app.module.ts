@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AngularFireModule } from '@angular/fire/compat';
@@ -22,7 +22,7 @@ import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { CountryComponent } from './components/country/country.component';
 import { CommonModule } from '@angular/common';
 import { BeersModule } from './components/beers/beers.module';
-
+import { SlickCarouselModule } from 'ngx-slick-carousel';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -55,9 +55,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     ProfileModule,
     AngularFirestoreModule,
     CommonModule,
-    BeersModule
+    BeersModule,
+    SlickCarouselModule
   ],
   providers: [AuthService],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA] 
 })
 export class AppModule { }
