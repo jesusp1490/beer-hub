@@ -42,8 +42,9 @@ p {
   height: 100%;
   overflow: hidden;
   padding-top: 40px;
-  // margin-top: 150px;
-  /* Ajusta el margen superior si es necesario */
+  padding: 0;
+  margin: 0;
+  
 }
 
 .carousel-track {
@@ -60,6 +61,7 @@ p {
   padding-top: 50px;
   padding-bottom: 50px;
   cursor: pointer;
+  
 
 }
 
@@ -88,14 +90,15 @@ p {
 
 .carousel-button {
   position: absolute;
-  top: 50%;
+  top: 70%;
   transform: translateY(-50%);
   background-color: #fff;
-  opacity: 0.4;
-  width: 60px;
-  height: 60px;
-  cursor: pointer;
+  // opacity: 0.4;
+  width: 75px;
+  height: 75px;
+  padding: 20px;
   z-index: 1;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,27 +106,28 @@ p {
   background-size: 50%;
   background-position: center;
   background-repeat: no-repeat;
+  border: none;
 }
 
 .carousel-button.right {
   right: 0px;
-  padding-right: 20px;
+  padding-right: 30px;
   border-radius: 40px 0px 0px 40px;
 }
 
 .carousel-button.left {
   left: 0px;
-  padding-left: 20px;
+  padding-left: 30px;
   border-radius: 40px 0px 0px 40px;
   transform: translateY(-50%) rotate(180deg);
 }
 
 .carousel-button.left {
-  left: 10px;
+  left: 0px;
 }
 
 .carousel-button.right {
-  right: 10px;
+  right: 0px;
 }
 
 .slick-dots {
@@ -135,7 +139,7 @@ p {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: #000;
+  background-color: rgb(42, 42, 42);
   opacity: 0.5;
   transition: background-color 0.3s ease;
 }
@@ -143,6 +147,7 @@ p {
 .slick-dots li.slick-active button {
   background-color: #fff;
   opacity: 1;
+  outline: 0;
 }
 
 .slick-dots li.slick-active button:before {
