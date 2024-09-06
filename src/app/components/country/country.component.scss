@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   text-align: center;
-  padding: 20px;
+  // padding: 20px;
   font-family: $font-family-primary;
   width: 100%;
   overflow: hidden;
@@ -39,18 +39,33 @@ p {
 .carousel-container {
   position: relative;
   width: 100%;
+  height: 100%;
   overflow: hidden;
+  padding-top: 40px;
+  // margin-top: 150px;
+  /* Ajusta el margen superior si es necesario */
 }
 
 .carousel-track {
   display: flex;
+  align-items: center;
   transition: transform 0.5s ease;
+  // height: 400px;
+
+}
+
+.slick-slider .slick-track,
+.slick-slider .slick-list {
+  transform: translate3d(0, 0, 0);
+  padding-top: 50px;
+  padding-bottom: 50px;
+  cursor: pointer;
+
 }
 
 .carousel-item {
   flex: 0 0 auto;
-  // opacity: 0.6;
-  // transition: opacity 0.8s ease;
+  margin: 0 20px;
 }
 
 .slick-center .carousel-item {
@@ -59,11 +74,10 @@ p {
 }
 
 .slick-center .brand-logo {
-  transform: scale(1.6);
-  /* Increase the scale to make it larger */
+  transform: scale(1.3);
   transition: transform 0.3s ease;
   width: 500px;
-  /* Increase the width */
+  height: auto;
 }
 
 .brand-logo {
@@ -76,12 +90,32 @@ p {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: rgba(0, 0, 0, 0.5);
-  color: #fff;
-  border: none;
-  padding: 10px;
+  background-color: #fff;
+  opacity: 0.4;
+  width: 60px;
+  height: 60px;
   cursor: pointer;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url('https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fflags%2Fright-arrow.webp?alt=media&token=c0c2cd84-8f36-488c-9278-7681720449d3');
+  background-size: 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.carousel-button.right {
+  right: 0px;
+  padding-right: 20px;
+  border-radius: 40px 0px 0px 40px;
+}
+
+.carousel-button.left {
+  left: 0px;
+  padding-left: 20px;
+  border-radius: 40px 0px 0px 40px;
+  transform: translateY(-50%) rotate(180deg);
 }
 
 .carousel-button.left {
@@ -90,4 +124,27 @@ p {
 
 .carousel-button.right {
   right: 10px;
+}
+
+.slick-dots {
+  bottom: -40px;
+  text-align: center;
+}
+
+.slick-dots li button {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #000;
+  opacity: 0.5;
+  transition: background-color 0.3s ease;
+}
+
+.slick-dots li.slick-active button {
+  background-color: #fff;
+  opacity: 1;
+}
+
+.slick-dots li.slick-active button:before {
+  opacity: 0;
 }

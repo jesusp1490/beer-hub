@@ -23,7 +23,7 @@ export class CountryComponent implements OnInit, AfterViewInit {
   pageSize: number = 10;
   visibleBrands: Brand[] = [];
 
-  
+
 
   constructor(
     private route: ActivatedRoute,
@@ -103,54 +103,52 @@ export class CountryComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-  setTimeout(() => {
-    this.initializeSlick();
-  }, 100); // Asegúrate de que el contenido esté disponible
-}
+    setTimeout(() => {
+      this.initializeSlick();
+    }, 100); // Asegúrate de que el contenido esté disponible
+  }
 
 
   private initializeSlick(): void {
-  const $carouselTrack = $('.carousel-track');
+    const $carouselTrack = $('.carousel-track');
 
-  if ($carouselTrack.length && !$carouselTrack.hasClass('slick-initialized')) {
-    setTimeout(() => {
-      $carouselTrack.slick({
-        infinite: true,
-        slidesToShow: 5,
-        slidesToScroll: 3,
-        centerMode: true,
-        centerPadding: '0', // Ajusta según sea necesario
-        dots: true, // Habilita los puntos de navegación,
-        prevArrow: '.carousel-button.left',
-        nextArrow: '.carousel-button.right',
-        responsive: [
-          {
-            breakpoint: 1024,
-            settings: {
-              slidesToShow: 3,
-              slidesToScroll: 1
+    if ($carouselTrack.length && !$carouselTrack.hasClass('slick-initialized')) {
+      setTimeout(() => {
+        $carouselTrack.slick({
+          infinite: true,
+          slidesToShow: 5,
+          slidesToScroll: 3,
+          centerMode: true,
+          centerPadding: '10px', // Ajusta según sea necesario
+          dots: true, // Habilita los puntos de navegación,
+          prevArrow: '.carousel-button.left',
+          nextArrow: '.carousel-button.right',
+          responsive: [
+            {
+              breakpoint: 1024,
+              settings: {
+                slidesToShow: 3,
+                slidesToScroll: 1
+              }
+            },
+            {
+              breakpoint: 600,
+              settings: {
+                slidesToShow: 2,
+                slidesToScroll: 1
+              }
+            },
+            {
+              breakpoint: 480,
+              settings: {
+                slidesToShow: 1,
+                slidesToScroll: 1
+              }
             }
-          },
-          {
-            breakpoint: 600,
-            settings: {
-              slidesToShow: 2,
-              slidesToScroll: 1
-            }
-          },
-          {
-            breakpoint: 480,
-            settings: {
-              slidesToShow: 1,
-              slidesToScroll: 1
-            }
-          }
-        ]
-      });
-    }, 100);
+          ]
+        });
+      }, 100);
+    }
+
   }
-}
-
-
-
 }
