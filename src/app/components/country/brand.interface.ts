@@ -4,4 +4,5 @@ export interface Brand {
   logoUrl: string;
   brandId: string;
   countryId: string;
+  beers?: any[];
 }

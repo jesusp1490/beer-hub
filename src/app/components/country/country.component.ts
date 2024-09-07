@@ -149,6 +149,5 @@ export class CountryComponent implements OnInit, AfterViewInit {
         });
       }, 100);
     }
-
   }
 }
