@@ -21,11 +21,12 @@
     margin: 0 auto;
   }
 
-    .carousel-track {
+  .carousel-track {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
+    margin-left: 180px;
+    width: 80%;
   }
 
   .slick-slider .slick-track,
@@ -40,14 +41,13 @@
 
   .carousel-item {
     flex: 0 0 auto;
-    margin: 0 110px;  
-    padding-top: 90px;  
+    margin: 0 80px;
+    padding-top: 90px;
   }
 
   .slick-center .carousel-item {
     opacity: 1;
     z-index: 2;
-    
   }
 
   .slick-center .beer-image {

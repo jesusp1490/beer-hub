@@ -25,33 +25,35 @@ export class BeersComponent implements OnInit {
     }, 100); // Asegúrate de que el contenido esté disponible
   }
 
-
   private initializeSlick(): void {
     const $carouselTrack = $('.carousel-track');
 
     if ($carouselTrack.length && !$carouselTrack.hasClass('slick-initialized')) {
       setTimeout(() => {
+        const slidesToShow = this.beers.length < 5 ? this.beers.length : 5; // Mostrar el número de cervezas disponibles, hasta un máximo de 5
+        const slidesToScroll = this.beers.length < 3 ? 1 : 3; // Desplazar 1 si hay menos de 3 cervezas
+
         $carouselTrack.slick({
-          infinite: true,
-          slidesToShow: 5,
-          slidesToScroll: 3,
-          centerMode: true,
-          centerPadding: '0px', // Ajusta según sea necesario
-          dots: true, // Habilita los puntos de navegación,
+          infinite: this.beers.length > 1, // Desactivar infinite si solo hay 1 cerveza
+          slidesToShow: slidesToShow,
+          slidesToScroll: slidesToScroll,
+          centerMode: this.beers.length > 1, // Solo centrar si hay más de 1 cerveza
+          centerPadding: '0px',
+          dots: this.beers.length > 1, // Desactivar puntos de navegación si solo hay 1 cerveza
           prevArrow: '.carousel-button.left',
           nextArrow: '.carousel-button.right',
           responsive: [
             {
               breakpoint: 1024,
               settings: {
-                slidesToShow: 3,
-                slidesToScroll: 1
+                slidesToShow: Math.min(slidesToShow, 3), // Ajustar según el tamaño de pantalla
+                slidesToScroll: Math.min(slidesToScroll, 1)
               }
             },
             {
               breakpoint: 600,
               settings: {
-                slidesToShow: 2,
+                slidesToShow: Math.min(slidesToShow, 2),
                 slidesToScroll: 1
               }
             },
