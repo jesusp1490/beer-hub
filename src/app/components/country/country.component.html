@@ -1,20 +1,27 @@
 <div class="country-container" *ngIf="countryName && countryFlagUrl">
-  <div class="title">
-    <h1>Brands from {{ countryName }}</h1>
-    <img [src]="countryFlagUrl" alt="{{ countryName }} flag" class="flag-image" />
+
+  <div class="country-brands">
+    <div class="country-title">
+      <h1>Brands from {{ countryName }}</h1>
+      <img [src]="countryFlagUrl" alt="{{ countryName }} flag" class="country-flag-image" />
+    </div>
+     <p class="country-description">Select a brand to know more about their beers.</p>
   </div>
 
-  <p>Select a brand to know more about their beers.</p>
+  <div class="country-carousel-container">
+    <button (click)="prevPage()" [disabled]="page === 0" class="carousel-button left"></button>
 
-  <div class="carousel-container">
-    <button class="carousel-button left">‹</button>
-
-    <div class="carousel-track">
-      <div *ngFor="let brand of brands" class="carousel-item">
-        <img [src]="brand.logoUrl" alt="{{ brand.name }}" class="brand-logo" (click)="selectBrand(brand.brandId)" />
+    <div class="country-carousel">
+      <div class="country-carousel-track">
+        <div class="country-carousel-row" *ngFor="let row of getRows()">
+          <div *ngFor="let brand of row" class="country-carousel-item">
+            <img [src]="brand.logoUrl" alt="{{ brand.name }}" class="country-brand-logo"
+              (click)="selectBrand(brand.brandId)" />
+          </div>
+        </div>
       </div>
     </div>
 
-    <button class="carousel-button right"></button>
+    <button (click)="nextPage()" [disabled]="!hasMoreBrands" class="carousel-button right"></button>
   </div>
 </div>
