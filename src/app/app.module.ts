@@ -24,6 +24,7 @@ import { CommonModule } from '@angular/common';
 import { BeersModule } from './components/beers/beers.module';
 import { SlickCarouselModule } from 'ngx-slick-carousel';
 
+
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
 }

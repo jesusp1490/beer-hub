@@ -4,6 +4,7 @@ import { BeersComponent } from './beers.component';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BeerDetailsComponent } from '../beer-details/beer-details.component'; 
+import { SlickCarouselModule } from 'ngx-slick-carousel';
 
 @NgModule({
   declarations: [
@@ -13,6 +14,7 @@ import { BeerDetailsComponent } from '../beer-details/beer-details.component';
   imports: [
     CommonModule, 
     FormsModule,
+    SlickCarouselModule,
     RouterModule.forChild([
       { path: '', component: BeersComponent },
       { path: 'country/:country/brands/:brandId/beers/:beerId', component: BeerDetailsComponent }

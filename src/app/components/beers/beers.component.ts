@@ -18,6 +18,56 @@ export class BeersComponent implements OnInit {
   private countryId: string = '';
   private brandId: string = '';
 
+  // Configuración para Slick Slider
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.initializeSlick();
+    }, 100); // Asegúrate de que el contenido esté disponible
+  }
+
+
+  private initializeSlick(): void {
+    const $carouselTrack = $('.carousel-track');
+
+    if ($carouselTrack.length && !$carouselTrack.hasClass('slick-initialized')) {
+      setTimeout(() => {
+        $carouselTrack.slick({
+          infinite: true,
+          slidesToShow: 5,
+          slidesToScroll: 3,
+          centerMode: true,
+          centerPadding: '0px', // Ajusta según sea necesario
+          dots: true, // Habilita los puntos de navegación,
+          prevArrow: '.carousel-button.left',
+          nextArrow: '.carousel-button.right',
+          responsive: [
+            {
+              breakpoint: 1024,
+              settings: {
+                slidesToShow: 3,
+                slidesToScroll: 1
+              }
+            },
+            {
+              breakpoint: 600,
+              settings: {
+                slidesToShow: 2,
+                slidesToScroll: 1
+              }
+            },
+            {
+              breakpoint: 480,
+              settings: {
+                slidesToShow: 1,
+                slidesToScroll: 1
+              }
+            }
+          ]
+        });
+      }, 200);
+    }
+  }
+
   constructor(
     private route: ActivatedRoute,
     private firestore: AngularFirestore,
@@ -60,28 +110,9 @@ export class BeersComponent implements OnInit {
     this.visibleBeers = this.beers.slice(start, end);
   }
 
-  prevPage(): void {
-    if (this.page > 0) {
-      this.page--;
-      this.updateVisibleBeers();
-    }
-  }
-
-  nextPage(): void {
-    if ((this.page + 1) * this.pageSize < this.beers.length) {
-      this.page++;
-      this.updateVisibleBeers();
-    }
-  }
-
   selectBeer(beerId: string): void {
-  console.log('Selecting beer with ID:', beerId); // Verifica que el ID es correcto
-  const route = `/country/${this.countryId}/brands/${this.brandId}/beers/${beerId}`;
-  this.router.navigate([route]);
-}
-
-
-  get hasMoreBeers(): boolean {
-    return (this.page + 1) * this.pageSize < this.beers.length;
+    console.log('Selecting beer with ID:', beerId); // Verifica que el ID es correcto
+    const route = `/country/${this.countryId}/brands/${this.brandId}/beers/${beerId}`;
+    this.router.navigate([route]);
   }
 }
