@@ -6,6 +6,7 @@ import { Beer } from '../beers/beers.interface';
 import { Brand } from '../country/brand.interface';
 import { Country } from '../country/country.interface';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-beer-details',
@@ -21,12 +22,15 @@ export class BeerDetailsComponent implements OnInit {
   countryMapUrl: string = '';
   userRating: number | null = null;
   userId: string | null = null;
+  favoriteIconUrl: string = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-crown.webp?alt=media&token=d6a7a1e5-1dcb-4c2d-8f34-87df6a9d2548'; // Default icon URL
+  showRegisterModal: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
     private firestore: AngularFirestore,
     private location: Location,
-    private afAuth: AngularFireAuth
+    private afAuth: AngularFireAuth,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -60,6 +64,9 @@ export class BeerDetailsComponent implements OnInit {
           const userRating = beer.rating[this.userId];
           this.userRating = userRating !== undefined ? userRating : null;
         }
+
+        // Update favorite icon after beer data is loaded
+        this.updateFavoriteIcon();
       }
     });
   }
@@ -120,5 +127,52 @@ export class BeerDetailsComponent implements OnInit {
     });
   }
 
+  toggleFavorite(): void {
+    if (!this.userId) {
+      this.showRegisterModal = true;
+      return;
+    }
 
+    const favoriteRef = this.firestore.collection('users').doc(this.userId).collection('favorites').doc(this.beer?.id);
+
+    favoriteRef.get().subscribe(doc => {
+      if (doc.exists) {
+        // Eliminar de favoritos
+        favoriteRef.delete().then(() => {
+          this.favoriteIconUrl = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-corwn.webp?alt=media&token=deb3f900-e608-4712-9b9a-bd4410852187'; // Default icon URL
+        });
+      } else {
+        // Añadir a favoritos
+        favoriteRef.set({}).then(() => {
+          this.favoriteIconUrl = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-crown.webp?alt=media&token=d52cdf3b-f0b6-4432-a921-7a16bfd62803'; // Filled icon URL
+        });
+      }
+    });
+  }
+
+  updateFavoriteIcon(): void {
+    if (!this.beer?.id || !this.userId) {
+      // Set default icon if no user is logged in or beer ID is missing
+      this.favoriteIconUrl = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-corwn.webp?alt=media&token=deb3f900-e608-4712-9b9a-bd4410852187';
+      return;
+    }
+
+    const favoriteRef = this.firestore.collection('users').doc(this.userId).collection('favorites').doc(this.beer.id);
+
+    favoriteRef.get().subscribe(doc => {
+      if (doc.exists) {
+        this.favoriteIconUrl = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-crown.webp?alt=media&token=d52cdf3b-f0b6-4432-a921-7a16bfd62803'; // Filled icon URL
+      } else {
+        this.favoriteIconUrl = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-corwn.webp?alt=media&token=deb3f900-e608-4712-9b9a-bd4410852187'; // Default icon URL
+      }
+    });
+  }
+
+  closeRegisterModal(): void {
+    this.showRegisterModal = false;
+  }
+
+  goToRegister(): void {
+    this.router.navigate(['/signup']);
+  }
 }

@@ -191,6 +191,20 @@
     }
 }
 
+.back-button {
+    background-color: transparent;
+    color: $color-secondary;
+    border: none;
+    font-size: 1.8rem;
+    // margin-bottom: -1000px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+        color: $color-text;
+    }
+}
+
 .rating-section {
     margin-top: 20px;
 
@@ -220,19 +234,52 @@
             }
         }
     }
+}
 
-    .back-button {
-        background-color: transparent;
-        color: $color-secondary;
-        border: none;
-        margin-left: -12px;
-        margin-top: 752px;
-        font-size: 1.8rem;
+.favorite-section {
+    margin-top: 1rem;
+
+    .favorite-icon {
         cursor: pointer;
-        transition: background-color 0.3s ease;
-
-        &:hover {
-            color: $color-text;
-        }
+        width: 40px;
+        height: 40px;
     }
 }
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 5px;
+    position: relative;
+    width: 80%;
+    max-width: 400px;
+}
+
+.modal-content .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.modal-content h2 {
+    margin: 0;
+}
+
+.modal-content p {
+    margin: 1rem 0;
+}
+

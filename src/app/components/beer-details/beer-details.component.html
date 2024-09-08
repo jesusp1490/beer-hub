@@ -1,9 +1,12 @@
 <div class="beer-details-container">
-  <button class="back-button" (click)="goBack()">
-    <i class="fa-solid fa-arrow-left"></i>
-  </button>
+    
   <!-- Parte derecha -->
   <div class="right-section">
+    <!-- Favorito -->
+    <div class="favorite-section">
+      <img [src]="favoriteIconUrl" (click)="toggleFavorite()" alt="Favorite Icon" class="favorite-icon"/>
+    </div>
+
     <div class="upper-grid">
       <!-- Cuadro 1: Logo de la marca -->
       <div class="upper-grid-item logo">
@@ -62,17 +65,31 @@
   </div>
 
   <div class="rating-section">
-      <h2>Average Rating: {{ beer?.averageRating }} </h2>
-      <div *ngIf="userId" class="user-rating">
-        <h3>Rate this beer:</h3>
-        <div class="beer-rate">
-          <img
+    <h2>Average Rating: {{ beer?.averageRating }} </h2>
+    <div *ngIf="userId" class="user-rating">
+      <h3>Rate this beer:</h3>
+      <div class="beer-rate">
+        <img
           *ngFor="let i of [1, 2, 3, 4, 5]"
           [src]="i <= (userRating || 0) ? 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-beer.webp?alt=media&token=a0cbaf82-83ef-41e7-abc5-36a140d10119' : 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-beer.webp?alt=media&token=65bd916f-f7dc-4b23-9efb-45bbdb627ce9'"
           (click)="rateBeer(i)"
           alt="beer icon"
-          />
-        </div>
+        />
       </div>
     </div>
   </div>
+
+  <!-- Modal de registro -->
+  <div *ngIf="showRegisterModal" class="modal">
+    <div class="modal-content">
+      <span (click)="closeRegisterModal()" class="close">&times;</span>
+      <h2>Please Register to Save Favorites</h2>
+      <p>You need to be registered to use the favorite feature. Please register to continue.</p>
+      <button (click)="goToRegister()">Register</button>
+    </div>
+  </div>
+</div>
+
+<button class="back-button" (click)="goBack()">
+  <i class="fa-solid fa-arrow-left"></i>
+</button>
