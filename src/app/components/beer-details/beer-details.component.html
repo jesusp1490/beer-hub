@@ -1,4 +1,7 @@
 <div class="beer-details-container">
+  <button class="back-button" (click)="goBack()">
+    <i class="fa-solid fa-arrow-left"></i>
+  </button>
   <!-- Parte derecha -->
   <div class="right-section">
     <div class="upper-grid">
@@ -31,30 +34,31 @@
     </div>
   </div>
 
-
   <!-- Parte izquierda -->
- <div class="left-section">
-  <!-- Cuadro 1: Imagen de la cerveza -->
-  <div class="beer-image">
-    <img *ngIf="beer?.beerImageUrl" [src]="beer?.beerImageUrl" alt="{{ beer?.name }} image" />
-  </div>
+  <div class="left-section">
+    <!-- Cuadro 1: Imagen de la cerveza -->
+    <div class="beer-image">
+      <img *ngIf="beer?.beerImageUrl" [src]="beer?.beerImageUrl" alt="{{ beer?.name }} image" />
+    </div>
 
-  <!-- Cuadro 2: Ingredientes -->
-  <div class="ingredients-container">
-    <div *ngFor="let column of splitIngredients(beer?.ingredients ?? []); let i = index" class="ingredient-column">
-      <div class="ingredient-item" *ngFor="let ingredient of column">
-        <div class="ingredient-content">
-          <div class="ingredient-icon">
-            <img [src]="ingredient.ingImageUrl" alt="{{ ingredient.name }} icon" />
+    <!-- Cuadro 2: Ingredientes -->
+    <div class="ingredients-container">
+      <div *ngFor="let column of splitIngredients(beer?.ingredients ?? []); let i = index" class="ingredient-column">
+        <div class="ingredient-item" *ngFor="let ingredient of column">
+          <div class="ingredient-content">
+            <div class="ingredient-icon">
+              <img [src]="ingredient.ingImageUrl" alt="{{ ingredient.name }} icon" />
+            </div>
+            <p class="ingredient-name">{{ ingredient.name }}</p>
           </div>
-          <p class="ingredient-name">{{ ingredient.name }}</p>
         </div>
-      </div>
-      <!-- Place ABV under the first column -->
-      <div *ngIf="i === 0" class="abv">
-        <h2>ABV</h2>
-        <span>{{ beer?.ABV }}</span>
+        <!-- Place ABV under the first column -->
+        <div *ngIf="i === 0" class="abv">
+          <h2>ABV</h2>
+          <span>{{ beer?.ABV }}</span>
+        </div>
       </div>
     </div>
   </div>
-</div>
+
+  

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { Location } from '@angular/common';
 import { Beer } from './beers.interface';
 import { Brand } from '../country/brand.interface';
 
@@ -73,7 +74,8 @@ export class BeersComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private firestore: AngularFirestore,
-    private router: Router
+    private router: Router,
+    private location: Location
   ) { }
 
   ngOnInit(): void {
@@ -83,6 +85,10 @@ export class BeersComponent implements OnInit {
       this.loadBrandData(this.brandId);
       this.loadBeers(this.countryId, this.brandId);
     });
+  }
+
+  goBack(): void {
+    this.location.back(); // Navega hacia la página anterior
   }
 
   private loadBrandData(brandId: string): void {

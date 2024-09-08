@@ -1,11 +1,13 @@
 @import 'src/styles/_variables.scss';
 
 .beers-container {
+  
   .brand-header {
     text-align: center;
     font-family: $font-family-primary;
     color: $color-hover;
     width: 100%;
+
   }
 
   .no-beers-message,
@@ -19,6 +21,7 @@
     height: 100%;
     padding: 10;
     margin: 0 auto;
+
   }
 
   .carousel-track {
@@ -27,6 +30,7 @@
     justify-content: center;
     margin-left: 180px;
     width: 80%;
+
   }
 
   .slick-slider .slick-track,
@@ -129,5 +133,19 @@
 
   .slick-dots li.slick-active button:before {
     opacity: 0;
+  }
+
+  .back-button {
+    background-color: transparent;
+    color: $color-secondary;
+    border: none;
+    margin-left: 5px;
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      color: $color-text;
+    }
   }
 }

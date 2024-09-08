@@ -8,14 +8,17 @@
   </div>
 
   <div class="carousel-container">
-    <button *ngIf="beers.length > 1" class="carousel-button left">‹</button>
+    
+    <button *ngIf="beers.length > 1" class="carousel-button left"></button>
 
     <div class="carousel-track">
       <div *ngFor="let beer of beers" class="carousel-item">
         <img [src]="beer.beerImageUrl" alt="{{ beer.name }} image" class="beer-image" (click)="selectBeer(beer.id)" />
       </div>
     </div>
-
+    <button class="back-button" (click)="goBack()">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
     <button *ngIf="beers.length > 1" class="carousel-button right"></button>
   </div>
 </div>
