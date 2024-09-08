@@ -61,4 +61,18 @@
     </div>
   </div>
 
-  
+  <div class="rating-section">
+      <h2>Average Rating: {{ beer?.averageRating }} </h2>
+      <div *ngIf="userId" class="user-rating">
+        <h3>Rate this beer:</h3>
+        <div class="beer-rate">
+          <img
+          *ngFor="let i of [1, 2, 3, 4, 5]"
+          [src]="i <= (userRating || 0) ? 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-beer.webp?alt=media&token=a0cbaf82-83ef-41e7-abc5-36a140d10119' : 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-beer.webp?alt=media&token=65bd916f-f7dc-4b23-9efb-45bbdb627ce9'"
+          (click)="rateBeer(i)"
+          alt="beer icon"
+          />
+        </div>
+      </div>
+    </div>
+  </div>

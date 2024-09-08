@@ -14,6 +14,6 @@ export interface Beer {
   brandId: string;
   countryId: string;
   averageRating: number;
-  ratings: Record<string, number>;
+  rating: Record<string, number>;
   favoriteUsers: Record<string, boolean>;
 }
