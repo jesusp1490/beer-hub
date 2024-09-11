@@ -1,11 +1,13 @@
 <div class="country-container" *ngIf="countryName && countryFlagUrl">
-
   <div class="country-brands">
     <div class="country-title">
       <h1>Brands from {{ countryName }}</h1>
       <img [src]="countryFlagUrl" alt="{{ countryName }} flag" class="country-flag-image" />
     </div>
-     <p class="country-description">Select a brand to know more about their beers.</p>
+    <p class="country-description">Select a brand to know more about their beers.</p>
+
+    <!-- Barra de búsqueda -->
+    <input type="text" placeholder="Search brands" [(ngModel)]="searchTerm" (input)="filterBrands()" class="search-bar" />
   </div>
 
   <div class="country-carousel-container">

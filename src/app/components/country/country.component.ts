@@ -15,10 +15,12 @@ export class CountryComponent implements OnInit {
   countryName: string = '';
   countryFlagUrl: string = '';
   brands: Brand[] = [];
-  private countryId: string = ''; 
+  filteredBrands: Brand[] = []; // Array para las marcas filtradas
+  private countryId: string = '';
   page: number = 0;
-  pageSize: number = 10; 
+  pageSize: number = 10;
   visibleBrands: Brand[] = [];
+  searchTerm: string = ''; // Término de búsqueda
 
   constructor(
     private route: ActivatedRoute,
@@ -50,6 +52,7 @@ export class CountryComponent implements OnInit {
       .valueChanges()
       .subscribe(brands => {
         this.brands = brands;
+        this.filteredBrands = brands; // Inicialmente, no hay filtro
         this.updateVisibleBrands();
       });
   }
@@ -57,7 +60,7 @@ export class CountryComponent implements OnInit {
   private updateVisibleBrands(): void {
     const start = this.page * this.pageSize;
     const end = start + this.pageSize;
-    this.visibleBrands = this.brands.slice(start, end);
+    this.visibleBrands = this.filteredBrands.slice(start, end);
   }
 
   prevPage(): void {
@@ -68,7 +71,7 @@ export class CountryComponent implements OnInit {
   }
 
   nextPage(): void {
-    if ((this.page + 1) * this.pageSize < this.brands.length) {
+    if ((this.page + 1) * this.pageSize < this.filteredBrands.length) {
       this.page++;
       this.updateVisibleBrands();
     }
@@ -76,12 +79,11 @@ export class CountryComponent implements OnInit {
 
   selectBrand(brandId: string): void {
     const route = `/country/${this.countryId}/brands/${brandId}/beers`;
-    console.log('Navigating to:', route); // Verifica la URL generada
     this.router.navigate([route]);
   }
 
   get hasMoreBrands(): boolean {
-    return (this.page + 1) * this.pageSize < this.brands.length;
+    return (this.page + 1) * this.pageSize < this.filteredBrands.length;
   }
 
   getRows(): Brand[][] {
@@ -90,5 +92,13 @@ export class CountryComponent implements OnInit {
       rows.push(this.visibleBrands.slice(i, i + 5));
     }
     return rows;
+  }
+
+  filterBrands(): void {
+    this.filteredBrands = this.brands.filter(brand => 
+      brand.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+    this.page = 0; // Reinicia a la primera página
+    this.updateVisibleBrands();
   }
 }
