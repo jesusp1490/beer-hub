@@ -30,7 +30,6 @@
                 padding: 10px;
                 box-sizing: border-box;
                 text-align: center;
-
             }
 
             .logo {
@@ -73,7 +72,6 @@
                 img {
                     width: 40px;
                     height: auto;
-
                 }
 
                 h2 {
@@ -123,7 +121,6 @@
         gap: 80px;
         margin-right: 100px;
 
-
         .beer-image {
 
             img {
@@ -148,7 +145,6 @@
 
         .ingredient-item {
             margin-bottom: 60px;
-
         }
 
         .ingredient-content {
@@ -195,7 +191,6 @@
     color: $color-secondary;
     border: none;
     font-size: 1.8rem;
-    // margin-bottom: -1000px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 
@@ -236,12 +231,20 @@
 }
 
 .favorite-section {
-    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 
     .favorite-icon {
         cursor: pointer;
-        width: 40px;
-        height: 40px;
+        width: 45px;
+        height: 45px;
+        margin-bottom: 10px;
+    }
+
+    .beer-name {
+        font-size: 2rem;
+        margin: 0;
     }
 }
 
@@ -281,4 +284,3 @@
 .modal-content p {
     margin: 1rem 0;
 }
-

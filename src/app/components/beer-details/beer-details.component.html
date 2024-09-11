@@ -2,8 +2,9 @@
     
   <!-- Parte derecha -->
   <div class="right-section">
-    <!-- Favorito -->
+    <!-- Favorito y Nombre de la Cerveza -->
     <div class="favorite-section">
+      <h1 class="beer-name">{{ beer?.name }}</h1>
       <img [src]="favoriteIconUrl" (click)="toggleFavorite()" alt="Favorite Icon" class="favorite-icon"/>
     </div>
 
