@@ -3,6 +3,9 @@
     <h1>{{ brandName }}</h1>
   </div>
 
+   <!-- Filtros -->
+  <app-filter-search></app-filter-search>
+
   <div *ngIf="beers.length === 0" class="no-beers-message">
     <p>No beers found for this brand.</p>
   </div>

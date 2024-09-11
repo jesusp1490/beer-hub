@@ -26,4 +26,16 @@ export class BeerService {
   getBeer(beerId: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/beers/${beerId}`);
   }
+
+  getFilteredBeers(filters: any): Observable<any> {
+  let params: any = {};
+  if (filters.searchTerm) params.searchTerm = filters.searchTerm;
+  if (filters.beerType) params.beerType = filters.beerType;
+  if (filters.abvRange) params.abvRange = filters.abvRange;
+  if (filters.ingredient) params.ingredient = filters.ingredient;
+
+  return this.http.get(`${this.apiUrl}/beers`, { params });
+}
+
+
 }

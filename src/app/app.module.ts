@@ -23,6 +23,8 @@ import { CountryComponent } from './components/country/country.component';
 import { CommonModule } from '@angular/common';
 import { BeersModule } from './components/beers/beers.module';
 import { SlickCarouselModule } from 'ngx-slick-carousel';
+import { ReactiveFormsModule } from '@angular/forms';
+import { FiltersSearchComponent } from './components/filters-search/filters-search.component';
 
 
 export function HttpLoaderFactory(http: HttpClient) {
@@ -35,7 +37,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     NavbarComponent,
     MapComponent,
     LogInComponent,
-    CountryComponent
+    CountryComponent,
+    FiltersSearchComponent
   ],
   imports: [
     HttpClientModule,
@@ -57,7 +60,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     AngularFirestoreModule,
     CommonModule,
     BeersModule,
-    SlickCarouselModule
+    SlickCarouselModule,
+    ReactiveFormsModule,
   ],
   providers: [AuthService],
   bootstrap: [AppComponent],

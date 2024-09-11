@@ -1,0 +1,23 @@
+<form [formGroup]="filtersForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label for="searchTerm">Buscar cervezas:</label>
+    <input id="searchTerm" formControlName="searchTerm" placeholder="Buscar cervezas" />
+  </div>
+  <div>
+    <label for="beerType">Tipo de cerveza:</label>
+    <select id="beerType" formControlName="beerType">
+      <option value="">--Seleccione un tipo--</option>
+      <option *ngFor="let type of beerTypes" [value]="type">{{ type }}</option>
+    </select>
+  </div>
+  <div>
+    <label for="abvRange">ABV (%):</label>
+    <input id="abvRange" type="range" formControlName="abvRange" min="0" max="20" />
+    <span>{{ filtersForm.get('abvRange')?.value }}%</span>
+  </div>
+  <div>
+    <label for="ingredient">Ingrediente:</label>
+    <input id="ingredient" formControlName="ingredient" placeholder="Buscar por ingrediente" />
+  </div>
+  <button type="submit">Buscar</button>
+</form>

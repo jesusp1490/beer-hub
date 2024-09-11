@@ -4,8 +4,8 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Location } from '@angular/common';
 import { Beer } from './beers.interface';
 import { Brand } from '../country/brand.interface';
-// import * as $ from 'jquery';
-import 'slick-carousel';
+import { FiltersSearchComponent } from '../filters-search/filters-search.component';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-beers',
@@ -15,18 +15,28 @@ import 'slick-carousel';
 export class BeersComponent implements OnInit, AfterViewInit {
   brandName: string = '';
   beers: Beer[] = [];
+  filteredBeers: Beer[] = [];
   visibleBeers: Beer[] = [];
   page: number = 0;
-  pageSize: number = 5; 
+  pageSize: number = 5;
   private countryId: string = '';
   private brandId: string = '';
+  filtersForm: FormGroup;
 
   constructor(
     private route: ActivatedRoute,
     private firestore: AngularFirestore,
     private router: Router,
-    private location: Location
-  ) { }
+    private location: Location,
+    private fb: FormBuilder
+  ) {
+    this.filtersForm = this.fb.group({
+      searchTerm: [''],
+      beerType: [''],
+      abvRange: [10],
+      ingredient: ['']
+    });
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -35,12 +45,17 @@ export class BeersComponent implements OnInit, AfterViewInit {
       this.loadBrandData(this.brandId);
       this.loadBeers(this.countryId, this.brandId);
     });
+
+    // Subscribe to filter changes
+    this.filtersForm.valueChanges.subscribe(() => {
+      this.applyFilters();
+    });
   }
 
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.initializeSlick();
-    }, 200); 
+    }, 200);
   }
 
   private initializeSlick(): void {
@@ -89,7 +104,7 @@ export class BeersComponent implements OnInit, AfterViewInit {
   }
 
   goBack(): void {
-    this.location.back(); 
+    this.location.back();
   }
 
   private loadBrandData(brandId: string): void {
@@ -115,7 +130,7 @@ export class BeersComponent implements OnInit, AfterViewInit {
       .subscribe(
         beers => {
           this.beers = beers;
-          this.updateVisibleBeers();
+          this.applyFilters(); // Apply filters to the loaded beers
         },
         error => {
           console.error('Error loading beers:', error);
@@ -123,14 +138,30 @@ export class BeersComponent implements OnInit, AfterViewInit {
       );
   }
 
+  private applyFilters(): void {
+    const { searchTerm, beerType, abvRange, ingredient } = this.filtersForm.value;
+
+    this.filteredBeers = this.beers.filter(beer => {
+      const matchesSearchTerm = searchTerm ? beer.name.toLowerCase().includes(searchTerm.toLowerCase()) : true;
+      const matchesBeerType = beerType ? beer.beerType === beerType : true;
+      const matchesAbv = abvRange ? beer.ABV <= abvRange : true;
+      const matchesIngredient = ingredient ? beer.ingredients.some(ing => ing.name.toLowerCase().includes(ingredient.toLowerCase())) : true;
+
+      return matchesSearchTerm && matchesBeerType && matchesAbv && matchesIngredient;
+    });
+
+    this.updateVisibleBeers();
+  }
+
+
   private updateVisibleBeers(): void {
     const start = this.page * this.pageSize;
     const end = start + this.pageSize;
-    this.visibleBeers = this.beers.slice(start, end);
+    this.visibleBeers = this.filteredBeers.slice(start, end);
   }
 
   selectBeer(beerId: string): void {
-    console.log('Selecting beer with ID:', beerId); 
+    console.log('Selecting beer with ID:', beerId);
     const route = `/country/${this.countryId}/brands/${this.brandId}/beers/${beerId}`;
     this.router.navigate([route]);
   }
