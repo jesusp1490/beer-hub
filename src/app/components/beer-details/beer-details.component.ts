@@ -59,13 +59,11 @@ export class BeerDetailsComponent implements OnInit {
         this.loadBrandData(beer.brandId);
         this.loadCountryData(beer.countryId);
 
-        // Load user rating if user is logged in
         if (this.userId && beer.rating) {
           const userRating = beer.rating[this.userId];
           this.userRating = userRating !== undefined ? userRating : null;
         }
 
-        // Update favorite icon after beer data is loaded
         this.updateFavoriteIcon();
       }
     });
@@ -152,7 +150,6 @@ export class BeerDetailsComponent implements OnInit {
 
   updateFavoriteIcon(): void {
     if (!this.beer?.id || !this.userId) {
-      // Set default icon if no user is logged in or beer ID is missing
       this.favoriteIconUrl = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-corwn.webp?alt=media&token=deb3f900-e608-4712-9b9a-bd4410852187';
       return;
     }

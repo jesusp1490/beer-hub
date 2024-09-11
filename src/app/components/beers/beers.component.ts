@@ -5,7 +5,7 @@ import { Location } from '@angular/common';
 import { Beer } from './beers.interface';
 import { Brand } from '../country/brand.interface';
 // import * as $ from 'jquery';
-// import 'slick-carousel';
+import 'slick-carousel';
 
 @Component({
   selector: 'app-beers',
@@ -40,7 +40,7 @@ export class BeersComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.initializeSlick();
-    }, 200); // Ensure the content is available
+    }, 200); 
   }
 
   private initializeSlick(): void {
@@ -89,7 +89,7 @@ export class BeersComponent implements OnInit, AfterViewInit {
   }
 
   goBack(): void {
-    this.location.back(); // Navigate to the previous page
+    this.location.back(); 
   }
 
   private loadBrandData(brandId: string): void {
@@ -130,7 +130,7 @@ export class BeersComponent implements OnInit, AfterViewInit {
   }
 
   selectBeer(beerId: string): void {
-    console.log('Selecting beer with ID:', beerId); // Verify the ID is correct
+    console.log('Selecting beer with ID:', beerId); 
     const route = `/country/${this.countryId}/brands/${this.brandId}/beers/${beerId}`;
     this.router.navigate([route]);
   }
