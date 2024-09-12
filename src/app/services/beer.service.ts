@@ -1,41 +1,71 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { AngularFirestore, CollectionReference } from '@angular/fire/compat/firestore';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { Beer } from '../components/beers/beers.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BeerService {
-  private apiUrl = 'https://your-firebase-function-url/api';
+  constructor(private firestore: AngularFirestore) {}
 
-  constructor(private http: HttpClient) { }
+  getFilteredBeers(filters: any): Observable<Beer[]> {
+    return new Observable(observer => {
+      let query: CollectionReference<Beer> = this.firestore.collection('beers').ref as CollectionReference<Beer>;
 
-  getCountries(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/countries`);
+      // Apply filter by name
+      if (filters.name) {
+        const name = filters.name.trim().toLowerCase();
+        if (name) {
+          query = query.where('name', '==', name) as CollectionReference<Beer>;
+        }
+      }
+
+      // Apply filter by brand
+      if (filters.brand) {
+        const brand = filters.brand.trim().toLowerCase();
+        if (brand) {
+          query = query.where('brand', '==', brand) as CollectionReference<Beer>;
+        }
+      }
+
+      // Apply filter by ABV
+      if (filters.abv) {
+        const abv = parseFloat(filters.abv);
+        if (!isNaN(abv)) {
+          query = query.where('abv', '==', abv) as CollectionReference<Beer>;
+        }
+      }
+
+      // Apply filter by beer type
+      if (filters.beerType) {
+        const beerType = filters.beerType.trim().toLowerCase();
+        if (beerType) {
+          query = query.where('beerType', '==', beerType) as CollectionReference<Beer>;
+        }
+      }
+
+      // Apply filter by ingredient
+      if (filters.ingredient) {
+        const ingredient = filters.ingredient.trim().toLowerCase();
+        if (ingredient) {
+          query = query.where('ingredients', 'array-contains', { name: ingredient }) as CollectionReference<Beer>;
+        }
+      }
+
+      // Execute the query
+      query.get().then(snapshot => {
+        const beers: Beer[] = [];
+        snapshot.forEach(doc => {
+          const data = doc.data() as Beer;
+          beers.push({ ...data, id: doc.id });
+        });
+        observer.next(beers);
+        observer.complete();
+      }).catch(error => {
+        console.error('Error al obtener cervezas filtradas', error);
+        observer.error(error);
+      });
+    });
   }
-
-  getBrands(countryId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/countries/${countryId}/brands`);
-  }
-
-  getBeers(brandId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/brands/${brandId}/beers`);
-  }
-
-  getBeer(beerId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/beers/${beerId}`);
-  }
-
-  getFilteredBeers(filters: any): Observable<any> {
-  let params: any = {};
-  if (filters.searchTerm) params.searchTerm = filters.searchTerm;
-  if (filters.beerType) params.beerType = filters.beerType;
-  if (filters.abvRange) params.abvRange = filters.abvRange;
-  if (filters.ingredient) params.ingredient = filters.ingredient;
-
-  return this.http.get(`${this.apiUrl}/beers`, { params });
-}
-
-
 }

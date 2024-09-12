@@ -24,7 +24,7 @@ import { CommonModule } from '@angular/common';
 import { BeersModule } from './components/beers/beers.module';
 import { SlickCarouselModule } from 'ngx-slick-carousel';
 import { ReactiveFormsModule } from '@angular/forms';
-import { FiltersSearchComponent } from './components/filters-search/filters-search.component';
+import { FilterSearchComponent } from './components/filters-search/filters-search.component';
 
 
 export function HttpLoaderFactory(http: HttpClient) {
@@ -38,7 +38,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     MapComponent,
     LogInComponent,
     CountryComponent,
-    FiltersSearchComponent
+    FilterSearchComponent
   ],
   imports: [
     HttpClientModule,

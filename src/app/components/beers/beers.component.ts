@@ -4,7 +4,7 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Location } from '@angular/common';
 import { Beer } from './beers.interface';
 import { Brand } from '../country/brand.interface';
-import { FiltersSearchComponent } from '../filters-search/filters-search.component';
+import { FilterSearchComponent } from '../filters-search/filters-search.component';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({

@@ -1,23 +1,23 @@
-<form [formGroup]="filtersForm" (ngSubmit)="onSubmit()">
-  <div>
-    <label for="searchTerm">Buscar cervezas:</label>
-    <input id="searchTerm" formControlName="searchTerm" placeholder="Buscar cervezas" />
-  </div>
-  <div>
-    <label for="beerType">Tipo de cerveza:</label>
-    <select id="beerType" formControlName="beerType">
-      <option value="">--Seleccione un tipo--</option>
+<div class="filters-container">
+  <form [formGroup]="filtersForm" (ngSubmit)="onSubmit()">
+    <!-- Inputs para el filtro -->
+    <input formControlName="searchTerm" placeholder="Search Term">
+    <select formControlName="beerType">
       <option *ngFor="let type of beerTypes" [value]="type">{{ type }}</option>
     </select>
+    <input type="range" formControlName="abvRange" min="0" max="100" step="1">
+    <input formControlName="ingredient" placeholder="Ingredient">
+
+    <button type="submit">Filter Beers</button>
+  </form>
+</div>
+
+<div class="beers-list" *ngIf="filteredBeers.length > 0">
+  <div *ngFor="let beer of filteredBeers">
+    <p>{{ beer.name }} ({{ beer.ABV }}% ABV) - {{ beer.beerType }}</p>
   </div>
-  <div>
-    <label for="abvRange">ABV (%):</label>
-    <input id="abvRange" type="range" formControlName="abvRange" min="0" max="20" />
-    <span>{{ filtersForm.get('abvRange')?.value }}%</span>
-  </div>
-  <div>
-    <label for="ingredient">Ingrediente:</label>
-    <input id="ingredient" formControlName="ingredient" placeholder="Buscar por ingrediente" />
-  </div>
-  <button type="submit">Buscar</button>
-</form>
+</div>
+
+<div *ngIf="filteredBeers.length === 0">
+  <p>No beers found matching your filters.</p>
+</div>
