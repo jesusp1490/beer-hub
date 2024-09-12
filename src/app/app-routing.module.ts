@@ -9,15 +9,16 @@ import { ContactComponent } from './components/contact/contact.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { LogInComponent } from './components/log-in/log-in.component';
+import { HomeComponent } from './components/home/home.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
-  { path: 'home', component: MapComponent },
+  { path: 'home', component: HomeComponent }, // Página de inicio con filtros
+  { path: 'map', component: MapComponent }, // Página de mapa
   { path: 'about', component: AboutComponent },
   { path: 'contact', component: ContactComponent },
   { path: 'profile', component: ProfileComponent },
   { path: 'beers', component: BeersComponent },
-  { path: 'map', component: MapComponent },
   { path: 'country/:country', component: CountryComponent },
   { path: 'country/:country/brands/:brandId', component: BeersComponent },
   { path: 'country/:country/brands/:brandId/beers', component: BeersComponent },
@@ -26,6 +27,7 @@ const routes: Routes = [
   { path: 'login', component: LogInComponent },
   { path: '**', redirectTo: '' }
 ];
+
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

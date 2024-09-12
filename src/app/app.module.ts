@@ -6,6 +6,7 @@ import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { HomeComponent } from './components/home/home.component';
 import { ProfileModule } from './components/profile/profile.module';
 import { AboutComponent } from './components/about/about.component';
 import { ContactComponent } from './components/contact/contact.component';
@@ -38,7 +39,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     MapComponent,
     LogInComponent,
     CountryComponent,
-    FilterSearchComponent
+    FilterSearchComponent,
+    HomeComponent
   ],
   imports: [
     HttpClientModule,
