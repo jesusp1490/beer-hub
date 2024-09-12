@@ -13,7 +13,9 @@
 
 <div class="beers-list" *ngIf="filteredBeers.length > 0">
   <div *ngFor="let beer of filteredBeers">
-    <p>{{ beer.name }} ({{ beer.ABV }}% ABV) - {{ beer.beerType }} | 
+    <p>
+      <img [src]="beer.beerImageUrl" alt="{{ beer.name }}">
+      {{ beer.name }} ({{ beer.ABV }}% ABV) - {{ beer.beerType }} |
       <span *ngFor="let ingredient of beer.ingredients; let i = index">
         {{ ingredient.name }}<span *ngIf="i < beer.ingredients.length - 1">, </span>
       </span>
@@ -21,6 +23,6 @@
   </div>
 </div>
 
-<div *ngIf="filteredBeers.length === 0">
+<div *ngIf="filteredBeers.length === 0" class="no-results">
   <p>No beers found matching your filters.</p>
 </div>
