@@ -1,20 +1,23 @@
-<div class="filters-container">
-  <form [formGroup]="filtersForm" (ngSubmit)="onSubmit()">
-    <!-- Inputs para el filtro -->
-    <input formControlName="searchTerm" placeholder="Search Term">
+<div class="filter-container">
+  <form [formGroup]="filtersForm" (ngSubmit)="applyFilters()">
+    <input formControlName="name" placeholder="Search by name">
+    <input formControlName="brand" placeholder="Search by brand">
     <select formControlName="beerType">
       <option *ngFor="let type of beerTypes" [value]="type">{{ type }}</option>
     </select>
     <input type="range" formControlName="abvRange" min="0" max="100" step="1">
-    <input formControlName="ingredient" placeholder="Ingredient">
-
+    <input formControlName="ingredient" placeholder="Search by ingredient">
     <button type="submit">Filter Beers</button>
   </form>
 </div>
 
 <div class="beers-list" *ngIf="filteredBeers.length > 0">
   <div *ngFor="let beer of filteredBeers">
-    <p>{{ beer.name }} ({{ beer.ABV }}% ABV) - {{ beer.beerType }}</p>
+    <p>{{ beer.name }} ({{ beer.ABV }}% ABV) - {{ beer.beerType }} | 
+      <span *ngFor="let ingredient of beer.ingredients; let i = index">
+        {{ ingredient.name }}<span *ngIf="i < beer.ingredients.length - 1">, </span>
+      </span>
+    </p>
   </div>
 </div>
 

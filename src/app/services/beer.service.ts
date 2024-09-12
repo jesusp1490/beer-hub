@@ -15,41 +15,37 @@ export class BeerService {
 
       // Apply filter by name
       if (filters.name) {
-        const name = filters.name.trim().toLowerCase();
+        const name = filters.name.trim();
         if (name) {
+          console.log(`Adding filter: name == ${name}`);
           query = query.where('name', '==', name) as CollectionReference<Beer>;
         }
       }
 
       // Apply filter by brand
       if (filters.brand) {
-        const brand = filters.brand.trim().toLowerCase();
+        const brand = filters.brand.trim();
         if (brand) {
-          query = query.where('brand', '==', brand) as CollectionReference<Beer>;
+          console.log(`Adding filter: brandId == ${brand}`);
+          query = query.where('brandId', '==', brand) as CollectionReference<Beer>;
         }
       }
 
-      // Apply filter by ABV
-      if (filters.abv) {
-        const abv = parseFloat(filters.abv);
-        if (!isNaN(abv)) {
-          query = query.where('abv', '==', abv) as CollectionReference<Beer>;
+      // Apply filter by ABV (string comparison)
+      if (filters.abvRange) {
+        const abv = filters.abvRange.toString();
+        if (abv) {
+          console.log(`Adding filter: ABV <= ${abv}`);
+          query = query.where('ABV', '<=', abv) as CollectionReference<Beer>;
         }
       }
 
       // Apply filter by beer type
       if (filters.beerType) {
-        const beerType = filters.beerType.trim().toLowerCase();
+        const beerType = filters.beerType.trim();
         if (beerType) {
+          console.log(`Adding filter: beerType == ${beerType}`);
           query = query.where('beerType', '==', beerType) as CollectionReference<Beer>;
-        }
-      }
-
-      // Apply filter by ingredient
-      if (filters.ingredient) {
-        const ingredient = filters.ingredient.trim().toLowerCase();
-        if (ingredient) {
-          query = query.where('ingredients', 'array-contains', { name: ingredient }) as CollectionReference<Beer>;
         }
       }
 
@@ -60,10 +56,12 @@ export class BeerService {
           const data = doc.data() as Beer;
           beers.push({ ...data, id: doc.id });
         });
+        console.log('Query result:', beers); // Log the query result
+        // Pass the beers to the component
         observer.next(beers);
         observer.complete();
       }).catch(error => {
-        console.error('Error al obtener cervezas filtradas', error);
+        console.error('Error getting filtered beers', error);
         observer.error(error);
       });
     });

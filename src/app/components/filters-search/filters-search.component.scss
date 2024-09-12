@@ -1,0 +1,23 @@
+.filter-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-container input,
+.filter-container select,
+.filter-container button {
+    padding: 10px;
+    font-size: 16px;
+}
+
+.beers-list {
+    margin-top: 20px;
+}
+
+.beers-list div {
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
