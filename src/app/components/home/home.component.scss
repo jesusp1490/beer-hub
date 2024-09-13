@@ -44,6 +44,7 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+    cursor: pointer;
 }
 
 .section-item img {
@@ -72,55 +73,33 @@
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    transition: transform 0.2s;
 }
 
 .beer-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
 }
 
-/* Imagen de cerveza */
-.beer-card img {
-    width: 100px;
-    height: auto;
-    margin-bottom: 10px;
-}
-
-/* Información de la cerveza */
-.beer-card p {
-    margin: 0;
-    font-size: 16px;
-    color: #333;
-}
-
-/* Ingredientes */
-.beer-card .ingredients {
-    font-size: 14px;
-    color: #888;
+.ingredients {
     margin-top: 10px;
+    font-size: 14px;
+    color: #555;
 }
 
-/* Mensaje de no resultados */
-.no-results {
-    text-align: center;
-    padding: 20px;
-    color: #777;
-    font-size: 18px;
-}
-
-/* Estilo para el rango de ABV */
-.abv-range-container {
+.brands-grid {
     display: flex;
-    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px; // Ajusta según sea necesario
+}
 
-    input[type="range"] {
-        margin-right: 10px;
-    }
+.brand-card {
+    width: 150px; // Ajusta el tamaño de las tarjetas
+    cursor: pointer;
+    text-align: center;
+}
 
-    .abv-value {
-        font-size: 1rem;
-        color: #333;
-    }
+.brand-card img {
+    width: 100%;
+    height: auto;
 }

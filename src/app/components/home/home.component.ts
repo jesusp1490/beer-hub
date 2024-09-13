@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BeerService } from '../../services/beer.service';
 import { Beer } from '../beers/beers.interface';
 import { Brand } from '../country/brand.interface';
+import { Router } from '@angular/router'; // Importar Router para redirección
 
 @Component({
   selector: 'app-home',
@@ -10,22 +11,29 @@ import { Brand } from '../country/brand.interface';
 })
 export class HomeComponent implements OnInit {
   searchActive = false; // Indica si la búsqueda está activa
-  filteredBeers: any[] = []; // Datos de cervezas filtradas
-  bestRatedBeers: any[] = []; // Datos de cervezas mejor valoradas
-  popularBrands: any[] = []; // Datos de marcas populares
-  userFavoriteBeers: any[] = []; // Datos de cervezas favoritas de usuarios
-  latestBeers: any[] = []; // Datos de cervezas añadidas recientemente
+  filteredBeers: Beer[] = []; // Datos de cervezas filtradas
+  bestRatedBeers: Beer[] = []; // Datos de cervezas mejor valoradas
+  popularBrands: Brand[] = []; // Datos de marcas populares
+  userFavoriteBeers: Beer[] = []; // Datos de cervezas favoritas de usuarios
+  latestBeers: Beer[] = []; // Datos de cervezas añadidas recientemente
+  countryId: string = ''; // Asignar valor correcto
+  brandId: string = ''; // Asignar valor correcto
 
-  constructor(private beerService: BeerService) {}
+  constructor(
+    private beerService: BeerService,
+    private router: Router // Inyectar Router para redirección
+  ) { }
 
   ngOnInit(): void {
+    this.countryId = 'actualCountryId'; // Asigna el valor correcto aquí
+    this.brandId = 'actualBrandId'; // Asigna el valor correcto aquí
     this.getBestRatedBeers();
     this.getUserFavoriteBeers();
     this.getPopularBrands();
     this.getLatestBeers();
   }
 
-   onSearchResults(results: any[]) {
+  onSearchResults(results: Beer[]): void {
     this.filteredBeers = results;
     this.searchActive = results.length > 0;
   }
@@ -50,6 +58,7 @@ export class HomeComponent implements OnInit {
 
   getPopularBrands(): void {
     this.beerService.getBrands().subscribe((brands) => {
+      console.log('Popular Brands:', brands); // Verifica la estructura
       this.popularBrands = brands.slice(0, 5); // Show only top 5
     });
   }
@@ -66,9 +75,22 @@ export class HomeComponent implements OnInit {
     });
   }
 
-   // Método para limpiar los filtros
-  clearFilters() {
+  clearFilters(): void {
     this.filteredBeers = [];
     this.searchActive = false;
+  }
+
+  viewBeerDetails(beerId: string): void {
+    console.log('Viewing details for beer:', beerId); // Depuración
+    this.router.navigate(['/country', this.countryId, 'brands', this.brandId, 'beers', beerId]);
+  }
+
+  viewBrandBeers(brandId: string): void {
+    console.log('Viewing beers for brand:', brandId); // Depuración
+    if (this.countryId && brandId) {
+      this.router.navigate(['/country', this.countryId, 'brands', brandId, 'beers']);
+    } else {
+      console.error('Invalid countryId or brandId');
+    }
   }
 }

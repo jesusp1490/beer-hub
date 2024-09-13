@@ -19,6 +19,7 @@ const routes: Routes = [
   { path: 'contact', component: ContactComponent },
   { path: 'profile', component: ProfileComponent },
   { path: 'beers', component: BeersComponent },
+  { path: 'brands/:brandId/beers', component: BeersComponent },
   { path: 'country/:country', component: CountryComponent },
   { path: 'country/:country/brands/:brandId', component: BeersComponent },
   { path: 'country/:country/brands/:brandId/beers', component: BeersComponent },

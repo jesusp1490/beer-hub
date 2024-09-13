@@ -9,9 +9,9 @@
     <section class="section best-rated">
       <h2>Best Rated Beers</h2>
       <div *ngIf="bestRatedBeers.length > 0" class="section-content">
-        <div *ngFor="let beer of bestRatedBeers" class="section-item">
+        <div *ngFor="let beer of bestRatedBeers" class="section-item" (click)="viewBeerDetails(beer.id)">
           <img [src]="beer.beerImageUrl" alt="{{ beer.name }}">
-          <p>{{ beer.name }} ({{ beer.ABV }}% ABV) - {{ beer.beerType }} | Rating: {{ beer.averageRating }}</p>
+          <p>{{ beer.name }} <br> | Rating: {{ beer.averageRating }}</p>
         </div>
       </div>
       <div *ngIf="bestRatedBeers.length === 0">
@@ -23,9 +23,9 @@
     <section class="section user-favorites">
       <h2>User Favorites</h2>
       <div *ngIf="userFavoriteBeers.length > 0" class="section-content">
-        <div *ngFor="let beer of userFavoriteBeers" class="section-item">
+        <div *ngFor="let beer of userFavoriteBeers" class="section-item" (click)="viewBeerDetails(beer.id)">
           <img [src]="beer.beerImageUrl" alt="{{ beer.name }}">
-          <p>{{ beer.name }} ({{ beer.ABV }}% ABV) - {{ beer.beerType }}</p>
+          <p>{{ beer.name }} - {{ beer.beerType }}</p>
         </div>
       </div>
       <div *ngIf="userFavoriteBeers.length === 0">
@@ -37,7 +37,7 @@
     <section class="section popular-brands">
       <h2>Popular Brands</h2>
       <div *ngIf="popularBrands.length > 0" class="section-content">
-        <div *ngFor="let brand of popularBrands" class="section-item">
+        <div *ngFor="let brand of popularBrands" class="brand-card" (click)="viewBrandBeers(brand.id)">
           <img [src]="brand.logoUrl" alt="{{ brand.name }}">
           <p>{{ brand.name }} ({{ brand.beersCount }} beers)</p>
         </div>
@@ -51,9 +51,9 @@
     <section class="section latest-beers">
       <h2>Latest Added Beers</h2>
       <div *ngIf="latestBeers.length > 0" class="section-content">
-        <div *ngFor="let beer of latestBeers" class="section-item">
+        <div *ngFor="let beer of latestBeers" class="section-item" (click)="viewBeerDetails(beer.id)">
           <img [src]="beer.beerImageUrl" alt="{{ beer.name }}">
-          <p>{{ beer.name }} ({{ beer.ABV }}% ABV) - {{ beer.beerType }} | Added on: {{ beer.addedDate | date }}</p>
+          <p>{{ beer.name }}</p>
         </div>
       </div>
       <div *ngIf="latestBeers.length === 0">
@@ -67,7 +67,7 @@
     <h2>Search Results</h2>
     <div *ngIf="filteredBeers.length > 0">
       <div class="beers-grid">
-        <div *ngFor="let beer of filteredBeers" class="beer-card">
+        <div *ngFor="let beer of filteredBeers" class="beer-card" (click)="viewBeerDetails(beer.id)">
           <img [src]="beer.beerImageUrl" alt="{{ beer.name }}">
           <p>{{ beer.name }} ({{ beer.ABV }}% ABV) - {{ beer.beerType }} | Rating: {{ beer.averageRating }}</p>
           <div class="ingredients">

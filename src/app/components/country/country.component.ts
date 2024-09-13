@@ -15,12 +15,12 @@ export class CountryComponent implements OnInit {
   countryName: string = '';
   countryFlagUrl: string = '';
   brands: Brand[] = [];
-  filteredBrands: Brand[] = []; // Array para las marcas filtradas
+  filteredBrands: Brand[] = [];
   private countryId: string = '';
   page: number = 0;
   pageSize: number = 10;
   visibleBrands: Brand[] = [];
-  searchTerm: string = ''; // Término de búsqueda
+  searchTerm: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -52,7 +52,7 @@ export class CountryComponent implements OnInit {
       .valueChanges()
       .subscribe(brands => {
         this.brands = brands;
-        this.filteredBrands = brands; // Inicialmente, no hay filtro
+        this.filteredBrands = brands;
         this.updateVisibleBrands();
       });
   }
@@ -78,6 +78,7 @@ export class CountryComponent implements OnInit {
   }
 
   selectBrand(brandId: string): void {
+    console.log('Selected Brand ID:', brandId); // Depuración
     const route = `/country/${this.countryId}/brands/${brandId}/beers`;
     this.router.navigate([route]);
   }

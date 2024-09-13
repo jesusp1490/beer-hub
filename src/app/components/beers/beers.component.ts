@@ -4,8 +4,8 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Location } from '@angular/common';
 import { Beer } from './beers.interface';
 import { Brand } from '../country/brand.interface';
-import { FilterSearchComponent } from '../filters-search/filters-search.component';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import * as $ from 'jquery'; // Asegúrate de que jQuery está importado
 
 @Component({
   selector: 'app-beers',
@@ -19,8 +19,8 @@ export class BeersComponent implements OnInit, AfterViewInit {
   visibleBeers: Beer[] = [];
   page: number = 0;
   pageSize: number = 5;
-  private countryId: string = '';
-  private brandId: string = '';
+  countryId: string = '';
+  brandId: string = '';
   filtersForm: FormGroup;
 
   constructor(
@@ -28,7 +28,7 @@ export class BeersComponent implements OnInit, AfterViewInit {
     private firestore: AngularFirestore,
     private router: Router,
     private location: Location,
-    private fb: FormBuilder
+    private fb: FormBuilder,
   ) {
     this.filtersForm = this.fb.group({
       searchTerm: [''],
@@ -40,15 +40,18 @@ export class BeersComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
-      this.countryId = params.get('country') || '';
-      this.brandId = params.get('brandId') || '';
-      this.loadBrandData(this.brandId);
-      this.loadBeers(this.countryId, this.brandId);
-    });
+      this.countryId = params.get('country') ?? '';
+      this.brandId = params.get('brandId') ?? '';
 
-    // Subscribe to filter changes
-    this.filtersForm.valueChanges.subscribe(() => {
-      this.applyFilters();
+      console.log('Country ID in BeersComponent:', this.countryId); // Depuración
+      console.log('Brand ID in BeersComponent:', this.brandId); // Depuración
+
+      if (this.countryId && this.brandId) {
+        this.loadBrandData(this.brandId);
+        this.loadBeers(this.countryId, this.brandId);
+      } else {
+        console.error('Invalid countryId or brandId');
+      }
     });
   }
 
@@ -153,7 +156,6 @@ export class BeersComponent implements OnInit, AfterViewInit {
     this.updateVisibleBeers();
   }
 
-
   private updateVisibleBeers(): void {
     const start = this.page * this.pageSize;
     const end = start + this.pageSize;
@@ -164,5 +166,24 @@ export class BeersComponent implements OnInit, AfterViewInit {
     console.log('Selecting beer with ID:', beerId);
     const route = `/country/${this.countryId}/brands/${this.brandId}/beers/${beerId}`;
     this.router.navigate([route]);
+  }
+
+  viewBrandBeers(brandId: string): void {
+    console.log('Viewing beers for brand ID:', brandId);
+    const route = `/country/${this.countryId}/brands/${brandId}/beers`;
+    this.router.navigate([route]);
+  }
+
+  onSearchResults(searchResults: Beer[]): void {
+    this.beers = searchResults;
+    this.applyFilters();
+  }
+
+  previousSlide(): void {
+    $('.carousel-track').slick('slickPrev');
+  }
+
+  nextSlide(): void {
+    $('.carousel-track').slick('slickNext');
   }
 }
