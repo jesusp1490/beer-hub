@@ -7,7 +7,7 @@ import { Beer } from '../components/beers/beers.interface';
   providedIn: 'root'
 })
 export class BeerService {
-  constructor(private firestore: AngularFirestore) {}
+  constructor(private firestore: AngularFirestore) { }
 
   getFilteredBeers(filters: any): Observable<Beer[]> {
     return new Observable(observer => {
@@ -22,6 +22,7 @@ export class BeerService {
         }
       }
 
+
       // Apply filter by brand
       if (filters.brand) {
         const brand = filters.brand.trim();
@@ -31,12 +32,12 @@ export class BeerService {
         }
       }
 
-      // Apply filter by ABV (string comparison)
-      if (filters.abvRange) {
-        const abv = filters.abvRange.toString();
-        if (abv) {
-          console.log(`Adding filter: ABV <= ${abv}`);
-          query = query.where('ABV', '<=', abv) as CollectionReference<Beer>;
+      // Apply filter by ABV
+      if (filters.abvRange !== undefined) {
+        const abvRange = Number(filters.abvRange);
+        if (!isNaN(abvRange)) {
+          console.log(`Adding filter: ABV <= ${abvRange}`);
+          query = query.where('ABV', '<=', abvRange) as CollectionReference<Beer>;
         }
       }
 
@@ -56,8 +57,7 @@ export class BeerService {
           const data = doc.data() as Beer;
           beers.push({ ...data, id: doc.id });
         });
-        console.log('Query result:', beers); // Log the query result
-        // Pass the beers to the component
+        console.log('Query result:', beers);
         observer.next(beers);
         observer.complete();
       }).catch(error => {

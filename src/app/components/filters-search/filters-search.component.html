@@ -3,9 +3,13 @@
     <input formControlName="name" placeholder="Search by name">
     <input formControlName="brand" placeholder="Search by brand">
     <select formControlName="beerType">
+      <option value="">-- Select Beer Type --</option>
       <option *ngFor="let type of beerTypes" [value]="type">{{ type }}</option>
     </select>
-    <input type="range" formControlName="abvRange" min="0" max="100" step="1">
+    <div>
+      <input type="range" formControlName="abvRange" min="0" max="100" step="1">
+      <span>{{ filtersForm.get('abvRange')?.value }}%</span>
+    </div>
     <input formControlName="ingredient" placeholder="Search by ingredient">
     <button type="submit">Filter Beers</button>
   </form>

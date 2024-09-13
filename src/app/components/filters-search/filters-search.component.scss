@@ -1,86 +1,101 @@
+/* Contenedor del filtro */
 .filter-container {
-    margin: 1rem auto;
-    padding: 1rem;
-    max-width: 600px;
-    border: 1px solid #ddd;
+    background-color: #f8f9fa;
+    padding: 20px;
     border-radius: 8px;
-    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    max-width: 600px;
+    margin: auto;
 }
 
 .filter-container form {
     display: flex;
     flex-direction: column;
+    gap: 10px;
 }
 
 .filter-container input,
 .filter-container select,
 .filter-container button {
-    margin-bottom: 1rem;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-}
-
-.filter-container input[type="range"] {
-    -webkit-appearance: none;
-    width: 100%;
-    background: #ddd;
-    height: 8px;
+    padding: 10px;
     border-radius: 5px;
-    outline: none;
-    margin-bottom: 1rem;
-}
-
-.filter-container input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
-    background: #007bff;
-    border-radius: 50%;
-    cursor: pointer;
+    border: 1px solid #ddd;
+    font-size: 16px;
 }
 
 .filter-container button {
-    background-color: #007bff;
+    background-color: #28a745;
     color: white;
     border: none;
     cursor: pointer;
-    font-size: 1rem;
+    transition: background-color 0.3s ease;
 }
 
 .filter-container button:hover {
-    background-color: #0056b3;
+    background-color: #218838;
 }
 
+/* Lista de cervezas */
 .beers-list {
-    margin: 1rem auto;
-    max-width: 600px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
 }
 
 .beers-list div {
-    border-bottom: 1px solid #ddd;
-    padding: 0.5rem 0;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.beers-list div:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Imagen de cerveza */
+.beers-list img {
+    width: 100px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+/* Texto de la cerveza */
 .beers-list p {
     margin: 0;
-    font-size: 1rem;
+    font-size: 18px;
+    color: #333;
 }
 
-.beers-list img {
-    max-width: 100px;
-    height: auto;
-    vertical-align: middle;
-    margin-right: 0.5rem;
-}
-
+/* Ingredientes */
 .beers-list span {
-    font-weight: bold;
+    font-size: 14px;
+    color: #888;
 }
 
+/* Mensaje de no resultados */
 .no-results {
     text-align: center;
-    font-size: 1.2rem;
+    padding: 20px;
     color: #777;
+    font-size: 18px;
+}
+
+.abv-range-container {
+    display: flex;
+    align-items: center;
+
+    input[type="range"] {
+        margin-right: 10px;
+    }
+
+    .abv-value {
+        font-size: 1rem;
+        color: #333;
+    }
 }
