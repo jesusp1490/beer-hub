@@ -9,56 +9,66 @@ import { Brand } from '../country/brand.interface';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-  filteredBeers: Beer[] = [];
-  bestRatedBeers: Beer[] = [];
-  userFavoriteBeers: Beer[] = [];
-  popularBrands: Brand[] = [];
-  latestBeers: Beer[] = [];
+  searchActive = false; // Indica si la búsqueda está activa
+  filteredBeers: any[] = []; // Datos de cervezas filtradas
+  bestRatedBeers: any[] = []; // Datos de cervezas mejor valoradas
+  popularBrands: any[] = []; // Datos de marcas populares
+  userFavoriteBeers: any[] = []; // Datos de cervezas favoritas de usuarios
+  latestBeers: any[] = []; // Datos de cervezas añadidas recientemente
 
   constructor(private beerService: BeerService) {}
 
   ngOnInit(): void {
-    this.loadBestRatedBeers();
-    this.loadUserFavoriteBeers();
-    this.loadPopularBrands();
-    this.loadLatestBeers();
+    this.getBestRatedBeers();
+    this.getUserFavoriteBeers();
+    this.getPopularBrands();
+    this.getLatestBeers();
   }
 
-  loadBestRatedBeers(): void {
-    this.beerService.getBeers().subscribe(beers => {
+   onSearchResults(results: any[]) {
+    this.filteredBeers = results;
+    this.searchActive = results.length > 0;
+  }
+
+  getBestRatedBeers(): void {
+    this.beerService.getBeers().subscribe((beers) => {
       this.bestRatedBeers = beers
-        .filter(beer => beer.averageRating) // Ensure there is an average rating
-        .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0)) // Sort by rating descending
-        .slice(0, 10); // Show top 10
+        .filter((beer) => beer.averageRating) // Ensure there's an average rating
+        .sort((a, b) => b.averageRating - a.averageRating)
+        .slice(0, 5); // Show only top 5
     });
   }
 
-  loadUserFavoriteBeers(): void {
-    this.beerService.getBeers().subscribe(beers => {
+  getUserFavoriteBeers(): void {
+    this.beerService.getBeers().subscribe((beers) => {
       this.userFavoriteBeers = beers
-        .filter(beer => Object.keys(beer.favoriteUsers).length > 0) // Ensure there are favorite users
-        .sort((a, b) => Object.keys(b.favoriteUsers).length - Object.keys(a.favoriteUsers).length) // Sort by number of favorite users descending
-        .slice(0, 10); // Show top 10
+        .filter((beer) => Object.keys(beer.favoriteUsers).length > 0) // Ensure there are favorites
+        .sort((a, b) => Object.keys(b.favoriteUsers).length - Object.keys(a.favoriteUsers).length)
+        .slice(0, 5); // Show only top 5
     });
   }
 
-  loadPopularBrands(): void {
-    this.beerService.getBrands().subscribe(brands => {
-      this.popularBrands = brands
-        .map(brand => ({
-          ...brand,
-          beersCount: brand.beers ? brand.beers.length : 0
-        }))
-        .sort((a, b) => b.beersCount - a.beersCount) // Sort by number of beers descending
-        .slice(0, 10); // Show top 10
+  getPopularBrands(): void {
+    this.beerService.getBrands().subscribe((brands) => {
+      this.popularBrands = brands.slice(0, 5); // Show only top 5
     });
   }
 
-  loadLatestBeers(): void {
-    this.beerService.getBeers().subscribe(beers => {
+  getLatestBeers(): void {
+    this.beerService.getBeers().subscribe((beers) => {
       this.latestBeers = beers
-        .sort((a, b) => (b.addedDate?.getTime() || 0) - (a.addedDate?.getTime() || 0)) // Sort by added date descending
-        .slice(0, 10); // Show top 10
+        .sort((a, b) => {
+          const dateA = a.addedDate ? new Date(a.addedDate).getTime() : 0;
+          const dateB = b.addedDate ? new Date(b.addedDate).getTime() : 0;
+          return dateB - dateA;
+        })
+        .slice(0, 5); // Show only latest 5
     });
+  }
+
+   // Método para limpiar los filtros
+  clearFilters() {
+    this.filteredBeers = [];
+    this.searchActive = false;
   }
 }

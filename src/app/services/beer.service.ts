@@ -8,6 +8,9 @@ import { Brand } from '../components/country/brand.interface';
   providedIn: 'root'
 })
 export class BeerService {
+  filterBeers(query: string) {
+    throw new Error('Method not implemented.');
+  }
   constructor(private firestore: AngularFirestore) { }
 
   getFilteredBeers(filters: any): Observable<Beer[]> {

@@ -1,50 +1,126 @@
 .homepage-container {
     display: flex;
     gap: 20px;
+    height: 100vh;
+    /* Para que ocupe toda la altura de la pantalla */
+    box-sizing: border-box;
 }
 
 .filter-sidebar {
-    width: 250px;
+    width: 300px;
+    /* Filtro con ancho fijo */
+    flex-shrink: 0;
+    /* Evita que el filtro se reduzca */
 }
 
 .main-content {
     flex: 1;
+    /* El contenido principal ocupa el espacio restante */
+    overflow-y: auto;
+    /* Habilita el scroll vertical si el contenido es largo */
+    display: flex;
+    flex-direction: column;
+    transition: flex 0.3s ease;
+    /* Añadido para una transición suave */
 }
 
-.section {
-    margin-bottom: 20px;
-}
-
-.section h2 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
+.search-results {
+    padding: 20px;
+    flex: 1;
+    /* Añadido para que ocupe el espacio necesario */
+    display: flex;
+    flex-direction: column;
 }
 
 .section-content {
     display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    flex-wrap: wrap;
     gap: 15px;
-    /* Espacio entre cada elemento */
 }
 
 .section-item {
-    flex: 0 0 auto;
-    /* Evita que los elementos se reduzcan en tamaño */
-    width: 150px;
-    /* Ancho fijo para cada elemento */
+    flex-basis: 18%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
 }
 
 .section-item img {
-    width: 100px;
+    max-width: 100px;
     height: auto;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    object-fit: cover;
 }
 
 .no-results {
     color: #777;
-    font-style: italic;
+}
+
+/* Estilos para la grid de cervezas */
+.beers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    width: 100%;
+    height: 100%;
+    /* Asegúrate de que la grid ocupe todo el espacio disponible */
+}
+
+/* Carta de cerveza */
+.beer-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.beer-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Imagen de cerveza */
+.beer-card img {
+    width: 100px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+/* Información de la cerveza */
+.beer-card p {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Ingredientes */
+.beer-card .ingredients {
+    font-size: 14px;
+    color: #888;
+    margin-top: 10px;
+}
+
+/* Mensaje de no resultados */
+.no-results {
+    text-align: center;
+    padding: 20px;
+    color: #777;
+    font-size: 18px;
+}
+
+/* Estilo para el rango de ABV */
+.abv-range-container {
+    display: flex;
+    align-items: center;
+
+    input[type="range"] {
+        margin-right: 10px;
+    }
+
+    .abv-value {
+        font-size: 1rem;
+        color: #333;
+    }
 }

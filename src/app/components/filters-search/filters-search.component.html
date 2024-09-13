@@ -7,28 +7,12 @@
       <option *ngFor="let type of beerTypes" [value]="type">{{ type }}</option>
     </select>
 
-    <div>
+    <div class="abv-range-container">
       <input type="range" formControlName="abvRange" min="0" max="100" step="1">
-      <span>{{ filtersForm.get('abvRange')?.value }}%</span>
+      <span class="abv-value">{{ filtersForm.get('abvRange')?.value }}%</span>
     </div>
 
     <input formControlName="ingredient" placeholder="Search by ingredient">
     <button type="submit">Filter Beers</button>
   </form>
-</div>
-
-<div class="beers-list" *ngIf="filteredBeers.length > 0">
-  <div *ngFor="let beer of filteredBeers">
-    <p>
-      <img [src]="beer.beerImageUrl" alt="{{ beer.name }}">
-      {{ beer.name }} ({{ beer.ABV }}% ABV) - {{ beer.beerType }} |
-      <span *ngFor="let ingredient of beer.ingredients; let i = index">
-        {{ ingredient.name }}<span *ngIf="i < beer.ingredients.length - 1">, </span>
-      </span>
-    </p>
-  </div>
-</div>
-
-<div *ngIf="filteredBeers.length === 0" class="no-results">
-  <p>No beers found matching your filters.</p>
 </div>
