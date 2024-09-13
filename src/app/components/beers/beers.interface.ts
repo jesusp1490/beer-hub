@@ -16,4 +16,6 @@ export interface Beer {
   averageRating: number;
   rating: Record<string, number>;
   favoriteUsers: Record<string, boolean>;
+  addedDate?: Date; // Añade esta línea si quieres usar addedDate
 }
+

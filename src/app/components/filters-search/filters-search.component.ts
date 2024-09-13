@@ -17,7 +17,7 @@ export class FilterSearchComponent implements OnInit {
     this.filtersForm = this.fb.group({
       name: [''],
       brand: [''],
-      abvRange: [11],
+      abvRange: [0],
       beerType: [''],
       ingredient: ['']
     });
@@ -29,10 +29,20 @@ export class FilterSearchComponent implements OnInit {
 
   applyFilters(): void {
     const filters = this.filtersForm.value;
-    console.log('Applying filters:', filters);
+    console.log('Applying filters:', filters); // Log the filters being applied
+
+    // Verifica si todos los filtros están vacíos
+    const isEmptyFilter = !filters.name && !filters.brand && !filters.abvRange && !filters.beerType && !filters.ingredient;
+
+    if (isEmptyFilter) {
+      // Si todos los filtros están vacíos, no mostrar cervezas
+      this.filteredBeers = [];
+      return;
+    }
 
     this.beerService.getFilteredBeers(filters).subscribe(
       (beers) => {
+        // Filtrado de ingredientes
         if (filters.ingredient) {
           const ingredient = filters.ingredient.trim().toLowerCase();
           this.filteredBeers = beers.filter(beer =>
@@ -42,11 +52,13 @@ export class FilterSearchComponent implements OnInit {
           this.filteredBeers = beers;
         }
 
-        console.log('Filtered beers:', this.filteredBeers);
+        // Log las cervezas filtradas
+        console.log('Filtered beers:', this.filteredBeers); // Log the filtered beers
       },
       (error) => {
-        console.error('Error fetching filtered beers:', error);
+        console.error('Error fetching filtered beers:', error); // Log any errors
       }
     );
   }
+
 }

@@ -1,1 +1,65 @@
-<app-filter-search></app-filter-search>
+<div class="homepage-container">
+  <!-- Sidebar for Filters -->
+  <aside class="filter-sidebar">
+    <app-filter-search></app-filter-search>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Best Rated Beers -->
+    <section class="section best-rated">
+      <h2>Best Rated Beers</h2>
+      <div *ngIf="bestRatedBeers.length > 0" class="section-content">
+        <div *ngFor="let beer of bestRatedBeers | slice:0:5" class="section-item">
+          <img [src]="beer.beerImageUrl" alt="{{ beer.name }}">
+          <p>{{ beer.name }} ({{ beer.ABV }}% ABV) <br> Rating: {{ beer.averageRating }}</p>
+        </div>
+      </div>
+      <div *ngIf="bestRatedBeers.length === 0" class="no-results">
+        <p>No best rated beers found.</p>
+      </div>
+    </section>
+
+    <!-- User Favorite Beers -->
+    <section class="section user-favorites">
+      <h2>User Favorites</h2>
+      <div *ngIf="userFavoriteBeers.length > 0" class="section-content">
+        <div *ngFor="let beer of userFavoriteBeers | slice:0:5" class="section-item">
+          <img [src]="beer.beerImageUrl" alt="{{ beer.name }}">
+          <p>{{ beer.name }} ({{ beer.ABV }}% ABV)</p>
+        </div>
+      </div>
+      <div *ngIf="userFavoriteBeers.length === 0" class="no-results">
+        <p>No user favorites found.</p>
+      </div>
+    </section>
+
+    <!-- Popular Brands -->
+    <section class="section popular-brands">
+      <h2>Popular Brands</h2>
+      <div *ngIf="popularBrands.length > 0" class="section-content">
+        <div *ngFor="let brand of popularBrands | slice:0:5" class="section-item">
+          <img [src]="brand.logoUrl" alt="{{ brand.name }} logo" class="brand-logo">
+          <p>{{ brand.name }} <br> ({{ brand.beersCount }} beers)</p>
+        </div>
+      </div>
+      <div *ngIf="popularBrands.length === 0" class="no-results">
+        <p>No popular brands found.</p>
+      </div>
+    </section>
+
+    <!-- Latest Added Beers -->
+    <section class="section latest-beers">
+      <h2>Latest Added Beers</h2>
+      <div *ngIf="latestBeers.length > 0" class="section-content">
+        <div *ngFor="let beer of latestBeers | slice:0:5" class="section-item">
+          <img [src]="beer.beerImageUrl" alt="{{ beer.name }}">
+          <p>{{ beer.name }} ({{ beer.ABV }}% ABV) <br> Added on: {{ beer.addedDate | date }}</p>
+        </div>
+      </div>
+      <div *ngIf="latestBeers.length === 0" class="no-results">
+        <p>No latest beers found.</p>
+      </div>
+    </section>
+  </div>
+</div>

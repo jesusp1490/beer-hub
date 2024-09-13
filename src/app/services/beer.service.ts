@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore, CollectionReference } from '@angular/fire/compat/firestore';
 import { Observable } from 'rxjs';
 import { Beer } from '../components/beers/beers.interface';
+import { Brand } from '../components/country/brand.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -64,6 +65,36 @@ export class BeerService {
         console.error('Error getting filtered beers', error);
         observer.error(error);
       });
+    });
+  }
+
+  getBeers(): Observable<Beer[]> {
+    return new Observable(observer => {
+      this.firestore.collection<Beer>('beers').valueChanges().subscribe(
+        beers => {
+          observer.next(beers);
+          observer.complete();
+        },
+        error => {
+          console.error('Error fetching beers', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
+  getBrands(): Observable<Brand[]> {
+    return new Observable(observer => {
+      this.firestore.collection<Brand>('brands').valueChanges().subscribe(
+        brands => {
+          observer.next(brands);
+          observer.complete();
+        },
+        error => {
+          console.error('Error fetching brands', error);
+          observer.error(error);
+        }
+      );
     });
   }
 }
