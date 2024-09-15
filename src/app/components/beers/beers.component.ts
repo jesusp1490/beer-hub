@@ -5,7 +5,7 @@ import { Location } from '@angular/common';
 import { Beer } from './beers.interface';
 import { Brand } from '../country/brand.interface';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import * as $ from 'jquery'; // Asegúrate de que jQuery está importado
+import * as $ from 'jquery';
 
 @Component({
   selector: 'app-beers',
@@ -43,8 +43,8 @@ export class BeersComponent implements OnInit, AfterViewInit {
       this.countryId = params.get('country') ?? '';
       this.brandId = params.get('brandId') ?? '';
 
-      console.log('Country ID in BeersComponent:', this.countryId); // Depuración
-      console.log('Brand ID in BeersComponent:', this.brandId); // Depuración
+      console.log('Country ID in BeersComponent:', this.countryId);
+      console.log('Brand ID in BeersComponent:', this.brandId);
 
       if (this.countryId && this.brandId) {
         this.loadBrandData(this.brandId);
@@ -66,13 +66,13 @@ export class BeersComponent implements OnInit, AfterViewInit {
 
     if ($carouselTrack.length && !$carouselTrack.hasClass('slick-initialized')) {
       setTimeout(() => {
-        const slidesToShow = this.beers.length < 5 ? this.beers.length : 5;
-        const slidesToScroll = this.beers.length < 3 ? 1 : 3;
+        const totalBeers = this.beers.length;
+        const slidesToShow = Math.min(totalBeers, 5); // Mostrar máximo 5 cervezas
 
         $carouselTrack.slick({
           infinite: true,
           slidesToShow: slidesToShow,
-          slidesToScroll: slidesToScroll,
+          slidesToScroll: 1,
           centerMode: true,
           centerPadding: '0px',
           dots: true,
@@ -82,21 +82,21 @@ export class BeersComponent implements OnInit, AfterViewInit {
             {
               breakpoint: 1024,
               settings: {
-                slidesToShow: Math.min(slidesToShow, 3),
-                slidesToScroll: Math.min(slidesToScroll, 1)
+                slidesToShow: slidesToShow,
+                slidesToScroll: 1,
               }
             },
             {
               breakpoint: 600,
               settings: {
-                slidesToShow: Math.min(slidesToShow, 2),
+                slidesToShow: Math.min(2, totalBeers),
                 slidesToScroll: 1
               }
             },
             {
               breakpoint: 480,
               settings: {
-                slidesToShow: 1,
+                slidesToShow: Math.min(1, totalBeers),
                 slidesToScroll: 1
               }
             }
@@ -105,6 +105,7 @@ export class BeersComponent implements OnInit, AfterViewInit {
       }, 200);
     }
   }
+
 
   goBack(): void {
     this.location.back();
@@ -133,7 +134,7 @@ export class BeersComponent implements OnInit, AfterViewInit {
       .subscribe(
         beers => {
           this.beers = beers;
-          this.applyFilters(); // Apply filters to the loaded beers
+          this.applyFilters();
         },
         error => {
           console.error('Error loading beers:', error);

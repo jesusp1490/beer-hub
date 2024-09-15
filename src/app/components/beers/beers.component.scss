@@ -1,85 +1,54 @@
-@import 'src/styles/_variables.scss';
-
 .beers-container {
-
-  .brand-header {
-    text-align: center;
-    font-family: $font-family-primary;
-    color: $color-hover;
-    width: 100%;
-  }
-
-  .no-beers-message {
-    text-align: center;
-    font-size: 18px;
-    color: #888;
-  }
-
-  .filters-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-
-    input {
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      width: 300px;
-    }
-  }
-
   .carousel-container {
     position: relative;
     margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
   }
 
   .carousel-track {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: 180px;
-    width: 80%;
-  }
-
-  .slick-slider .slick-track,
-  .slick-slider .slick-list {
-    transform: translate3d(0, 0, 0);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s linear;
+    width: 100%;
+    // padding: 0 50px;
+    /* Agregar padding para centrar los elementos */
   }
 
   .carousel-item {
-    flex: 0 0 auto;
-    margin: 0 80px;
-    padding-top: 90px;
+    position: relative;
+    margin: 0 60px;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    transform: scale(1);
+    opacity: 0.9;
+    padding-left: 35px;
+    // padding-top: 50px;
+    padding-bottom: 50px;
+    z-index: 1;
   }
 
   .slick-center .carousel-item {
-    transform: scale(1.2);
+    transform: scale(1.7);
     opacity: 1;
-    z-index: 2;
+    z-index: 3;
   }
 
   .slick-center .beer-image {
-    transform: scale(1.3);
-    transition: transform 0.4s ease;
-    padding-top: 90px;
-    padding-bottom: 90px;
-    height: auto;
-    margin-top: -100px;
+    transform: scale(1.6);
+    /* Ajustamos el escalado para la imagen */
+    width: 250px;
+    /* Ajustamos el tamaño de la imagen */
   }
 
   .beer-image {
-    width: 150px;
+    width: 180px;
     height: auto;
-    margin: 0 auto;
-    display: block;
+    transition: transform 0.3s ease;
   }
 
+  // Botones de navegación
   .carousel-button {
     position: absolute;
     top: 50%;
@@ -112,7 +81,6 @@
     border-radius: 40px 0px 0px 40px;
     transform: translateY(-50%) rotate(180deg);
   }
-
 
   .back-button {
     background-color: transparent;
