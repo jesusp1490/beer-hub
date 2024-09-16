@@ -1,92 +1,56 @@
 <div class="beer-details-container">
-    
-  <!-- Parte derecha -->
-  <div class="right-section">
-    <!-- Favorito y Nombre de la Cerveza -->
-    <div class="favorite-section">
+  <div class="beer-image-container">
+    <img [src]="beer?.beerImageUrl" [alt]="beer?.name" class="beer-image">
+  </div>
+
+  <div class="info-card">
+
+    <div class="left-section">
+
+      <div class="country-info">
+        <img [src]="countryFlagUrl" [alt]="countryName" class="country-flag">
+        <span>{{ countryName }}</span>
+      </div>
+      <div class="country-map">
+        <img [src]="countryMapUrl" [alt]="countryName + ' map'" class="map-image">
+      </div>
+      <div class="beer-stats">
+        <div class="stat">
+          <span class="label">ABV: </span>
+          <span class="value">{{ beer?.ABV }}%</span>
+        </div>
+        <div class="stat">
+          <span class="label">IBU: </span>
+          <!-- <span class="value">{{ beer?.IBU }}</span> -->
+        </div>
+      </div>
+    </div>
+
+
+    <div class="right-section">
       <h1 class="beer-name">{{ beer?.name }}</h1>
-      <img [src]="favoriteIconUrl" (click)="toggleFavorite()" alt="Favorite Icon" class="favorite-icon"/>
-    </div>
+      <img *ngIf="brandLogoUrl" [src]="brandLogoUrl" alt="{{ brandName }} logo" class="brand-logo"/>
 
-    <div class="upper-grid">
-      <!-- Cuadro 1: Logo de la marca -->
-      <div class="upper-grid-item logo">
-        <img *ngIf="brandLogoUrl" [src]="brandLogoUrl" alt="{{ brandName }} logo" />
-      </div>
+      <div class="rating-section">
+        <h2>Average Rating: {{ beer?.averageRating }} </h2>
+        <div *ngIf="userId" class="user-rating">
 
-      <!-- Cuadro 2: Tipo de cerveza -->
-      <div class="upper-grid-item beer-type">
-        <h2>Beer Type:</h2>
-        <h4>{{ beer?.beerType }}</h4>
-      </div>
-
-      <!-- Cuadro 3: País + bandera -->
-      <div class="upper-grid-item country">
-        <h2>{{ countryName }} <img *ngIf="countryFlagUrl" [src]="countryFlagUrl" alt="{{ countryName }} flag" /></h2>
-      </div>
-
-      <!-- Cuadro 4: Territorio -->
-      <div class="upper-grid-item territory">
-        <img *ngIf="countryMapUrl" [src]="countryMapUrl" alt="{{ countryName }} map" />
-      </div>
-    </div>
-
-    <!-- Cuadro 5: Descripción de la cerveza -->
-    <div class="description">
-      <h2>Meet the Beer</h2>
-      <p>{{ beer?.description }}</p>
-    </div>
-  </div>
-
-  <!-- Parte izquierda -->
-  <div class="left-section">
-    <!-- Cuadro 1: Imagen de la cerveza -->
-    <div class="beer-image">
-      <img *ngIf="beer?.beerImageUrl" [src]="beer?.beerImageUrl" alt="{{ beer?.name }} image" />
-    </div>
-
-    <!-- Cuadro 2: Ingredientes -->
-    <div class="ingredients-container">
-      <div *ngFor="let column of splitIngredients(beer?.ingredients ?? []); let i = index" class="ingredient-column">
-        <div class="ingredient-item" *ngFor="let ingredient of column">
-          <div class="ingredient-content">
-            <div class="ingredient-icon">
-              <img [src]="ingredient.ingImageUrl" alt="{{ ingredient.name }} icon" />
-            </div>
-            <p class="ingredient-name">{{ ingredient.name }}</p>
+          <h3>Rate this beer:</h3>
+          <div class="beer-rate">
+            <img *ngFor="let i of [1, 2, 3, 4, 5]"
+              [src]="i <= (userRating || 0) ? 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-beer.webp?alt=media&token=a0cbaf82-83ef-41e7-abc5-36a140d10119' : 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-beer.webp?alt=media&token=65bd916f-f7dc-4b23-9efb-45bbdb627ce9'"
+              (click)="rateBeer(i)" alt="beer icon" />
           </div>
-        </div>
-        <!-- Place ABV under the first column -->
-        <div *ngIf="i === 0" class="abv">
-          <h2>ABV</h2>
-          <span>{{ beer?.ABV }}</span>
+          
         </div>
       </div>
-    </div>
-  </div>
 
-  <div class="rating-section">
-    <h2>Average Rating: {{ beer?.averageRating }} </h2>
-    <div *ngIf="userId" class="user-rating">
-      <h3>Rate this beer:</h3>
-      <div class="beer-rate">
-        <img
-          *ngFor="let i of [1, 2, 3, 4, 5]"
-          [src]="i <= (userRating || 0) ? 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-beer.webp?alt=media&token=a0cbaf82-83ef-41e7-abc5-36a140d10119' : 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-beer.webp?alt=media&token=65bd916f-f7dc-4b23-9efb-45bbdb627ce9'"
-          (click)="rateBeer(i)"
-          alt="beer icon"
-        />
+      <div class="beer-info">
+        <h2>Beer Type</h2>
+        <p>{{ beer?.beerType }}</p>
       </div>
-    </div>
-  </div>
 
-  <!-- Modal de registro -->
-  <div *ngIf="showRegisterModal" class="modal">
-    <div class="modal-content">
-      <span (click)="closeRegisterModal()" class="close">&times;</span>
-      <h2>Please Register to Save Favorites</h2>
-      <p>You need to be registered to use the favorite feature. Please register to continue.</p>
-      <button (click)="goToRegister()">Register</button>
+      <p class="beer-description">{{ beer?.description }}</p>
     </div>
   </div>
 </div>
@@ -94,3 +58,12 @@
 <button class="back-button" (click)="goBack()">
   <i class="fa-solid fa-arrow-left"></i>
 </button>
+
+<div *ngIf="showRegisterModal" class="modal">
+  <div class="modal-content">
+    <span (click)="closeRegisterModal()" class="close">&times;</span>
+    <h2>Please Register to Save Favorites</h2>
+    <p>You need to be registered to use the favorite feature. Please register to continue.</p>
+    <button (click)="goToRegister()">Register</button>
+  </div>
+</div>

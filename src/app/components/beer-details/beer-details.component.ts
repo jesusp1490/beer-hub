@@ -22,7 +22,7 @@ export class BeerDetailsComponent implements OnInit {
   countryMapUrl: string = '';
   userRating: number | null = null;
   userId: string | null = null;
-  favoriteIconUrl: string = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-crown.webp?alt=media&token=d6a7a1e5-1dcb-4c2d-8f34-87df6a9d2548'; // Default icon URL
+  favoriteIconUrl: string = 'assets/icons/empty-heart.svg';
   showRegisterModal: boolean = false;
 
   constructor(
@@ -46,10 +46,6 @@ export class BeerDetailsComponent implements OnInit {
         this.loadBeerData(beerId);
       }
     });
-  }
-
-  goBack(): void {
-    this.location.back();
   }
 
   private loadBeerData(beerId: string): void {
@@ -125,6 +121,7 @@ export class BeerDetailsComponent implements OnInit {
     });
   }
 
+
   toggleFavorite(): void {
     if (!this.userId) {
       this.showRegisterModal = true;
@@ -148,6 +145,7 @@ export class BeerDetailsComponent implements OnInit {
     });
   }
 
+
   updateFavoriteIcon(): void {
     if (!this.beer?.id || !this.userId) {
       this.favoriteIconUrl = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-corwn.webp?alt=media&token=deb3f900-e608-4712-9b9a-bd4410852187';
@@ -163,6 +161,11 @@ export class BeerDetailsComponent implements OnInit {
         this.favoriteIconUrl = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-corwn.webp?alt=media&token=deb3f900-e608-4712-9b9a-bd4410852187'; // Default icon URL
       }
     });
+  }
+
+
+  goBack(): void {
+    this.location.back();
   }
 
   closeRegisterModal(): void {

@@ -1,5 +1,6 @@
 .homepage-container {
     display: flex;
+    // padding: 10px;
     gap: 20px;
     height: 100vh;
     /* Para que ocupe toda la altura de la pantalla */
@@ -8,26 +9,20 @@
 
 .filter-sidebar {
     width: 300px;
-    /* Filtro con ancho fijo */
     flex-shrink: 0;
-    /* Evita que el filtro se reduzca */
 }
 
 .main-content {
     flex: 1;
-    /* El contenido principal ocupa el espacio restante */
     overflow-y: auto;
-    /* Habilita el scroll vertical si el contenido es largo */
     display: flex;
     flex-direction: column;
     transition: flex 0.3s ease;
-    /* Añadido para una transición suave */
 }
 
 .search-results {
     padding: 20px;
     flex: 1;
-    /* Añadido para que ocupe el espacio necesario */
     display: flex;
     flex-direction: column;
 }
