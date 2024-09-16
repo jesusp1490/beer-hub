@@ -69,11 +69,9 @@
       <div class="beers-grid">
         <div *ngFor="let beer of filteredBeers" class="beer-card" (click)="viewBeerDetails(beer.id)">
           <img [src]="beer.beerImageUrl" alt="{{ beer.name }}">
-          <p>{{ beer.name }} ({{ beer.ABV }}% ABV) - {{ beer.beerType }} | Rating: {{ beer.averageRating }}</p>
+          <p>{{ beer.name }} ({{ beer.ABV }}% ABV) - {{ beer.beerType }} | Rating: {{ beer.averageRating || 'N/A' }}</p>
           <div class="ingredients">
-            <span *ngFor="let ingredient of beer.ingredients; let i = index">
-              {{ ingredient.name }}<span *ngIf="i < beer.ingredients.length - 1">, </span>
-            </span>
+            <span>Ingredients: {{ getIngredients(beer) }}</span>
           </div>
         </div>
       </div>

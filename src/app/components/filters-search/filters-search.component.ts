@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { BeerService } from '../../services/beer.service';
 import { Beer } from '../beers/beers.interface';
 
@@ -20,40 +20,57 @@ export class FilterSearchComponent implements OnInit {
     'Quadrupel', 'Saison', 'SCHWARZBIER', 'Scotch Ale', 'Shandy', 'Special Beer', 'Spiced Beer', 'Stout', 
     'Sour Ale', 'Vienna Lager', 'Weissbier', 'Witbier', 'Barleywine', 'Berliner Weisse'
   ];
-  filteredBeers: Beer[] = []; // Define filteredBeers here
-  @Output() searchResults = new EventEmitter<Beer[]>(); // Emit the search results
+  filteredBeers: Beer[] = [];
+  @Output() searchResults = new EventEmitter<Beer[]>();
 
   constructor(private fb: FormBuilder, private beerService: BeerService) {
     this.filtersForm = this.fb.group({
       name: [''],
       brand: [''],
       abvRange: [0],
-      beerType: [''],
+      beerTypes: this.fb.array([]),
       ingredient: ['']
     });
+
+    this.initBeerTypeCheckboxes();
   }
 
   ngOnInit(): void {}
 
-  applyFilters(): void {
-  const filters = this.filtersForm.value;
-  const isEmptyFilter = !filters.name && !filters.brand && !filters.abvRange && !filters.beerType && !filters.ingredient;
-
-  if (isEmptyFilter) {
-    this.filteredBeers = []; // Clear filteredBeers if no filters
-    this.searchResults.emit([]); // Emit empty array if no filters
-    return;
+  initBeerTypeCheckboxes(): void {
+    const checkArray: FormArray = this.filtersForm.get('beerTypes') as FormArray;
+    this.beerTypes.forEach(() => {
+      checkArray.push(this.fb.control(false));
+    });
   }
 
-  this.beerService.getFilteredBeers(filters).subscribe(
-    (beers: Beer[]) => { // Specify type for beers
-      this.filteredBeers = beers;
-      this.searchResults.emit(this.filteredBeers); // Emit filtered beers
-    },
-    (error) => {
-      console.error('Error fetching filtered beers:', error);
-    }
-  );
-}
+  onCheckboxChange(event: any, index: number): void {
+    const checkArray: FormArray = this.filtersForm.get('beerTypes') as FormArray;
+    checkArray.controls[index].setValue(event.target.checked);
+  }
 
+  applyFilters(): void {
+    const filters = this.filtersForm.value;
+    const selectedBeerTypes = filters.beerTypes
+      .map((checked: boolean, index: number) => checked ? this.beerTypes[index] : null)
+      .filter((type: string | null) => type !== null);
+
+    const isEmptyFilter = !filters.name && !filters.brand && !filters.abvRange && selectedBeerTypes.length === 0 && !filters.ingredient;
+
+    if (isEmptyFilter) {
+      this.filteredBeers = [];
+      this.searchResults.emit([]);
+      return;
+    }
+
+    this.beerService.getFilteredBeers({ ...filters, beerTypes: selectedBeerTypes }).subscribe(
+      (beers: Beer[]) => {
+        this.filteredBeers = beers;
+        this.searchResults.emit(this.filteredBeers);
+      },
+      (error) => {
+        console.error('Error fetching filtered beers:', error);
+      }
+    );
+  }
 }

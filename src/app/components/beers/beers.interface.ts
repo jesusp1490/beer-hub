@@ -10,12 +10,12 @@ export interface Beer {
   ABV: number;
   description: string;
   beerImageUrl: string;
-  ingredients: Ingredient[];
+  ingredients?: { name: string; ingImageUrl: string }[];
   brandId: string;
   countryId: string;
-  averageRating: number;
+  averageRating?: number;
+  favoriteUsers?: { [userId: string]: boolean };
   rating: Record<string, number>;
-  favoriteUsers: Record<string, boolean>;
-  addedDate?: Date; // Añade esta línea si quieres usar addedDate
+  addedDate?: string;
 }
 

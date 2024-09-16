@@ -1,9 +1,10 @@
 export interface Brand {
-beersCount: any;
+  beersCount: any;
   id: string;
   name: string;
   logoUrl: string;
   brandId: string;
   countryId: string;
   beers?: any[];
+  
 }

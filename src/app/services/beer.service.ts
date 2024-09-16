@@ -8,16 +8,12 @@ import { Brand } from '../components/country/brand.interface';
   providedIn: 'root'
 })
 export class BeerService {
-  filterBeers(query: string) {
-    throw new Error('Method not implemented.');
-  }
   constructor(private firestore: AngularFirestore) { }
 
   getFilteredBeers(filters: any): Observable<Beer[]> {
     return new Observable(observer => {
       let query: CollectionReference<Beer> = this.firestore.collection('beers').ref as CollectionReference<Beer>;
 
-      // Apply filter by name
       if (filters.name) {
         const name = filters.name.trim();
         if (name) {
@@ -26,8 +22,6 @@ export class BeerService {
         }
       }
 
-
-      // Apply filter by brand
       if (filters.brand) {
         const brand = filters.brand.trim();
         if (brand) {
@@ -36,7 +30,6 @@ export class BeerService {
         }
       }
 
-      // Apply filter by ABV
       if (filters.abvRange !== undefined) {
         const abvRange = Number(filters.abvRange);
         if (!isNaN(abvRange)) {
@@ -45,22 +38,28 @@ export class BeerService {
         }
       }
 
-      // Apply filter by beer type
-      if (filters.beerType) {
-        const beerType = filters.beerType.trim();
-        if (beerType) {
-          console.log(`Adding filter: beerType == ${beerType}`);
-          query = query.where('beerType', '==', beerType) as CollectionReference<Beer>;
-        }
-      }
-
       // Execute the query
       query.get().then(snapshot => {
-        const beers: Beer[] = [];
+        let beers: Beer[] = [];
         snapshot.forEach(doc => {
           const data = doc.data() as Beer;
           beers.push({ ...data, id: doc.id });
         });
+
+        // Filter by beer types if any are selected
+        if (filters.beerTypes && filters.beerTypes.length > 0) {
+          beers = beers.filter(beer => filters.beerTypes.includes(beer.beerType));
+        }
+
+        // Filter by ingredient if provided
+        if (filters.ingredient) {
+          const ingredient = filters.ingredient.trim().toLowerCase();
+          beers = beers.filter(beer => 
+            beer.ingredients && Array.isArray(beer.ingredients) && 
+            beer.ingredients.some(ing => ing && ing.name && ing.name.toLowerCase().includes(ingredient))
+          );
+        }
+
         console.log('Query result:', beers);
         observer.next(beers);
         observer.complete();
@@ -72,32 +71,10 @@ export class BeerService {
   }
 
   getBeers(): Observable<Beer[]> {
-    return new Observable(observer => {
-      this.firestore.collection<Beer>('beers').valueChanges().subscribe(
-        beers => {
-          observer.next(beers);
-          observer.complete();
-        },
-        error => {
-          console.error('Error fetching beers', error);
-          observer.error(error);
-        }
-      );
-    });
+    return this.firestore.collection<Beer>('beers').valueChanges({ idField: 'id' });
   }
 
   getBrands(): Observable<Brand[]> {
-    return new Observable(observer => {
-      this.firestore.collection<Brand>('brands').valueChanges().subscribe(
-        brands => {
-          observer.next(brands);
-          observer.complete();
-        },
-        error => {
-          console.error('Error fetching brands', error);
-          observer.error(error);
-        }
-      );
-    });
+    return this.firestore.collection<Brand>('brands').valueChanges({ idField: 'id' });
   }
 }

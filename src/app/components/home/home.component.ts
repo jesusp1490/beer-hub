@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BeerService } from '../../services/beer.service';
 import { Beer } from '../beers/beers.interface';
 import { Brand } from '../country/brand.interface';
-import { Router } from '@angular/router'; // Importar Router para redirección
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -10,23 +10,23 @@ import { Router } from '@angular/router'; // Importar Router para redirección
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-  searchActive = false; // Indica si la búsqueda está activa
-  filteredBeers: Beer[] = []; // Datos de cervezas filtradas
-  bestRatedBeers: Beer[] = []; // Datos de cervezas mejor valoradas
-  popularBrands: Brand[] = []; // Datos de marcas populares
-  userFavoriteBeers: Beer[] = []; // Datos de cervezas favoritas de usuarios
-  latestBeers: Beer[] = []; // Datos de cervezas añadidas recientemente
-  countryId: string = ''; // Asignar valor correcto
-  brandId: string = ''; // Asignar valor correcto
+  searchActive = false;
+  filteredBeers: Beer[] = [];
+  bestRatedBeers: Beer[] = [];
+  popularBrands: Brand[] = [];
+  userFavoriteBeers: Beer[] = [];
+  latestBeers: Beer[] = [];
+  countryId: string = '';
+  brandId: string = '';
 
   constructor(
     private beerService: BeerService,
-    private router: Router // Inyectar Router para redirección
+    private router: Router
   ) { }
 
   ngOnInit(): void {
-    this.countryId = 'actualCountryId'; // Asigna el valor correcto aquí
-    this.brandId = 'actualBrandId'; // Asigna el valor correcto aquí
+    this.countryId = 'actualCountryId';
+    this.brandId = 'actualBrandId';
     this.getBestRatedBeers();
     this.getUserFavoriteBeers();
     this.getPopularBrands();
@@ -39,40 +39,46 @@ export class HomeComponent implements OnInit {
   }
 
   getBestRatedBeers(): void {
-    this.beerService.getBeers().subscribe((beers) => {
+    this.beerService.getBeers().subscribe((beers: Beer[]) => {
       this.bestRatedBeers = beers
-        .filter((beer) => beer.averageRating) // Ensure there's an average rating
-        .sort((a, b) => b.averageRating - a.averageRating)
-        .slice(0, 5); // Show only top 5
+        .filter((beer: Beer) => beer.averageRating !== undefined)
+        .sort((a: Beer, b: Beer) => (b.averageRating || 0) - (a.averageRating || 0))
+        .slice(0, 5);
     });
   }
 
   getUserFavoriteBeers(): void {
-    this.beerService.getBeers().subscribe((beers) => {
+    this.beerService.getBeers().subscribe((beers: Beer[]) => {
       this.userFavoriteBeers = beers
-        .filter((beer) => Object.keys(beer.favoriteUsers).length > 0) // Ensure there are favorites
-        .sort((a, b) => Object.keys(b.favoriteUsers).length - Object.keys(a.favoriteUsers).length)
-        .slice(0, 5); // Show only top 5
+        .filter((beer: Beer) => beer.favoriteUsers && Object.keys(beer.favoriteUsers).length > 0)
+        .sort((a: Beer, b: Beer) => Object.keys(b.favoriteUsers || {}).length - Object.keys(a.favoriteUsers || {}).length)
+        .slice(0, 5);
     });
   }
 
   getPopularBrands(): void {
-    this.beerService.getBrands().subscribe((brands) => {
-      console.log('Popular Brands:', brands); // Verifica la estructura
-      this.popularBrands = brands.slice(0, 5); // Show only top 5
+    this.beerService.getBrands().subscribe((brands: Brand[]) => {
+      console.log('Popular Brands:', brands);
+      this.popularBrands = brands.slice(0, 5);
     });
   }
 
   getLatestBeers(): void {
-    this.beerService.getBeers().subscribe((beers) => {
+    this.beerService.getBeers().subscribe((beers: Beer[]) => {
       this.latestBeers = beers
-        .sort((a, b) => {
+        .sort((a: Beer, b: Beer) => {
           const dateA = a.addedDate ? new Date(a.addedDate).getTime() : 0;
           const dateB = b.addedDate ? new Date(b.addedDate).getTime() : 0;
           return dateB - dateA;
         })
-        .slice(0, 5); // Show only latest 5
+        .slice(0, 5);
     });
+  }
+
+  getIngredients(beer: Beer): string {
+    return beer.ingredients && beer.ingredients.length > 0
+      ? beer.ingredients.map(ing => ing.name).join(', ')
+      : 'No ingredients listed';
   }
 
   clearFilters(): void {
@@ -81,12 +87,12 @@ export class HomeComponent implements OnInit {
   }
 
   viewBeerDetails(beerId: string): void {
-    console.log('Viewing details for beer:', beerId); // Depuración
+    console.log('Viewing details for beer:', beerId);
     this.router.navigate(['/country', this.countryId, 'brands', this.brandId, 'beers', beerId]);
   }
 
   viewBrandBeers(brandId: string): void {
-    console.log('Viewing beers for brand:', brandId); // Depuración
+    console.log('Viewing beers for brand:', brandId);
     if (this.countryId && brandId) {
       this.router.navigate(['/country', this.countryId, 'brands', brandId, 'beers']);
     } else {

@@ -86,9 +86,15 @@
         }
 
         .right-section {
-            width: 60%;
+            width: 50%;
             padding: 2rem;
             padding-left: 35%;
+
+            .brand-logo {
+                width: 250px;
+                object-fit: contain;
+                margin-bottom: 1rem;
+            }
 
             .beer-name {
                 font-size: 2rem;
@@ -102,20 +108,18 @@
                 margin-bottom: -5px;
             }
 
-            .brand-logo {
-                width: 250px;
-                object-fit: contain;
-                margin-bottom: 1rem;
-            }
-
             .beer-info,
             .ingredients-section,
             .description-section {
-                margin-bottom: 1rem;
+                margin-bottom: 2rem;
 
                 h2 {
                     font-size: 1.5rem;
                     margin-bottom: 0.5rem;
+                }
+
+                p {
+                    font-size: 1.2rem;
                 }
             }
 
@@ -128,6 +132,7 @@
                     display: flex;
                     align-items: center;
                     gap: 0.5rem;
+                    margin-top: 15px;
 
                     .ingredient-icon {
                         width: 30px;

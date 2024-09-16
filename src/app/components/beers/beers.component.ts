@@ -149,7 +149,7 @@ export class BeersComponent implements OnInit, AfterViewInit {
       const matchesSearchTerm = searchTerm ? beer.name.toLowerCase().includes(searchTerm.toLowerCase()) : true;
       const matchesBeerType = beerType ? beer.beerType === beerType : true;
       const matchesAbv = abvRange ? beer.ABV <= abvRange : true;
-      const matchesIngredient = ingredient ? beer.ingredients.some(ing => ing.name.toLowerCase().includes(ingredient.toLowerCase())) : true;
+      const matchesIngredient = ingredient ? (beer.ingredients ?? []).some(ing => ing.name.toLowerCase().includes(ingredient.toLowerCase())) : true;
 
       return matchesSearchTerm && matchesBeerType && matchesAbv && matchesIngredient;
     });
