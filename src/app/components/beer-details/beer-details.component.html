@@ -4,9 +4,7 @@
   </div>
 
   <div class="info-card">
-
     <div class="left-section">
-
       <div class="country-info">
         <img [src]="countryFlagUrl" [alt]="countryName" class="country-flag">
         <span>{{ countryName }}</span>
@@ -14,6 +12,46 @@
       <div class="country-map">
         <img [src]="countryMapUrl" [alt]="countryName + ' map'" class="map-image">
       </div>
+    
+      <div class="description-section">
+        <h2>Description</h2>
+        <p class="beer-description">{{ beer?.description }}</p>
+      </div>
+
+      <div class="rating-section">
+        <h2>Average Rating: {{ beer?.averageRating | number:'1.1-1' }} </h2>
+        <div *ngIf="userId" class="user-rating">
+          <h3>Rate this beer:</h3>
+          <div class="beer-rate">
+            <img *ngFor="let i of [1, 2, 3, 4, 5]"
+              [src]="i <= (userRating || 0) ? 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-beer.webp?alt=media&token=a0cbaf82-83ef-41e7-abc5-36a140d10119' : 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-beer.webp?alt=media&token=65bd916f-f7dc-4b23-9efb-45bbdb627ce9'"
+              (click)="rateBeer(i)" alt="beer icon" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <img *ngIf="brandLogoUrl" [src]="brandLogoUrl" alt="{{ brandName }} logo" class="brand-logo" />
+
+      <h1 class="beer-name">{{ beer?.name }} <img [src]="favoriteIconUrl" (click)="toggleFavorite()" alt="Favorite Icon" class="favorite-icon"/> </h1>
+      
+
+      <div class="beer-info">
+        <h2>Beer Type</h2>
+        <p>{{ beer?.beerType }}</p>
+      </div>
+
+      <div class="ingredients-section">
+        <h2>Ingredients</h2>
+        <div class="ingredients-list">
+          <div *ngFor="let ingredient of beer?.ingredients" class="ingredient-item">
+            <img [src]="ingredient.ingImageUrl" [alt]="ingredient.name" class="ingredient-icon">
+            <span class="ingredient-name">{{ ingredient.name }}</span>
+          </div>
+        </div>
+      </div>
+
       <div class="beer-stats">
         <div class="stat">
           <span class="label">ABV: </span>
@@ -24,33 +62,7 @@
           <!-- <span class="value">{{ beer?.IBU }}</span> -->
         </div>
       </div>
-    </div>
 
-
-    <div class="right-section">
-      <h1 class="beer-name">{{ beer?.name }}</h1>
-      <img *ngIf="brandLogoUrl" [src]="brandLogoUrl" alt="{{ brandName }} logo" class="brand-logo"/>
-
-      <div class="rating-section">
-        <h2>Average Rating: {{ beer?.averageRating }} </h2>
-        <div *ngIf="userId" class="user-rating">
-
-          <h3>Rate this beer:</h3>
-          <div class="beer-rate">
-            <img *ngFor="let i of [1, 2, 3, 4, 5]"
-              [src]="i <= (userRating || 0) ? 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-beer.webp?alt=media&token=a0cbaf82-83ef-41e7-abc5-36a140d10119' : 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-beer.webp?alt=media&token=65bd916f-f7dc-4b23-9efb-45bbdb627ce9'"
-              (click)="rateBeer(i)" alt="beer icon" />
-          </div>
-          
-        </div>
-      </div>
-
-      <div class="beer-info">
-        <h2>Beer Type</h2>
-        <p>{{ beer?.beerType }}</p>
-      </div>
-
-      <p class="beer-description">{{ beer?.description }}</p>
     </div>
   </div>
 </div>

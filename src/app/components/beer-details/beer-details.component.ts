@@ -22,7 +22,7 @@ export class BeerDetailsComponent implements OnInit {
   countryMapUrl: string = '';
   userRating: number | null = null;
   userId: string | null = null;
-  favoriteIconUrl: string = 'assets/icons/empty-heart.svg';
+  favoriteIconUrl: string = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-crown.webp?alt=media&token=d6a7a1e5-1dcb-4c2d-8f34-87df6a9d2548';
   showRegisterModal: boolean = false;
 
   constructor(
@@ -46,6 +46,10 @@ export class BeerDetailsComponent implements OnInit {
         this.loadBeerData(beerId);
       }
     });
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 
   private loadBeerData(beerId: string): void {
@@ -84,30 +88,17 @@ export class BeerDetailsComponent implements OnInit {
     });
   }
 
-  splitIngredients(ingredients: any[]): any[][] {
-    if (!ingredients) return [];
-    const result = [];
-    for (let i = 0; i < ingredients.length; i += 6) {
-      result.push(ingredients.slice(i, i + 6));
-    }
-    return result;
-  }
-
   rateBeer(rating: number): void {
     if (!this.userId || !this.beer) return;
 
-    // Obtener las valoraciones actuales y añadir o actualizar la valoración del usuario
     const ratings = this.beer.rating || {};
     ratings[this.userId] = rating;
 
-    // Calcular el total de las valoraciones
-    const totalRating = Object.values(ratings).reduce((sum, r) => sum + r, 0);
+    const totalRating = Object.values(ratings).reduce((sum, r) => sum + (r as number), 0);
     const totalUsers = Object.keys(ratings).length;
 
-    // Calcular el nuevo promedio de las valoraciones
     const newAverageRating = (totalRating / totalUsers).toFixed(1);
 
-    // Actualizar Firestore
     this.firestore.collection('beers').doc(this.beer.id).update({
       rating: ratings,
       averageRating: parseFloat(newAverageRating)
@@ -121,7 +112,6 @@ export class BeerDetailsComponent implements OnInit {
     });
   }
 
-
   toggleFavorite(): void {
     if (!this.userId) {
       this.showRegisterModal = true;
@@ -132,19 +122,16 @@ export class BeerDetailsComponent implements OnInit {
 
     favoriteRef.get().subscribe(doc => {
       if (doc.exists) {
-        // Eliminar de favoritos
         favoriteRef.delete().then(() => {
-          this.favoriteIconUrl = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-corwn.webp?alt=media&token=deb3f900-e608-4712-9b9a-bd4410852187'; // Default icon URL
+          this.favoriteIconUrl = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-corwn.webp?alt=media&token=deb3f900-e608-4712-9b9a-bd4410852187';
         });
       } else {
-        // Añadir a favoritos
         favoriteRef.set({}).then(() => {
-          this.favoriteIconUrl = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-crown.webp?alt=media&token=d52cdf3b-f0b6-4432-a921-7a16bfd62803'; // Filled icon URL
+          this.favoriteIconUrl = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-crown.webp?alt=media&token=d52cdf3b-f0b6-4432-a921-7a16bfd62803';
         });
       }
     });
   }
-
 
   updateFavoriteIcon(): void {
     if (!this.beer?.id || !this.userId) {
@@ -156,16 +143,11 @@ export class BeerDetailsComponent implements OnInit {
 
     favoriteRef.get().subscribe(doc => {
       if (doc.exists) {
-        this.favoriteIconUrl = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-crown.webp?alt=media&token=d52cdf3b-f0b6-4432-a921-7a16bfd62803'; // Filled icon URL
+        this.favoriteIconUrl = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-crown.webp?alt=media&token=d52cdf3b-f0b6-4432-a921-7a16bfd62803';
       } else {
-        this.favoriteIconUrl = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-corwn.webp?alt=media&token=deb3f900-e608-4712-9b9a-bd4410852187'; // Default icon URL
+        this.favoriteIconUrl = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-corwn.webp?alt=media&token=deb3f900-e608-4712-9b9a-bd4410852187';
       }
     });
-  }
-
-
-  goBack(): void {
-    this.location.back();
   }
 
   closeRegisterModal(): void {
