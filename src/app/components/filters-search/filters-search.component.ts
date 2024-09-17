@@ -32,7 +32,7 @@ export class FilterSearchComponent implements OnInit {
     this.filtersForm = this.fb.group({
       name: [''],
       brand: [''],
-      abvRange: [0],
+      abvRange: [10],
       ...beerTypeControls,
       ingredient: ['']
     });

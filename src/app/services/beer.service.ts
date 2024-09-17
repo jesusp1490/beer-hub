@@ -77,4 +77,8 @@ export class BeerService {
   getBrands(): Observable<Brand[]> {
     return this.firestore.collection<Brand>('brands').valueChanges({ idField: 'id' });
   }
+
+  getBeersByBrand(brandId: string): Observable<Beer[]> {
+    return this.firestore.collection<Beer>('beers', ref => ref.where('brandId', '==', brandId)).valueChanges({ idField: 'id' });
+  }
 }

@@ -1,19 +1,20 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Location } from '@angular/common';
 import { Beer } from '../beers/beers.interface';
 import { Brand } from '../country/brand.interface';
 import { Country } from '../country/country.interface';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-beer-details',
   templateUrl: './beer-details.component.html',
   styleUrls: ['./beer-details.component.scss']
 })
-export class BeerDetailsComponent implements OnInit {
+export class BeerDetailsComponent implements OnInit, OnDestroy {
   beer: Beer | undefined;
   brandName: string = '';
   brandLogoUrl: string = '';
@@ -24,6 +25,7 @@ export class BeerDetailsComponent implements OnInit {
   userId: string | null = null;
   favoriteIconUrl: string = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-crown.webp?alt=media&token=d6a7a1e5-1dcb-4c2d-8f34-87df6a9d2548';
   showRegisterModal: boolean = false;
+  private unsubscribe$ = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
@@ -34,13 +36,13 @@ export class BeerDetailsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.afAuth.authState.subscribe(user => {
+    this.afAuth.authState.pipe(takeUntil(this.unsubscribe$)).subscribe(user => {
       if (user) {
         this.userId = user.uid;
       }
     });
 
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.unsubscribe$)).subscribe(params => {
       const beerId = params.get('beerId');
       if (beerId) {
         this.loadBeerData(beerId);
@@ -48,25 +50,32 @@ export class BeerDetailsComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
   goBack(): void {
     this.location.back();
   }
 
   private loadBeerData(beerId: string): void {
-    this.firestore.collection<Beer>('beers').doc(beerId).valueChanges().subscribe(beer => {
-      if (beer) {
-        this.beer = beer;
-        this.loadBrandData(beer.brandId);
-        this.loadCountryData(beer.countryId);
+    this.firestore.collection<Beer>('beers').doc(beerId).valueChanges()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(beer => {
+        if (beer) {
+          this.beer = beer;
+          this.loadBrandData(beer.brandId);
+          this.loadCountryData(beer.countryId);
 
-        if (this.userId && beer.rating) {
-          const userRating = beer.rating[this.userId];
-          this.userRating = userRating !== undefined ? userRating : null;
+          if (this.userId && beer.rating) {
+            const userRating = beer.rating[this.userId];
+            this.userRating = userRating !== undefined ? userRating : null;
+          }
+
+          this.updateFavoriteIcon();
         }
-
-        this.updateFavoriteIcon();
-      }
-    });
+      });
   }
 
   private loadBrandData(brandId: string): void {

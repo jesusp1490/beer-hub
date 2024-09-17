@@ -16,8 +16,6 @@ export class HomeComponent implements OnInit {
   popularBrands: Brand[] = [];
   userFavoriteBeers: Beer[] = [];
   latestBeers: Beer[] = [];
-  countryId: string = '';
-  brandId: string = '';
 
   constructor(
     private beerService: BeerService,
@@ -25,8 +23,6 @@ export class HomeComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.countryId = 'actualCountryId';
-    this.brandId = 'actualBrandId';
     this.getBestRatedBeers();
     this.getUserFavoriteBeers();
     this.getPopularBrands();
@@ -86,17 +82,11 @@ export class HomeComponent implements OnInit {
     this.searchActive = false;
   }
 
-  viewBeerDetails(beerId: string): void {
-    console.log('Viewing details for beer:', beerId);
-    this.router.navigate(['/country', this.countryId, 'brands', this.brandId, 'beers', beerId]);
+  viewBeerDetails(beer: Beer): void {
+    this.router.navigate(['/beers', beer.id]);
   }
 
-  viewBrandBeers(brandId: string): void {
-    console.log('Viewing beers for brand:', brandId);
-    if (this.countryId && brandId) {
-      this.router.navigate(['/country', this.countryId, 'brands', brandId, 'beers']);
-    } else {
-      console.error('Invalid countryId or brandId');
-    }
+  viewBrandBeers(brand: Brand): void {
+    this.router.navigate(['/brands', brand.id, 'beers']);
   }
 }

@@ -1,100 +1,114 @@
 .homepage-container {
-    display: flex;
-    // padding: 10px;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 2rem;
     height: 100vh;
-    /* Para que ocupe toda la altura de la pantalla */
+    padding: 2rem;
     box-sizing: border-box;
+    // background-color: #f5f5f5;
+}
+
+.hero {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 0;
+    background-color: #f3b200;
+    color: white;
+    border-radius: 8px;
+
+    h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        font-size: 1.2rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
 }
 
 .filter-sidebar {
-    width: 300px;
-    flex-shrink: 0;
+    grid-row: 2 / 3;
 }
 
-.main-content {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    transition: flex 0.3s ease;
-}
-
+.main-content,
 .search-results {
-    padding: 20px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    overflow-y: auto;
 }
 
-.section-content {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
+.section {
+    margin-bottom: 3rem;
+
+    h2 {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+        color: #dadada;
+    }
 }
 
-.section-item {
-    flex-basis: 18%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+.beer-grid,
+.brand-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-left: 60px;
+}
+
+.beer-card,
+.brand-card {
+    // background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
-}
+    width: 200px;
 
-.section-item img {
-    max-width: 100px;
-    height: auto;
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .beer-info,
+    .brand-info {
+        padding: 1rem;
+
+        h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #dadada;
+        }
+
+        p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 0.25rem;
+        }
+
+        .rating {
+            font-weight: 500;
+            color: #f39c12;
+        }
+
+        .ingredients {
+            font-size: 0.8rem;
+            color: #95a5a6;
+        }
+    }
 }
 
 .no-results {
-    color: #777;
-}
-
-/* Estilos para la grid de cervezas */
-.beers-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-    padding: 20px;
-    width: 100%;
-    height: 100%;
-    /* Asegúrate de que la grid ocupe todo el espacio disponible */
-}
-
-/* Carta de cerveza */
-.beer-card {
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.beer-card:hover {
-    transform: scale(1.05);
-}
-
-.ingredients {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #555;
-}
-
-.brands-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px; // Ajusta según sea necesario
-}
-
-.brand-card {
-    width: 150px; // Ajusta el tamaño de las tarjetas
-    cursor: pointer;
     text-align: center;
-}
-
-.brand-card img {
-    width: 100%;
-    height: auto;
+    color: #7f8c8d;
+    font-size: 1.2rem;
+    margin-top: 2rem;
 }

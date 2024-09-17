@@ -1,18 +1,19 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Location } from '@angular/common';
 import { Beer } from './beers.interface';
 import { Brand } from '../country/brand.interface';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import * as $ from 'jquery';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-beers',
   templateUrl: './beers.component.html',
   styleUrls: ['./beers.component.scss']
 })
-export class BeersComponent implements OnInit, AfterViewInit {
+export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   brandName: string = '';
   beers: Beer[] = [];
   filteredBeers: Beer[] = [];
@@ -22,6 +23,7 @@ export class BeersComponent implements OnInit, AfterViewInit {
   countryId: string = '';
   brandId: string = '';
   filtersForm: FormGroup;
+  private unsubscribe$ = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
@@ -39,20 +41,22 @@ export class BeersComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.unsubscribe$)).subscribe(params => {
       this.countryId = params.get('country') ?? '';
       this.brandId = params.get('brandId') ?? '';
 
-      console.log('Country ID in BeersComponent:', this.countryId);
-      console.log('Brand ID in BeersComponent:', this.brandId);
-
-      if (this.countryId && this.brandId) {
+      if (this.brandId) {
         this.loadBrandData(this.brandId);
-        this.loadBeers(this.countryId, this.brandId);
+        this.loadBeers(this.brandId);
       } else {
-        console.error('Invalid countryId or brandId');
+        console.error('Invalid brandId');
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   ngAfterViewInit(): void {
@@ -126,11 +130,10 @@ export class BeersComponent implements OnInit, AfterViewInit {
     );
   }
 
-  private loadBeers(countryId: string, brandId: string): void {
-    this.firestore.collection<Beer>('beers', ref => ref
-      .where('countryId', '==', countryId)
-      .where('brandId', '==', brandId))
+  private loadBeers(brandId: string): void {
+    this.firestore.collection<Beer>('beers', ref => ref.where('brandId', '==', brandId))
       .valueChanges()
+      .pipe(takeUntil(this.unsubscribe$))
       .subscribe(
         beers => {
           this.beers = beers;
@@ -141,50 +144,63 @@ export class BeersComponent implements OnInit, AfterViewInit {
         }
       );
   }
-
-  private applyFilters(): void {
-    const { searchTerm, beerType, abvRange, ingredient } = this.filtersForm.value;
-
-    this.filteredBeers = this.beers.filter(beer => {
-      const matchesSearchTerm = searchTerm ? beer.name.toLowerCase().includes(searchTerm.toLowerCase()) : true;
-      const matchesBeerType = beerType ? beer.beerType === beerType : true;
-      const matchesAbv = abvRange ? beer.ABV <= abvRange : true;
-      const matchesIngredient = ingredient ? (beer.ingredients ?? []).some(ing => ing.name.toLowerCase().includes(ingredient.toLowerCase())) : true;
-
-      return matchesSearchTerm && matchesBeerType && matchesAbv && matchesIngredient;
-    });
-
-    this.updateVisibleBeers();
-  }
-
-  private updateVisibleBeers(): void {
-    const start = this.page * this.pageSize;
-    const end = start + this.pageSize;
-    this.visibleBeers = this.filteredBeers.slice(start, end);
+  
+  applyFilters() {
+    throw new Error('Method not implemented.');
   }
 
   selectBeer(beerId: string): void {
-    console.log('Selecting beer with ID:', beerId);
-    const route = `/country/${this.countryId}/brands/${this.brandId}/beers/${beerId}`;
-    this.router.navigate([route]);
-  }
-
-  viewBrandBeers(brandId: string): void {
-    console.log('Viewing beers for brand ID:', brandId);
-    const route = `/country/${this.countryId}/brands/${brandId}/beers`;
-    this.router.navigate([route]);
-  }
-
-  onSearchResults(searchResults: Beer[]): void {
-    this.beers = searchResults;
-    this.applyFilters();
-  }
-
-  previousSlide(): void {
-    $('.carousel-track').slick('slickPrev');
-  }
-
-  nextSlide(): void {
-    $('.carousel-track').slick('slickNext');
+    this.router.navigate(['/beers', beerId]);
   }
 }
+
+  // private applyFilters(): void {
+  //   const { searchTerm, beerType, abvRange, ingredient } = this.filtersForm.value;
+
+  //   this.filteredBeers = this.beers.filter(beer => {
+  //     const matchesSearchTerm = searchTerm ? beer.name.toLowerCase().includes(searchTerm.toLowerCase()) : true;
+  //     const matchesBeerType = beerType ? beer.beerType === beerType : true;
+  //     const matchesAbv = abvRange ? beer.ABV <= abvRange : true;
+  //     const matchesIngredient = ingredient ? (beer.ingredients ?? []).some(ing => ing.name.toLowerCase().includes(ingredient.toLowerCase())) : true;
+
+  //     return matchesSearchTerm && matchesBeerType && matchesAbv && matchesIngredient;
+  //   });
+
+  //   this.updateVisibleBeers();
+  // }
+
+  // private updateVisibleBeers(): void {
+  //   const start = this.page * this.pageSize;
+  //   const end = start + this.pageSize;
+  //   this.visibleBeers = this.filteredBeers.slice(start, end);
+  // }
+
+  // selectBeer(beerId: string): void {
+  //   console.log('Selecting beer with ID:', beerId);
+  //   const route = `/country/${this.countryId}/brands/${this.brandId}/beers/${beerId}`;
+  //   this.router.navigate([route]);
+  // }
+
+  // viewBrandBeers(brandId: string): void {
+  //   console.log('Viewing beers for brand ID:', brandId);
+  //   const route = `/country/${this.countryId}/brands/${brandId}/beers`;
+  //   this.router.navigate([route]);
+  // }
+
+  // onSearchResults(searchResults: Beer[]): void {
+  //   this.beers = searchResults;
+  //   this.applyFilters();
+  // }
+
+  // previousSlide(): void {
+  //   $('.carousel-track').slick('slickPrev');
+  // }
+
+  // nextSlide(): void {
+  //   $('.carousel-track').slick('slickNext');
+  // }
+
+function applyFilters() {
+  throw new Error('Function not implemented.');
+}
+
