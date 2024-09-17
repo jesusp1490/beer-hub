@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
   firebaseConfig: {
-    apiKey: "AIzaSyD3d7lAHBMiDDSAHYWQhEZiDEfmFy1NxjE",
+    apiKey: "AIzaSyDovLKo3djdRbs963vqKdbjgeRWyzMTrg",
   authDomain: "beer-hub-c7f53.firebaseapp.com",
   projectId: "beer-hub",
   storageBucket: "beer-hub.appspot.com",

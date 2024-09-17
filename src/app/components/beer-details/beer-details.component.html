@@ -29,7 +29,13 @@
           </div>
         </div>
       </div>
+      <div class="web">
+        <h2>Get more info:</h2>
+        <a [href]="beer?.web" target="_blank">{{ beer?.web }}</a>
+      </div>
     </div>
+
+    
 
     <div class="right-section">
       <img *ngIf="brandLogoUrl" [src]="brandLogoUrl" alt="{{ brandName }} logo" class="brand-logo" />
@@ -58,7 +64,7 @@
         </div>
         <div class="stat">
           <span class="label">IBU: </span>
-          <!-- <span class="value">{{ beer?.IBU }}</span> -->
+          <span class="value">{{ beer?.IBU }}.</span>
         </div>
       </div>
 

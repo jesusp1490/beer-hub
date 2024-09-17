@@ -11,14 +11,14 @@ import { Beer } from '../beers/beers.interface';
 export class FilterSearchComponent implements OnInit {
   filtersForm: FormGroup;
   beerTypes: string[] = [
-    'Ale', 'American Lager', 'American Pale Ale', 'American India Pale Ale', 'American Wheat', 'Amber Ale', 
-    'Alsatian', 'Altbier', 'Barleywine', 'Barrel Aged Beer', 'Belgian Dark Ale', 'Belgian Dubble', 'Belgian Tripel', 
-    'Blonde Ale', 'Bock', 'Brown Ale', 'Cider', 'DoppelBock', 'Dry Stout', 'Dunkel', 'Fruit Beer', 'German Pilsner', 
-    'Gose', 'Hefeweizen', 'Helles', 'Imperial Stout', 'India Pale Ale', 'Kölsh', 'Lager', 'Lambic', 'Low Alcohol', 
-    'MÄRZEN', 'Milk Stout', 'Münchner Dunkel', 'Neipa', 'Non-alcoholic Lager', 'Non-alcoholic Stout', 
-    'Non-alcoholic Weissbier', 'Pale Ale', 'Pale Lager', 'Porter', 'Radler', 'Red Ale', 'Red India Pale Ale', 
-    'Quadrupel', 'Saison', 'SCHWARZBIER', 'Scotch Ale', 'Shandy', 'Special Beer', 'Spiced Beer', 'Stout', 
-    'Sour Ale', 'Vienna Lager', 'Weissbier', 'Witbier', 'Barleywine', 'Berliner Weisse'
+    'ALE', 'AMERICAN LAGER', 'AMERICAN PALE ALE', 'AMERICAN INDIA PALE ALE', 'AMERICAN WHEAT', 'AMBER ALE', 
+    'ALSATIAN', 'ALTBIER', 'BARLEYWINE', 'BARREL AGED BEER', 'BELGIAN DARK ALE', 'BELGIAN DUBBLE', 'BELGIAN TRIPEL', 
+    'BLONDE ALE', 'BOCK', 'BROWN ALE', 'CIDER', 'DOPPELBOCK', 'DRY STOUT', 'DUNKEL', 'DUNKEL BOCK', 'FRUIT BEER', 'GERMAN PILSNER', 
+    'GOSE', 'HEFEWEIZEN', 'HELLES', 'HELLES BOCK', 'IMPERIAL STOUT', 'INDIA PALE ALE', 'IRISH RED ALE', 'KÖLSH', 'LAGER', 'LAMBIC', 'LOW ALCOHOL', 
+    'MÄRZEN', 'MILK STOUT', 'MÜNCHNER DUNKEL', 'NEIPA', 'NON-ALCOHOLIC LAGER', 'NON-ALCOHOLIC STOUT', 
+    'NON-ALCOHOLIC WEISSBIER', 'PALE ALE', 'PALE LAGER', 'PORTER', 'RADLER', 'RED ALE', 'RED INDIA PALE ALE', 
+    'QUADRUPEL', 'SAISON', 'SCHWARZBIER', 'SCOTCH ALE', 'SHANDY', 'SPECIAL BEER', 'SPICED BEER', 'STOUT', 
+    'SOUR ALE', 'VIENNA LAGER', 'WEISSBIER', 'WITBIER', 'BARLEYWINE', 'BERLINER WEISSE'
   ];
   filteredBeers: Beer[] = [];
   @Output() searchResults = new EventEmitter<Beer[]>();

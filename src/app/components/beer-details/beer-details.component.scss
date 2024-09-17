@@ -83,6 +83,21 @@
                 color: $color-text-secondary;
                 font-size: 0.9rem;
             }
+
+            .web {
+                margin-top: 30px;
+
+                h2 {
+                    font-weight: 500;
+                }
+
+                a {
+                    text-decoration: none;
+                    color: #f3b200;
+                }   
+            }
+
+            
         }
 
         .right-section {
@@ -181,7 +196,7 @@
     justify-content: center;
 
     .beer-image {
-        height: 100%;
+        height: 90%;
         width: auto;
         object-fit: contain;
     }

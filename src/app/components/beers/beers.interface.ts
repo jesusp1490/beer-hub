@@ -8,6 +8,7 @@ export interface Beer {
   name: string;
   beerType: string;
   ABV: number;
+  IBU: number;
   description: string;
   beerImageUrl: string;
   ingredients?: { name: string; ingImageUrl: string }[];
@@ -17,5 +18,6 @@ export interface Beer {
   favoriteUsers?: { [userId: string]: boolean };
   rating: Record<string, number>;
   addedDate?: string;
+  web: string;
 }
 
