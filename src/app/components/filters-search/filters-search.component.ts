@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { BeerService } from '../../services/beer.service';
 import { Beer } from '../beers/beers.interface';
 
@@ -24,38 +24,30 @@ export class FilterSearchComponent implements OnInit {
   @Output() searchResults = new EventEmitter<Beer[]>();
 
   constructor(private fb: FormBuilder, private beerService: BeerService) {
+    const beerTypeControls: { [key: string]: FormControl } = {};
+    this.beerTypes.forEach(type => {
+      beerTypeControls[type] = new FormControl(false);
+    });
+
     this.filtersForm = this.fb.group({
       name: [''],
       brand: [''],
       abvRange: [0],
-      beerTypes: this.fb.array([]),
+      ...beerTypeControls,
       ingredient: ['']
     });
-
-    this.initBeerTypeCheckboxes();
   }
 
-  ngOnInit(): void {}
-
-  initBeerTypeCheckboxes(): void {
-    const checkArray: FormArray = this.filtersForm.get('beerTypes') as FormArray;
-    this.beerTypes.forEach(() => {
-      checkArray.push(this.fb.control(false));
-    });
-  }
-
-  onCheckboxChange(event: any, index: number): void {
-    const checkArray: FormArray = this.filtersForm.get('beerTypes') as FormArray;
-    checkArray.controls[index].setValue(event.target.checked);
+  ngOnInit(): void {
+    console.log('Total beer types:', this.beerTypes.length);
+    console.log('Form controls:', Object.keys(this.filtersForm.controls).length);
   }
 
   applyFilters(): void {
     const filters = this.filtersForm.value;
-    const selectedBeerTypes = filters.beerTypes
-      .map((checked: boolean, index: number) => checked ? this.beerTypes[index] : null)
-      .filter((type: string | null) => type !== null);
+    const selectedBeerTypes = this.beerTypes.filter(type => filters[type]);
 
-    const isEmptyFilter = !filters.name && !filters.brand && !filters.abvRange && selectedBeerTypes.length === 0 && !filters.ingredient;
+    const isEmptyFilter = !filters.name && !filters.brand && filters.abvRange === 0 && selectedBeerTypes.length === 0 && !filters.ingredient;
 
     if (isEmptyFilter) {
       this.filteredBeers = [];
@@ -71,6 +63,13 @@ export class FilterSearchComponent implements OnInit {
       (error) => {
         console.error('Error fetching filtered beers:', error);
       }
+    );
+  }
+
+  // Helper method to chunk the beer types array
+  chunkArray(arr: any[], size: number): any[][] {
+    return Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
+      arr.slice(i * size, i * size + size)
     );
   }
 }
