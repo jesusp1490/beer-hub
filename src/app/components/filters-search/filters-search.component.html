@@ -2,28 +2,21 @@
   <h2>Search for your beer</h2>
   <form [formGroup]="filtersForm" (ngSubmit)="applyFilters()">
     <div class="input-group">
-      <input formControlName="name" placeholder="Search by name" class="label">
-    </div>
-    <div class="input-group">
-      <input formControlName="brand" placeholder="Search by brand" class="label">
+      <input formControlName="searchTerm" placeholder="Search by name or brand" class="label">
     </div>
     <div class="input-group">
       <input formControlName="ingredient" placeholder="Search by ingredient" class="label">
     </div>
-    
+
     <div class="beer-types-container">
-      <h2>Beer Types</h2>
+      <h3>Beer Types</h3>
       <div class="beer-types-grid">
-        <ng-container *ngFor="let chunk of chunkArray(beerTypes, 3)">
-          <div class="beer-type-column">
-            <div *ngFor="let type of chunk" class="beer-type-checkbox">
-              <label>
-                <input type="checkbox" [formControlName]="type">
-                <span>{{ type }}</span>
-              </label>
-            </div>
-          </div>
-        </ng-container>
+        <div *ngFor="let type of beerTypes" class="beer-type-checkbox">
+          <label>
+            <input type="checkbox" [value]="type" (change)="updateBeerTypes($event, type)">
+            <span>{{ type }}</span>
+          </label>
+        </div>
       </div>
     </div>
 
@@ -31,8 +24,6 @@
       <label for="abvRange">ABV Range: {{ filtersForm.get('abvRange')?.value }}%</label>
       <input type="range" id="abvRange" formControlName="abvRange" min="0" max="20" step="0.1">
     </div>
-
-    
 
     <button type="submit">Apply Filters</button>
   </form>
