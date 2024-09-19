@@ -8,10 +8,9 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/storage';
 
 interface FavoriteBeer {
-beerImageUrl: any;
+  beerImageUrl: any;
   id: string;
   name: string;
-  imageUrl: string;
 }
 
 @Component({
@@ -75,7 +74,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
             return {
               id: beer?.id || '',
               name: beerData.name,
-              imageUrl: beerData.imageUrl,
               beerImageUrl: beerData.beerImageUrl
             };
           });
@@ -162,15 +160,16 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
   }
 
-  removeFavoriteBeer(beerId: string): void {
+  async removeFavoriteBeer(beerId: string): Promise<void> {
     if (this.user) {
-      this.firestore.doc(`users/${this.user.uid}/favorites/${beerId}`).delete()
-        .then(() => {
-          this.favoriteBeers = this.favoriteBeers.filter(beer => beer.id !== beerId);
-        })
-        .catch(error => {
-          console.error('Error removing favorite beer:', error);
-        });
+      try {
+        const idToken = await this.user.getIdToken();
+        await this.firestore.collection('users').doc(this.user.uid).collection('favorites').doc(beerId).delete();
+        console.log('Favorite beer removed successfully');
+      } catch (error) {
+        console.error('Error removing favorite beer:', error);
+        alert('Error removing favorite beer. Please try again.');
+      }
     }
   }
 }
