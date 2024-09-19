@@ -8,10 +8,15 @@
   </div>
   <div class="map-controls">
     <button (click)="resetZoom()">Reset Zoom</button>
+    <button (click)="toggleHeatMap()">{{ isHeatMap ? 'Normal View' : 'Heat Map' }}</button>
+    <button (click)="zoomToRegion('Europe')">Europe</button>
+    <button (click)="zoomToRegion('North America')">North America</button>
+    <button (click)="zoomToRegion('Asia')">Asia</button>
+    <button (click)="simulateDataChange()">Simulate Data Change</button>
   </div>
   <div class="legend">
     <h3>Beer Availability</h3>
-    <div class="legend-gradient"></div>
+    <div class="legend-gradient" (mousemove)="onLegendHover($event)" (mouseleave)="onLegendLeave()"></div>
     <div class="legend-labels">
       <span>Low</span>
       <span>High</span>

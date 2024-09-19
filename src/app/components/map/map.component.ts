@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ElementRef, OnDestroy, HostListener } from '@angular/core';
 import * as d3 from 'd3';
 import { geoMercator, geoPath } from 'd3-geo';
 import { Router } from '@angular/router';
@@ -24,6 +24,9 @@ export class MapComponent implements OnInit, OnDestroy {
   private colorScale!: d3.ScaleLinear<string, string>;
   private countryBeerCounts: { [countryId: string]: number } = {};
   private destroy$ = new Subject<void>();
+  
+  public isHeatMap: boolean = false;
+  private heatMapColorScale!: d3.ScaleLinear<string, string>;
 
   constructor(
     private el: ElementRef,
@@ -31,7 +34,7 @@ export class MapComponent implements OnInit, OnDestroy {
     private beerService: BeerService
   ) {
     this.zoom = d3.zoom()
-      .scaleExtent([1, 3])
+      .scaleExtent([1, 8])
       .on('zoom', (event) => {
         this.g.attr('transform', event.transform);
       });
@@ -42,25 +45,24 @@ export class MapComponent implements OnInit, OnDestroy {
     this.createSvg();
     this.createTooltip();
     this.loadData();
-
-    window.addEventListener('resize', this.onResize.bind(this));
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    window.removeEventListener('resize', this.onResize.bind(this));
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    this.setDimensions();
+    this.updateSvg();
+    this.updateProjection();
   }
 
   private setDimensions(): void {
-    this.width = window.innerWidth;
-    this.height = window.innerHeight - 80;
-  }
-
-  private onResize(): void {
-    this.setDimensions();
-    this.createSvg();
-    this.drawMap(this.filteredCountries, this.createProjection());
+    const element = this.el.nativeElement.querySelector('.map-container');
+    this.width = element.clientWidth;
+    this.height = element.clientHeight;
   }
 
   private createSvg(): void {
@@ -68,12 +70,18 @@ export class MapComponent implements OnInit, OnDestroy {
     container.selectAll('svg').remove();
 
     this.svg = container.append('svg')
-      .attr('width', this.width)
-      .attr('height', this.height);
+      .attr('class', 'map-svg')
+      .attr('viewBox', `0 0 ${this.width} ${this.height}`)
+      .attr('preserveAspectRatio', 'xMidYMid meet');
 
     this.g = this.svg.append('g');
 
     this.svg.call(this.zoom as any);
+  }
+
+  private updateSvg(): void {
+    this.svg
+      .attr('viewBox', `0 0 ${this.width} ${this.height}`);
   }
 
   private createTooltip(): void {
@@ -92,6 +100,12 @@ export class MapComponent implements OnInit, OnDestroy {
     return geoMercator()
       .scale((this.width / 6.4) * 0.9)
       .translate([this.width / 2, this.height / 1.8]);
+  }
+
+  private updateProjection(): void {
+    const projection = this.createProjection();
+    const path = geoPath().projection(projection);
+    this.drawMap(this.filteredCountries, path);
   }
 
   private loadData(): void {
@@ -134,7 +148,10 @@ export class MapComponent implements OnInit, OnDestroy {
       .range(['#c7c7c7', '#606060'])
       .interpolate(d3.interpolateRgb.gamma(2.2));
 
-    console.log('Color scale updated:', minCount, maxCount);
+    this.heatMapColorScale = d3.scaleLinear<string>()
+      .domain([minCount, maxCount])
+      .range(['#FEE5D9', '#A50F15'])
+      .interpolate(d3.interpolateRgb.gamma(2.2));
   }
 
   private drawMap(countries: any[], path: any): void {
@@ -151,14 +168,12 @@ export class MapComponent implements OnInit, OnDestroy {
       .on('mouseover', (event: any, d: any) => this.onMouseOver(event, d))
       .on('mouseout', (event: any, d: any) => this.onMouseOut(event, d))
       .on('click', (event: any, d: any) => this.onCountrySelect(event, d));
-
-    console.log('Map drawn with', countries.length, 'countries');
   }
 
   private getCountryColor(d: any): string {
     const countryName = d.properties.name;
     const beerCount = this.countryBeerCounts[countryName] || 0;
-    return this.colorScale(beerCount);
+    return this.isHeatMap ? this.heatMapColorScale(beerCount) : this.colorScale(beerCount);
   }
 
   private onMouseOver(event: any, d: any): void {
@@ -192,10 +207,8 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private onCountrySelect(event: any, d: any): void {
-    // Hide the tooltip immediately
     this.tooltip.style('opacity', 0);
 
-    // Reset the country color
     d3.select(event.currentTarget)
       .attr('fill', this.getCountryColor(d))
       .attr('filter', 'none');
@@ -209,7 +222,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.filteredCountries = this.countries.filter((country: any) =>
       country.properties.name.toLowerCase().includes(this.searchText)
     );
-    this.drawMap(this.filteredCountries, geoPath().projection(this.createProjection()));
+    this.updateProjection();
   }
 
   resetZoom(): void {
@@ -218,5 +231,96 @@ export class MapComponent implements OnInit, OnDestroy {
       d3.zoomIdentity,
       d3.zoomTransform(this.svg.node() as any).invert([this.width / 2, this.height / 2])
     );
+  }
+
+  toggleHeatMap(): void {
+    this.isHeatMap = !this.isHeatMap;
+    this.updateMap();
+  }
+
+  private updateMap(): void {
+    this.g.selectAll('path')
+      .transition()
+      .duration(750)
+      .attr('fill', (d: any) => this.getCountryColor(d));
+    
+    this.updateLegend();
+  }
+
+  private updateLegend(): void {
+    // Implement legend update logic here
+  }
+
+  zoomToRegion(region: string): void {
+    let bounds: [[number, number], [number, number]];
+    switch (region) {
+      case 'Europe':
+        bounds = [[-20, -10], [70, 75]];
+        break;
+      case 'North America':
+        bounds = [[-170, -20], [-40, 75]];
+        break;
+      case 'Asia':
+        bounds = [[20, 0], [180, 60]];
+        break;
+      default:
+        return;
+    }
+
+    const [[x0, y0], [x1, y1]] = bounds;
+    const projection = this.createProjection();
+    const projectedPoints = [projection([x0, y0]), projection([x1, y1])];
+
+    if (projectedPoints[0] && projectedPoints[1]) {
+      const [[px0, py0], [px1, py1]] = projectedPoints as [[number, number], [number, number]];
+      const scale = Math.min(8, 0.9 / Math.max((px1 - px0) / this.width, (py1 - py0) / this.height));
+      const translate = [this.width / 2 - scale * (px0 + px1) / 2, this.height / 2 - scale * (py0 + py1) / 2];
+
+      this.svg.transition().duration(750).call(
+        this.zoom.transform as any,
+        d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
+      );
+    }
+  }
+
+  onLegendHover(event: MouseEvent): void {
+    const legendElement = event.currentTarget as HTMLElement;
+    const rect = legendElement.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const percentage = x / rect.width;
+    
+    const beerCounts = Object.values(this.countryBeerCounts);
+    const maxCount = Math.max(...beerCounts, 1);
+    const minCount = Math.min(...beerCounts, 0);
+    const hoverValue = minCount + percentage * (maxCount - minCount);
+
+    this.g.selectAll('path')
+      .attr('opacity', (d: any) => {
+        const countryName = d.properties.name;
+        const beerCount = this.countryBeerCounts[countryName] || 0;
+        return Math.abs(beerCount - hoverValue) < (maxCount - minCount) * 0.1 ? 1 : 0.3;
+      });
+  }
+
+  onLegendLeave(): void {
+    this.g.selectAll('path')
+      .attr('opacity', 1);
+  }
+
+  simulateDataChange(): void {
+    Object.keys(this.countryBeerCounts).forEach(country => {
+      this.countryBeerCounts[country] = Math.floor(Math.random() * 1000);
+    });
+    this.updateColorScale();
+    this.animateDataChange();
+  }
+
+  private animateDataChange(): void {
+    this.g.selectAll('path')
+      .transition()
+      .duration(1000)
+      .attr('fill', (d: any) => this.getCountryColor(d));
+    
+    this.updateLegend();
   }
 }

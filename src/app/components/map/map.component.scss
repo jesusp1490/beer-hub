@@ -1,12 +1,17 @@
 @import 'src/styles/_variables.scss';
 
 .map-container {
-    position: fixed;
+    position: relative;
     // top: 70px; // Adjust this value based on your navbar height
     left: 0;
     width: 100vw;
     height: calc(100vh - 70px); // Subtract navbar height from viewport height
     overflow: hidden;
+}
+
+map-svg {
+    width: 100%;
+    height: 100%;
 }
 
 .search-container {
@@ -22,6 +27,11 @@
         border: none;
         border-radius: 5px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+        @media (max-width: 768px) {
+            width: 150px;
+            font-size: 14px;
+        }
     }
 }
 
@@ -42,6 +52,11 @@
 
         &:hover {
             background-color: #f0f0f0;
+        }
+
+        @media (max-width: 768px) {
+            padding: 8px 16px;
+            font-size: 14px;
         }
     }
 }
@@ -73,6 +88,25 @@
         justify-content: space-between;
         font-size: 12px;
     }
+
+    @media (max-width: 768px) {
+        bottom: 10px;
+        right: 10px;
+        padding: 5px;
+
+        h3 {
+            font-size: 12px;
+        }
+
+        .legend-gradient {
+            width: 150px;
+            height: 15px;
+        }
+
+        .legend-labels {
+            font-size: 10px;
+        }
+    }
 }
 
 .tooltip {
@@ -83,4 +117,10 @@
     border-radius: 5px;
     pointer-events: none;
     z-index: 1001;
+    font-size: 14px;
+
+    @media (max-width: 768px) {
+        padding: 5px;
+        font-size: 12px;
+    }
 }
