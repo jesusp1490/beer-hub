@@ -43,10 +43,10 @@ export class FilterSearchComponent implements OnInit {
 
   applyFilters(): void {
     const filters = this.filtersForm.value;
-    console.log('Applying filters:', filters); // Debug log
+    console.log('Applying filters:', filters); 
     this.beerService.getFilteredBeers(filters).subscribe(
       (beers: Beer[]) => {
-        console.log('Filtered beers:', beers); // Debug log
+        console.log('Filtered beers:', beers); 
         this.searchResults.emit(beers);
       },
       (error) => {

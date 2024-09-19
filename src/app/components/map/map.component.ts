@@ -34,7 +34,7 @@ export class MapComponent implements OnInit, OnDestroy {
     private beerService: BeerService
   ) {
     this.zoom = d3.zoom()
-      .scaleExtent([1, 8])
+      .scaleExtent([1, 3])
       .on('zoom', (event) => {
         this.g.attr('transform', event.transform);
       });
@@ -99,7 +99,7 @@ export class MapComponent implements OnInit, OnDestroy {
   private createProjection(): d3.GeoProjection {
     return geoMercator()
       .scale((this.width / 6.4) * 0.9)
-      .translate([this.width / 2, this.height / 1.8]);
+      .translate([this.width / 2, this.height / 1.5]);
   }
 
   private updateProjection(): void {
@@ -183,7 +183,7 @@ export class MapComponent implements OnInit, OnDestroy {
     d3.select(event.currentTarget)
       .transition()
       .duration(100)
-      .attr('fill', '#4A90E2')
+      .attr('fill', '#f3b200')
       .attr('filter', 'drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.5))');
 
     this.tooltip.transition()

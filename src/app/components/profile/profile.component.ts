@@ -1,25 +1,35 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import firebase from 'firebase/compat/app';
-import 'firebase/compat/storage'; 
+import 'firebase/compat/storage';
+
+interface FavoriteBeer {
+beerImageUrl: any;
+  id: string;
+  name: string;
+  imageUrl: string;
+}
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
   user$: Observable<firebase.User | null> = this.afAuth.authState;
-  userProfile: any = {}; // Esto almacenará la información adicional
+  userProfile: any = {};
   selectedFile: File | null = null;
   newPassword: string = '';
   confirmPassword: string = '';
-  user: firebase.User | null = null; // Definido para el uso en métodos
-  showNewBeerModal: boolean = false; // Controla la visibilidad del modal
-  newBeer: any = { name: '', description: '' }; // Almacena los datos de la nueva cerveza
+  user: firebase.User | null = null;
+  showNewBeerModal: boolean = false;
+  newBeer: any = { name: '', description: '' };
+  favoriteBeers: FavoriteBeer[] = [];
+  private unsubscribe$ = new Subject<void>();
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -28,14 +38,49 @@ export class ProfileComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.user$.subscribe(user => {
+    this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe(user => {
       this.user = user;
       if (user) {
-        this.firestore.doc(`users/${user.uid}`).valueChanges().subscribe(profile => {
-          this.userProfile = profile || {};
-        });
+        this.loadUserProfile(user.uid);
+        this.loadFavoriteBeers(user.uid);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
+  private loadUserProfile(userId: string): void {
+    this.firestore.doc(`users/${userId}`).valueChanges()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(profile => {
+        this.userProfile = profile || {};
+      });
+  }
+
+  private loadFavoriteBeers(userId: string): void {
+    this.firestore.collection(`users/${userId}/favorites`)
+      .valueChanges({ idField: 'id' })
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(favorites => {
+        const beerPromises = favorites.map((favorite: any) => 
+          this.firestore.doc(`beers/${favorite.id}`).get().toPromise()
+        );
+
+        Promise.all(beerPromises).then(beers => {
+          this.favoriteBeers = beers.map(beer => {
+            const beerData = beer?.data() as any;
+            return {
+              id: beer?.id || '',
+              name: beerData.name,
+              imageUrl: beerData.imageUrl,
+              beerImageUrl: beerData.beerImageUrl
+            };
+          });
+        });
+      });
   }
 
   onFileSelected(event: Event): void {
@@ -47,23 +92,19 @@ export class ProfileComponent implements OnInit {
   }
 
   private async uploadProfilePicture(): Promise<void> {
-    if (this.selectedFile) {
-      const user = await this.afAuth.currentUser;
-      if (user) {
-        const storageRef = firebase.storage().ref();
-        const userProfilePicRef = storageRef.child(`profilePictures/${user.uid}`);
+    if (this.selectedFile && this.user) {
+      const storageRef = firebase.storage().ref();
+      const userProfilePicRef = storageRef.child(`profilePictures/${this.user.uid}`);
 
-        try {
-          await userProfilePicRef.put(this.selectedFile);
-          const photoURL = await userProfilePicRef.getDownloadURL();
-          await user.updateProfile({ photoURL });
-          await this.firestore.doc(`users/${user.uid}`).update({ photoURL });
+      try {
+        await userProfilePicRef.put(this.selectedFile);
+        const photoURL = await userProfilePicRef.getDownloadURL();
+        await this.user.updateProfile({ photoURL });
+        await this.firestore.doc(`users/${this.user.uid}`).update({ photoURL });
 
-          alert('Profile picture updated successfully!');
-        } catch (error) {
-          console.error('Error updating profile picture:', error);
-          alert('Error updating profile picture');
-        }
+        this.userProfile.photoURL = photoURL;
+      } catch (error) {
+        console.error('Error updating profile picture:', error);
       }
     }
   }
@@ -78,6 +119,8 @@ export class ProfileComponent implements OnInit {
       try {
         await this.user.updatePassword(this.newPassword);
         alert('Password updated successfully!');
+        this.newPassword = '';
+        this.confirmPassword = '';
       } catch (error) {
         alert(`Error updating password: ${(error as any).message}`);
       }
@@ -86,23 +129,21 @@ export class ProfileComponent implements OnInit {
 
   signOut(): void {
     this.afAuth.signOut().then(() => {
-      alert('Logged out successfully!');
+      this.router.navigate(['/login']);
     }).catch(error => {
       alert(`Error signing out: ${(error as any).message}`);
     });
   }
 
-  // Abrir modal de nueva cerveza
   openNewBeerModal(): void {
     this.showNewBeerModal = true;
   }
 
-  // Cerrar modal de nueva cerveza
   closeNewBeerModal(): void {
     this.showNewBeerModal = false;
+    this.newBeer = { name: '', description: '' };
   }
 
-  // Enviar solicitud de nueva cerveza
   submitNewBeerRequest(): void {
     if (this.newBeer.name && this.newBeer.description) {
       this.firestore.collection('beerRequests').add({
@@ -118,6 +159,18 @@ export class ProfileComponent implements OnInit {
       });
     } else {
       alert('Please fill out all fields.');
+    }
+  }
+
+  removeFavoriteBeer(beerId: string): void {
+    if (this.user) {
+      this.firestore.doc(`users/${this.user.uid}/favorites/${beerId}`).delete()
+        .then(() => {
+          this.favoriteBeers = this.favoriteBeers.filter(beer => beer.id !== beerId);
+        })
+        .catch(error => {
+          console.error('Error removing favorite beer:', error);
+        });
     }
   }
 }
