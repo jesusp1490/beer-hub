@@ -31,7 +31,7 @@ export class MapComponent implements OnInit, OnDestroy {
     private beerService: BeerService
   ) {
     this.zoom = d3.zoom()
-      .scaleExtent([1, 8])
+      .scaleExtent([1, 3])
       .on('zoom', (event) => {
         this.g.attr('transform', event.transform);
       });
@@ -54,7 +54,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   private setDimensions(): void {
     this.width = window.innerWidth;
-    this.height = window.innerHeight;
+    this.height = window.innerHeight - 80;
   }
 
   private onResize(): void {
@@ -84,7 +84,8 @@ export class MapComponent implements OnInit, OnDestroy {
       .style('background-color', 'white')
       .style('border', '1px solid #ddd')
       .style('padding', '10px')
-      .style('border-radius', '5px');
+      .style('border-radius', '5px')
+      .style('pointer-events', 'none');
   }
 
   private createProjection(): d3.GeoProjection {
@@ -149,7 +150,7 @@ export class MapComponent implements OnInit, OnDestroy {
       .attr('stroke-width', 0.5)
       .on('mouseover', (event: any, d: any) => this.onMouseOver(event, d))
       .on('mouseout', (event: any, d: any) => this.onMouseOut(event, d))
-      .on('click', (event: any, d: any) => this.onCountrySelect(d));
+      .on('click', (event: any, d: any) => this.onCountrySelect(event, d));
 
     console.log('Map drawn with', countries.length, 'countries');
   }
@@ -190,7 +191,15 @@ export class MapComponent implements OnInit, OnDestroy {
       .style('opacity', 0);
   }
 
-  private onCountrySelect(d: any): void {
+  private onCountrySelect(event: any, d: any): void {
+    // Hide the tooltip immediately
+    this.tooltip.style('opacity', 0);
+
+    // Reset the country color
+    d3.select(event.currentTarget)
+      .attr('fill', this.getCountryColor(d))
+      .attr('filter', 'none');
+
     const countryName = d.properties.name;
     this.router.navigate(['/country', countryName]);
   }

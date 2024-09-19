@@ -1,9 +1,11 @@
+@import 'src/styles/_variables.scss';
+
 .map-container {
     position: fixed;
-    top: 0;
+    // top: 70px; // Adjust this value based on your navbar height
     left: 0;
     width: 100vw;
-    height: 100vh;
+    height: calc(100vh - 70px); // Subtract navbar height from viewport height
     overflow: hidden;
 }
 
