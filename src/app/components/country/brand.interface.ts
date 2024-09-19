@@ -1,5 +1,5 @@
 export interface Brand {
-  beersCount: any;
+  beersCount: number;
   id: string;
   name: string;
   logoUrl: string;

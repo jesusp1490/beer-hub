@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 import { map, tap, shareReplay } from 'rxjs/operators';
 import { Beer } from '../components/beers/beers.interface';
 import { Brand } from '../components/country/brand.interface';
+import { Country } from '../components/country/country.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +12,33 @@ import { Brand } from '../components/country/brand.interface';
 export class BeerService {
   private cachedBeers$: Observable<Beer[]> | null = null;
   private cachedBrands$: Observable<Brand[]> | null = null;
+  private cachedCountries$: Observable<Country[]> | null = null;
 
   constructor(private firestore: AngularFirestore) { }
+
+  getCountries(): Observable<Country[]> {
+    if (!this.cachedCountries$) {
+      this.cachedCountries$ = this.firestore.collection<Country>('countries').valueChanges({ idField: 'id' }).pipe(
+        shareReplay(1)
+      );
+    }
+    return this.cachedCountries$;
+  }
+
+  getCountryBeerCounts(): Observable<{ [countryId: string]: number }> {
+    return this.firestore.collection<Beer>('beers').valueChanges().pipe(
+      map(beers => {
+        const countryCounts: { [countryId: string]: number } = {};
+        beers.forEach(beer => {
+          if (beer.countryId) {
+            countryCounts[beer.countryId] = (countryCounts[beer.countryId] || 0) + 1;
+          }
+        });
+        return countryCounts;
+      }),
+      shareReplay(1)
+    );
+  }
 
   private getBeers(): Observable<Beer[]> {
     if (!this.cachedBeers$) {
