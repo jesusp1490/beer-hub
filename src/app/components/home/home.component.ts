@@ -54,6 +54,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.beerService.getUserFavoriteBeers().pipe(takeUntil(this.unsubscribe$)).subscribe(
       (beers: Beer[]) => {
         this.userFavoriteBeers = beers;
+      },
+      (error) => {
+        console.error('Error fetching user favorite beers:', error);
       }
     );
   }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable, of } from 'rxjs';
-import { map, tap, shareReplay } from 'rxjs/operators';
+import { Observable, forkJoin, of } from 'rxjs';
+import { map, tap, shareReplay, switchMap } from 'rxjs/operators';
 import { Beer } from '../components/beers/beers.interface';
 import { Brand } from '../components/country/brand.interface';
 import { Country } from '../components/country/country.interface';
@@ -69,12 +69,28 @@ export class BeerService {
   }
 
   getUserFavoriteBeers(): Observable<Beer[]> {
-    return this.getBeers().pipe(
-      map(beers => beers
-        .filter(beer => beer.favoriteUsers && Object.keys(beer.favoriteUsers).length > 0)
-        .sort((a, b) => Object.keys(b.favoriteUsers || {}).length - Object.keys(a.favoriteUsers || {}).length)
-        .slice(0, 5)
-      )
+    return this.firestore.collection('users').get().pipe(
+      switchMap(users => {
+        const userFavorites = users.docs.map(user => 
+          this.firestore.collection(`users/${user.id}/favorites`).get()
+        );
+        return forkJoin(userFavorites);
+      }),
+      map(favoritesSnapshots => {
+        const allFavoriteIds = new Set<string>();
+        favoritesSnapshots.forEach(snapshot => {
+          snapshot.docs.forEach(doc => allFavoriteIds.add(doc.id));
+        });
+        return Array.from(allFavoriteIds);
+      }),
+      switchMap(favoriteIds => {
+        if (favoriteIds.length === 0) {
+          return of([]);
+        }
+        return this.firestore.collection<Beer>('beers', ref => 
+          ref.where('id', 'in', favoriteIds)
+        ).valueChanges();
+      })
     );
   }
 
