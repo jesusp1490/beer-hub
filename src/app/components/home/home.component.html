@@ -22,12 +22,15 @@
       </div>
     </section>
 
-    <section *ngIf="userFavoriteBeers.length > 0">
-      <h2>User Favorite Beers</h2>
+    <section class="section user-favorites" *ngIf="userFavoriteBeers.length > 0">
+      <h2>{{ isLoggedIn ? 'Your Favorite Beers' : 'Popular Favorite Beers' }}</h2>
       <div class="beer-grid">
         <div *ngFor="let beer of userFavoriteBeers" class="beer-card" (click)="viewBeerDetails(beer)">
-          <img [src]="beer.beerImageUrl" [alt]="beer.name">
-          <h3>{{ beer.name }}</h3>
+          <img [src]="beer.beerImageUrl" [alt]="beer.name" loading="lazy">
+          <div class="beer-info">
+            <h3>{{ beer.name }}</h3>
+            <p class="rating">Rating: {{ beer.averageRating | number:'1.1-1' }}</p>
+          </div>
         </div>
       </div>
     </section>

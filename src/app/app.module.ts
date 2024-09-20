@@ -68,6 +68,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatNativeDateModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFirestoreModule,
+    AngularFireAuthModule,
     AppRoutingModule,
     RouterModule.forRoot([]),
     FormsModule,

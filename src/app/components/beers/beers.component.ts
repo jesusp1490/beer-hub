@@ -26,6 +26,7 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   private unsubscribe$ = new Subject<void>();
   isLoading: boolean = true;
 
+
   constructor(
     private route: ActivatedRoute,
     private firestore: AngularFirestore,

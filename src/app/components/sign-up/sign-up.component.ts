@@ -8,6 +8,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sign-up',
@@ -33,7 +35,12 @@ export class SignUpComponent {
   country: string = '';
   dob: Date | null = null;
 
-  constructor(private afAuth: AngularFireAuth, private firestore: AngularFirestore) { }
+  constructor(
+    private afAuth: AngularFireAuth, 
+    private firestore: AngularFirestore,
+    private snackBar: MatSnackBar,
+    private router: Router
+  ) { }
 
   async signUp() {
     try {
@@ -49,10 +56,22 @@ export class SignUpComponent {
           dob: this.dob,
         });
 
-        console.log('Sign Up successful!');
+        this.snackBar.open('Sign Up successful!', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
+        });
+
+        // Redirect to the profile page or home page after successful registration
+        this.router.navigate(['/profile']); // or '/home' depending on your route setup
       }
     } catch (error) {
       console.error(`Error: ${(error as any).message}`);
+      this.snackBar.open(`Registration failed: ${(error as any).message}`, 'Close', {
+        duration: 5000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+      });
     }
   }
 }
