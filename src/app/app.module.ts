@@ -17,7 +17,7 @@ import { ProfileModule } from './components/profile/profile.module';
 import { AboutComponent } from './components/about/about.component';
 import { ContactComponent } from './components/contact/contact.component';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -29,10 +29,8 @@ import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { CountryComponent } from './components/country/country.component';
 import { CommonModule } from '@angular/common';
 import { BeersModule } from './components/beers/beers.module';
-import { SlickCarouselModule } from 'ngx-slick-carousel';
-import { ReactiveFormsModule } from '@angular/forms';
 import { FilterSearchComponent } from './components/filters-search/filters-search.component';
-
+import { BackButtonComponent } from './components/back-button/back-button.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -45,9 +43,14 @@ export function HttpLoaderFactory(http: HttpClient) {
     MapComponent,
     CountryComponent,
     FilterSearchComponent,
-    HomeComponent
+    HomeComponent,
+    BackButtonComponent,
+    // AboutComponent,
+    // ContactComponent
   ],
   imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     TranslateModule.forRoot({
       loader: {
@@ -56,27 +59,21 @@ export function HttpLoaderFactory(http: HttpClient) {
         deps: [HttpClient]
       }
     }),
-    BrowserModule,
-    BrowserAnimationsModule,
     MatInputModule,
     MatButtonModule,
     MatFormFieldModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    SignUpComponent,
-    LogInComponent,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFireAuthModule,
+    AngularFirestoreModule,
     AppRoutingModule,
     RouterModule.forRoot([]),
     FormsModule,
-    SignUpComponent,
-    ProfileModule,
-    AngularFirestoreModule,
-    CommonModule,
-    BeersModule,
-    SlickCarouselModule,
     ReactiveFormsModule,
+    ProfileModule,
+    CommonModule,
+    BeersModule
   ],
   providers: [AuthService],
   bootstrap: [AppComponent],

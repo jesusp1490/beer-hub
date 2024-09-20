@@ -6,5 +6,4 @@ export interface Brand {
   brandId: string;
   countryId: string;
   beers?: any[];
-  
 }

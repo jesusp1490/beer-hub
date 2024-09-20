@@ -21,17 +21,12 @@
     "lib": [
       "ES2022",
       "dom"
-    ],
-    "typeRoots": ["node_modules/@types", "src/types"]
+    ]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/typings/**/*.d.ts"
-  ]
+  }
 }
