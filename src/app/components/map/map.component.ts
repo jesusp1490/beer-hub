@@ -89,8 +89,7 @@ export class MapComponent implements OnInit, OnDestroy {
       .attr('class', 'tooltip')
       .style('opacity', 0)
       .style('position', 'absolute')
-      .style('background-color', 'white')
-      .style('border', '1px solid #ddd')
+      .style('background-color', '#333333')
       .style('padding', '10px')
       .style('border-radius', '5px')
       .style('pointer-events', 'none');
@@ -182,8 +181,8 @@ export class MapComponent implements OnInit, OnDestroy {
 
     d3.select(event.currentTarget)
       .transition()
-      .duration(100)
-      .attr('fill', '#f3b200')
+      .duration(50)
+      .attr('fill', '#ff9100')
       .attr('filter', 'drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.5))');
 
     this.tooltip.transition()

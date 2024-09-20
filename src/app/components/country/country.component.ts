@@ -99,7 +99,7 @@ export class CountryComponent implements OnInit {
     this.filteredBrands = this.brands.filter(brand => 
       brand.name.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
-    this.page = 0; // Reinicia a la primera página
+    this.page = 0;
     this.updateVisibleBrands();
   }
 
