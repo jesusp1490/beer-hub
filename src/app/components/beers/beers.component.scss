@@ -1,4 +1,17 @@
 .beers-container {
+
+  .loading-spinner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+  
+      svg {
+        margin-bottom: 20px;
+      }
+    }
+
   .carousel-container {
     position: relative;
     margin: 20px 0;

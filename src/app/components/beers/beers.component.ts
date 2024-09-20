@@ -5,7 +5,7 @@ import { Location } from '@angular/common';
 import { Beer } from './beers.interface';
 import { Brand } from '../country/brand.interface';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Subject } from 'rxjs';
+import { Subject, forkJoin } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -24,6 +24,7 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   brandId: string = '';
   filtersForm: FormGroup;
   private unsubscribe$ = new Subject<void>();
+  isLoading: boolean = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -60,12 +61,26 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.initializeSlick();
-    }, 200);
+    
+  }
+
+  private loadBrandData(brandId: string): void {
+    this.firestore.collection<Brand>('brands').doc(brandId).valueChanges().subscribe(
+      brand => {
+        if (brand) {
+          this.brandName = brand.name;
+        } else {
+          console.error('Brand not found');
+        }
+      },
+      error => {
+        console.error('Error loading brand data:', error);
+      }
+    );
   }
 
   private loadBeers(brandId: string): void {
+    this.isLoading = true;
     this.firestore.collection<Beer>('beers', ref => ref.where('brandId', '==', brandId))
       .valueChanges()
       .pipe(takeUntil(this.unsubscribe$))
@@ -73,15 +88,31 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
         beers => {
           this.beers = beers;
           this.applyFilters();
-          // Initialize Slick after beers are loaded
-          setTimeout(() => {
-            this.initializeSlick();
-          }, 0);
+          this.preloadImages();
         },
         error => {
           console.error('Error loading beers:', error);
+          this.isLoading = false;
         }
       );
+  }
+
+  private preloadImages(): void {
+    const imageLoadPromises = this.beers.map(beer => {
+      return new Promise<void>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+        img.src = beer.beerImageUrl;
+      });
+    });
+
+    forkJoin(imageLoadPromises).subscribe(() => {
+      this.isLoading = false;
+      setTimeout(() => {
+        this.initializeSlick();
+      }, 0);
+    });
   }
 
   private initializeSlick(): void {
@@ -129,39 +160,26 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-
-  goBack(): void {
-    this.location.back();
-  }
-
-  private loadBrandData(brandId: string): void {
-    this.firestore.collection<Brand>('brands').doc(brandId).valueChanges().subscribe(
-      brand => {
-        if (brand) {
-          this.brandName = brand.name;
-        } else {
-          console.error('Brand not found');
-        }
-      },
-      error => {
-        console.error('Error loading brand data:', error);
-      }
-    );
-  }
-  
   applyFilters() {
     // Implement your filter logic here
     this.filteredBeers = this.beers.filter(beer => {
       // Add your filtering conditions
       return true; // Replace with actual filtering logic
     });
+    this.updateVisibleBeers();
+  }
+
+  private updateVisibleBeers() {
+    const start = this.page * this.pageSize;
+    const end = start + this.pageSize;
+    this.visibleBeers = this.filteredBeers.slice(start, end);
   }
 
   selectBeer(beerId: string): void {
     this.router.navigate(['/beers', beerId]);
   }
-}
 
-function applyFilters() {
-  throw new Error('Function not implemented.');
+  goBack(): void {
+    this.location.back();
+  }
 }
