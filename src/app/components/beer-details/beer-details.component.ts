@@ -55,10 +55,6 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 
-  goBack(): void {
-    this.location.back();
-  }
-
   private loadBeerData(beerId: string): void {
     this.firestore.collection<Beer>('beers').doc(beerId).valueChanges()
       .pipe(takeUntil(this.unsubscribe$))

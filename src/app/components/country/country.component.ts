@@ -4,7 +4,6 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Observable } from 'rxjs';
 import { Country } from './country.interface';
 import { Brand } from './brand.interface';
-import { Location } from '@angular/common'; 
 
 @Component({
   selector: 'app-country',
@@ -27,7 +26,6 @@ export class CountryComponent implements OnInit {
     private route: ActivatedRoute,
     private firestore: AngularFirestore,
     private router: Router,
-    private location: Location
   ) {
     this.countryId = this.route.snapshot.paramMap.get('country') || '';
     this.country$ = this.firestore.doc<Country>(`countries/${this.countryId}`).valueChanges();
@@ -106,6 +104,6 @@ export class CountryComponent implements OnInit {
   }
 
   goBack(): void {
-    this.location.back();
+
   }
 }

@@ -65,48 +65,67 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 200);
   }
 
+  private loadBeers(brandId: string): void {
+    this.firestore.collection<Beer>('beers', ref => ref.where('brandId', '==', brandId))
+      .valueChanges()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(
+        beers => {
+          this.beers = beers;
+          this.applyFilters();
+          // Initialize Slick after beers are loaded
+          setTimeout(() => {
+            this.initializeSlick();
+          }, 0);
+        },
+        error => {
+          console.error('Error loading beers:', error);
+        }
+      );
+  }
+
   private initializeSlick(): void {
     const $carouselTrack = $('.carousel-track');
 
     if ($carouselTrack.length && !$carouselTrack.hasClass('slick-initialized')) {
-      setTimeout(() => {
-        const totalBeers = this.beers.length;
-        const slidesToShow = Math.min(totalBeers, 5); // Mostrar máximo 5 cervezas
+      const totalBeers = this.beers.length;
+      const slidesToShow = Math.min(totalBeers, 5);
 
-        $carouselTrack.slick({
-          infinite: true,
-          slidesToShow: slidesToShow,
-          slidesToScroll: 1,
-          centerMode: true,
-          centerPadding: '0px',
-          dots: true,
-          prevArrow: '.carousel-button.left',
-          nextArrow: '.carousel-button.right',
-          responsive: [
-            {
-              breakpoint: 1024,
-              settings: {
-                slidesToShow: slidesToShow,
-                slidesToScroll: 1,
-              }
-            },
-            {
-              breakpoint: 600,
-              settings: {
-                slidesToShow: Math.min(2, totalBeers),
-                slidesToScroll: 1
-              }
-            },
-            {
-              breakpoint: 480,
-              settings: {
-                slidesToShow: Math.min(1, totalBeers),
-                slidesToScroll: 1
-              }
+      $carouselTrack.slick({
+        infinite: true,
+        slidesToShow: slidesToShow,
+        slidesToScroll: 1,
+        centerMode: true,
+        centerPadding: '0px',
+        dots: true,
+        prevArrow: '.carousel-button.left',
+        nextArrow: '.carousel-button.right',
+        speed: 500,
+        cssEase: 'cubic-bezier(0.645, 0.045, 0.355, 1)',
+        responsive: [
+          {
+            breakpoint: 1024,
+            settings: {
+              slidesToShow: Math.min(3, totalBeers),
+              slidesToScroll: 1,
             }
-          ]
-        });
-      }, 200);
+          },
+          {
+            breakpoint: 600,
+            settings: {
+              slidesToShow: Math.min(2, totalBeers),
+              slidesToScroll: 1
+            }
+          },
+          {
+            breakpoint: 480,
+            settings: {
+              slidesToShow: 1,
+              slidesToScroll: 1
+            }
+          }
+        ]
+      });
     }
   }
 
@@ -129,24 +148,13 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     );
   }
-
-  private loadBeers(brandId: string): void {
-    this.firestore.collection<Beer>('beers', ref => ref.where('brandId', '==', brandId))
-      .valueChanges()
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(
-        beers => {
-          this.beers = beers;
-          this.applyFilters();
-        },
-        error => {
-          console.error('Error loading beers:', error);
-        }
-      );
-  }
   
   applyFilters() {
-    throw new Error('Method not implemented.');
+    // Implement your filter logic here
+    this.filteredBeers = this.beers.filter(beer => {
+      // Add your filtering conditions
+      return true; // Replace with actual filtering logic
+    });
   }
 
   selectBeer(beerId: string): void {
@@ -154,53 +162,6 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 }
 
-  // private applyFilters(): void {
-  //   const { searchTerm, beerType, abvRange, ingredient } = this.filtersForm.value;
-
-  //   this.filteredBeers = this.beers.filter(beer => {
-  //     const matchesSearchTerm = searchTerm ? beer.name.toLowerCase().includes(searchTerm.toLowerCase()) : true;
-  //     const matchesBeerType = beerType ? beer.beerType === beerType : true;
-  //     const matchesAbv = abvRange ? beer.ABV <= abvRange : true;
-  //     const matchesIngredient = ingredient ? (beer.ingredients ?? []).some(ing => ing.name.toLowerCase().includes(ingredient.toLowerCase())) : true;
-
-  //     return matchesSearchTerm && matchesBeerType && matchesAbv && matchesIngredient;
-  //   });
-
-  //   this.updateVisibleBeers();
-  // }
-
-  // private updateVisibleBeers(): void {
-  //   const start = this.page * this.pageSize;
-  //   const end = start + this.pageSize;
-  //   this.visibleBeers = this.filteredBeers.slice(start, end);
-  // }
-
-  // selectBeer(beerId: string): void {
-  //   console.log('Selecting beer with ID:', beerId);
-  //   const route = `/country/${this.countryId}/brands/${this.brandId}/beers/${beerId}`;
-  //   this.router.navigate([route]);
-  // }
-
-  // viewBrandBeers(brandId: string): void {
-  //   console.log('Viewing beers for brand ID:', brandId);
-  //   const route = `/country/${this.countryId}/brands/${brandId}/beers`;
-  //   this.router.navigate([route]);
-  // }
-
-  // onSearchResults(searchResults: Beer[]): void {
-  //   this.beers = searchResults;
-  //   this.applyFilters();
-  // }
-
-  // previousSlide(): void {
-  //   $('.carousel-track').slick('slickPrev');
-  // }
-
-  // nextSlide(): void {
-  //   $('.carousel-track').slick('slickNext');
-  // }
-
 function applyFilters() {
   throw new Error('Function not implemented.');
 }
-

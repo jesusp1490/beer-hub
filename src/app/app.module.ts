@@ -28,9 +28,10 @@ import { AuthService } from './services/auth.service';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { CountryComponent } from './components/country/country.component';
 import { CommonModule } from '@angular/common';
-import { BeersModule } from './components/beers/beers.module';
+import { BeersModule } from './components/beers/beers.module'; 
 import { FilterSearchComponent } from './components/filters-search/filters-search.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
+
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -50,6 +51,7 @@ export function HttpLoaderFactory(http: HttpClient) {
   ],
   imports: [
     BrowserModule,
+    BeersModule,
     BrowserAnimationsModule,
     HttpClientModule,
     TranslateModule.forRoot({
@@ -65,7 +67,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatDatepickerModule,
     MatNativeDateModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
-    AngularFireAuthModule,
     AngularFirestoreModule,
     AppRoutingModule,
     RouterModule.forRoot([]),
@@ -73,7 +74,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     ReactiveFormsModule,
     ProfileModule,
     CommonModule,
-    BeersModule
+  ],
+  exports: [
+    BackButtonComponent
   ],
   providers: [AuthService],
   bootstrap: [AppComponent],

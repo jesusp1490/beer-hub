@@ -3,14 +3,13 @@
     <h1>{{ brandName }}</h1>
   </div>
 
-  <!-- Filtros -->
   <app-filter-search></app-filter-search>
 
   <div *ngIf="beers.length === 0" class="no-beers-message">
     <p>No beers found for this brand.</p>
   </div>
 
-  <div class="carousel-container">
+  <div *ngIf="beers.length > 0" class="carousel-container">
     <button *ngIf="beers.length > 1" class="carousel-button left"></button>
 
     <div class="carousel-track">
@@ -19,10 +18,10 @@
       </div>
     </div>
 
-    <button class="back-button" (click)="goBack()">
-      <i class="fa-solid fa-arrow-left"></i>
-    </button>
-
     <button *ngIf="beers.length > 1" class="carousel-button right"></button>
   </div>
+
+  <button class="back-button" (click)="goBack()">
+    <i class="fa-solid fa-arrow-left"></i>
+  </button>
 </div>
