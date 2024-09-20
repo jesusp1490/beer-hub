@@ -1,6 +1,6 @@
 @import 'src/styles/_variables.scss';
 
-.signUp {
+.sign-up-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -10,73 +10,32 @@
     margin: 0;
     padding: 20px;
     box-sizing: border-box;
-    background: #f5f5f5;
-    overflow: hidden;
+    background-color: $color-background-dark;
+    color: $color-text-light;
 
     h2 {
         margin-bottom: 20px;
         font-size: 2rem;
-        color: #333;
-        /* Color del texto */
+        color: $color-text-light;
     }
 
     form {
-        background: #fff;
+        background-color: $color-card-background;
         border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         padding: 20px;
         width: 100%;
         max-width: 500px;
         margin: 0 auto;
 
-        /* Estilos para los elementos del formulario */
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.875rem;
-            color: #555;
-            /* Color del texto */
-        }
-
-        input {
+        mat-form-field {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            /* Borde del input */
-            border-radius: 4px;
-            /* Bordes redondeados */
             margin-bottom: 16px;
-            font-size: 1rem;
-            box-sizing: border-box;
-
-            &:focus {
-                border-color: #007bff;
-                /* Color del borde en foco */
-                outline: none;
-                /* Elimina el borde azul predeterminado del navegador */
-                box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-                /* Sombra en foco */
-            }
         }
 
         button {
-            background-color: #007bff;
-            /* Color de fondo del botón */
-            color: #fff;
-            /* Color del texto del botón */
-            border: none;
-            border-radius: 4px;
-            padding: 12px;
-            font-size: 1rem;
-            cursor: pointer;
             width: 100%;
-            transition: background-color 0.3s ease;
-            /* Transición suave para el hover */
-
-            &:hover {
-                background-color: #0056b3;
-                /* Color de fondo del botón en hover */
-            }
+            margin-top: 16px;
         }
     }
 }

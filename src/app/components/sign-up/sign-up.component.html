@@ -1,28 +1,43 @@
-<div class="signUp">
-  <h2>Sing Up</h2>
+<div class="sign-up-container">
+  <h2>Sign Up</h2>
   <form (ngSubmit)="signUp()">
-    <label for="firstName">First Name:</label>
-    <input type="text" id="firstName" [(ngModel)]="firstName" name="firstName" required>
+    <mat-form-field appearance="fill">
+      <mat-label>First Name</mat-label>
+      <input matInput type="text" [(ngModel)]="firstName" name="firstName" required>
+    </mat-form-field>
 
-    <label for="lastName">Last Name:</label>
-    <input type="text" id="lastName" [(ngModel)]="lastName" name="lastName" required>
+    <mat-form-field appearance="fill">
+      <mat-label>Last Name</mat-label>
+      <input matInput type="text" [(ngModel)]="lastName" name="lastName" required>
+    </mat-form-field>
 
-    <label for="username">Username:</label>
-    <input type="text" id="username" [(ngModel)]="username" name="username" required>
+    <mat-form-field appearance="fill">
+      <mat-label>Username</mat-label>
+      <input matInput type="text" [(ngModel)]="username" name="username" required>
+    </mat-form-field>
 
-    <label for="email">Email:</label>
-    <input type="email" id="email" [(ngModel)]="email" name="email" required>
+    <mat-form-field appearance="fill">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" [(ngModel)]="email" name="email" required>
+    </mat-form-field>
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" [(ngModel)]="password" name="password" required>
+    <mat-form-field appearance="fill">
+      <mat-label>Password</mat-label>
+      <input matInput type="password" [(ngModel)]="password" name="password" required>
+    </mat-form-field>
 
-    <label for="country">Country:</label>
-    <input type="text" id="country" [(ngModel)]="country" name="country" required>
+    <mat-form-field appearance="fill">
+      <mat-label>Country</mat-label>
+      <input matInput type="text" [(ngModel)]="country" name="country" required>
+    </mat-form-field>
 
-    <label for="dob">Date of Birth:</label>
-    <input type="date" id="dob" [(ngModel)]="dob" name="dob" required>
+    <mat-form-field appearance="fill">
+      <mat-label>Date of Birth</mat-label>
+      <input matInput [matDatepicker]="picker" [(ngModel)]="dob" name="dob" required>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
 
-
-    <button type="submit">Sing Up</button>
+    <button mat-raised-button color="primary" type="submit">Sign Up</button>
   </form>
 </div>

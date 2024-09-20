@@ -1,5 +1,11 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
@@ -37,7 +43,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     AppComponent,
     NavbarComponent,
     MapComponent,
-    LogInComponent,
     CountryComponent,
     FilterSearchComponent,
     HomeComponent
@@ -52,6 +57,14 @@ export function HttpLoaderFactory(http: HttpClient) {
       }
     }),
     BrowserModule,
+    BrowserAnimationsModule,
+    MatInputModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    SignUpComponent,
+    LogInComponent,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFireAuthModule,
     AppRoutingModule,

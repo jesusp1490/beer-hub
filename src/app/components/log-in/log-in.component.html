@@ -1,13 +1,19 @@
 <div class="login-container">
   <h2>Login</h2>
   <form (ngSubmit)="login()">
-    <label for="email">Email:</label>
-    <input type="email" id="email" [(ngModel)]="email" name="email" required>
+    <mat-form-field appearance="fill">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" [(ngModel)]="email" name="email" required>
+    </mat-form-field>
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" [(ngModel)]="password" name="password" required>
+    <mat-form-field appearance="fill">
+      <mat-label>Password</mat-label>
+      <input matInput type="password" [(ngModel)]="password" name="password" required>
+    </mat-form-field>
 
-    <button type="submit">Login</button>
+    <button mat-raised-button color="primary" type="submit">Login</button>
   </form>
-  <button (click)="loginWithGoogle()">Login with Google</button>
+  <button mat-raised-button color="accent" (click)="loginWithGoogle()">
+    <i class="fab fa-google"></i> Login with Google
+  </button>
 </div>

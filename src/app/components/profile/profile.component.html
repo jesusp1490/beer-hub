@@ -11,7 +11,7 @@
   </div>
 
   <div class="profile-content">
-    <div class="profile-section">
+    <div class="profile-section personal-info">
       <h2>Personal Information</h2>
       <p><strong>Name:</strong> {{ userProfile.firstName }} {{ userProfile.lastName }}</p>
       <p><strong>Email:</strong> {{ user?.email }}</p>
@@ -19,7 +19,7 @@
       <p><strong>Date of Birth:</strong> {{ userProfile.dateOfBirth || 'Not specified' }}</p>
     </div>
 
-    <div class="profile-section">
+    <div class="profile-section password-change">
       <h2>Change Password</h2>
       <form (ngSubmit)="updatePassword()" class="password-form">
         <div class="form-group">
@@ -34,7 +34,7 @@
       </form>
     </div>
 
-    <div class="profile-section">
+    <div class="profile-section favorite-beers">
       <h2>Favorite Beers</h2>
       <div class="favorite-beers-list">
         <div *ngFor="let beer of favoriteBeers" class="favorite-beer-item">
@@ -45,7 +45,7 @@
       </div>
     </div>
 
-    <div class="profile-section">
+    <div class="profile-section new-beer-request">
       <h2>Request New Beer</h2>
       <button (click)="openNewBeerModal()" class="btn btn-secondary">Request New Beer</button>
     </div>

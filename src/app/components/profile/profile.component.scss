@@ -1,55 +1,53 @@
 @import 'src/styles/_variables.scss';
 
 .profile-container {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 1rem;
     font-family: $font-family-primary;
-    background-color: #656565;
+    background-color: #1e1e1e;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .profile-header {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    margin-bottom: 2rem;
-    background-color: rgb(198, 198, 198);
-    padding: 2rem;
+    margin-bottom: 1rem;
+    background-color: #212121;
+    padding: 1rem;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
     h1 {
-        margin-top: 1rem;
-        font-size: 2rem;
-        color: rgb(160, 160, 160);
+        margin-left: 1rem;
+        font-size: 1.5rem;
+        color: #e0e0e0;
         font-weight: bold;
     }
 }
 
 .profile-avatar-container {
     position: relative;
-    width: 150px;
-    height: 150px;
-    margin-bottom: 1rem;
+    width: 100px;
+    height: 100px;
 
     .profile-avatar {
         width: 100%;
         height: 100%;
         border-radius: 50%;
         object-fit: cover;
-        border: 3px solid white;
+        border: 3px solid #424242;
     }
 
     .custom-file-upload {
         position: absolute;
         bottom: 0;
         right: 0;
-        background-color: white;
-        color: white;
-        width: 40px;
-        height: 40px;
+        background-color: #424242;
+        color: #e0e0e0;
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
         display: flex;
         justify-content: center;
@@ -58,11 +56,11 @@
         transition: background-color 0.3s ease;
 
         &:hover {
-            background-color: darken(white, 10%);
+            background-color: #616161;
         }
 
         i {
-            font-size: 1.2rem;
+            font-size: 1rem;
         }
     }
 
@@ -73,102 +71,105 @@
 
 .profile-content {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
 }
 
 .profile-section {
-    background-color: white;
-    padding: 1.5rem;
+    background-color: #212121;
+    padding: 1rem;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
     h2 {
-        color: red;
-        margin-bottom: 1rem;
-        font-size: 1.5rem;
+        color: #ffa726;
+        margin-bottom: 0.5rem;
+        font-size: 1.2rem;
         font-weight: bold;
-        border-bottom: 2px solid red;
-        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #ffa726;
+        padding-bottom: 0.25rem;
     }
 
     p {
-        margin-bottom: 0.5rem;
-        font-size: 1rem;
-        color: #333;
+        margin-bottom: 0.25rem;
+        font-size: 0.9rem;
+        color: #e0e0e0;
 
         strong {
-            color: red;
+            color: #ffa726;
             font-weight: bold;
         }
     }
 }
 
 .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 
     label {
         display: block;
-        margin-bottom: 0.5rem;
-        color: red;
+        margin-bottom: 0.25rem;
+        color: #ffa726;
         font-weight: bold;
+        font-size: 0.9rem;
     }
 
     input,
     textarea {
         width: 100%;
-        padding: 0.75rem;
-        border: 1px solid #ccc;
+        padding: 0.5rem;
+        border: 1px solid #424242;
         border-radius: 4px;
-        font-size: 1rem;
+        font-size: 0.9rem;
+        background-color: #333333;
+        color: #e0e0e0;
         transition: border-color 0.3s ease;
 
         &:focus {
             outline: none;
-            border-color: white;
-            box-shadow: 0 0 0 2px rgba(white, 0.2);
+            border-color: #ffa726;
+            box-shadow: 0 0 0 2px rgba(255, 167, 38, 0.2);
         }
     }
 
     textarea {
-        min-height: 100px;
+        min-height: 80px;
         resize: vertical;
     }
 }
 
 .btn {
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem 1rem;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: bold;
     transition: all 0.3s ease;
 
     &.btn-primary {
-        background-color: white;
-        color: rgb(134, 134, 134);
+        background-color: #ffa726;
+        color: #212121;
 
         &:hover {
-            background-color: darken(white, 10%);
+            background-color: darken(#ffa726, 10%);
         }
     }
 
     &.btn-secondary {
-        background-color: red;
-        color: white;
+        background-color: #424242;
+        color: #e0e0e0;
 
         &:hover {
-            background-color: darken(red, 10%);
+            background-color: #616161;
         }
     }
 
     &.btn-danger {
-        background-color: #dc3545;
-        color: white;
+        background-color: #f44336;
+        color: #ffffff;
 
         &:hover {
-            background-color: darken(#dc3545, 10%);
+            background-color: darken(#f44336, 10%);
         }
     }
 }
@@ -176,57 +177,57 @@
 .logout-btn {
     grid-column: 1 / -1;
     justify-self: center;
-    margin-top: 2rem;
+    margin-top: 1rem;
 }
 
 .favorite-beers-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.5rem;
 
     .favorite-beer-item {
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
-        background-color: #f8f9fa;
-        padding: 1rem;
+        background-color: #333333;
+        padding: 0.5rem;
         border-radius: 8px;
         transition: transform 0.3s ease;
         position: relative;
 
         &:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
         }
 
         img {
-            width: 80px;
-            height: 80px;
+            width: 50px;
+            height: 50px;
             object-fit: cover;
             border-radius: 50%;
-            margin-bottom: 0.5rem;
-            border: 2px solid white;
+            margin-bottom: 0.25rem;
+            border: 2px solid #424242;
         }
 
         span {
-            font-size: 0.9rem;
-            color: red;
+            font-size: 0.8rem;
+            color: #ffa726;
             font-weight: bold;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
         }
 
         .remove-favorite {
-            background-color: #dc3545;
-            color: white;
+            background-color: #f44336;
+            color: #ffffff;
             border: none;
-            padding: 0.25rem 0.5rem;
+            padding: 0.15rem 0.3rem;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             transition: background-color 0.3s ease;
 
             &:hover {
-                background-color: darken(#dc3545, 10%);
+                background-color: darken(#f44336, 10%);
             }
         }
     }
@@ -238,39 +239,39 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
 
     .modal-content {
-        background-color: white;
-        padding: 2rem;
+        background-color: #212121;
+        padding: 1.5rem;
         border-radius: 8px;
         width: 90%;
-        max-width: 500px;
+        max-width: 400px;
         position: relative;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 
         .close {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
-            font-size: 1.5rem;
+            top: 0.5rem;
+            right: 0.5rem;
+            font-size: 1.2rem;
             cursor: pointer;
-            color: red;
+            color: #ffa726;
             transition: color 0.3s ease;
 
             &:hover {
-                color: darken(red, 20%);
+                color: darken(#ffa726, 20%);
             }
         }
 
         h2 {
             margin-bottom: 1rem;
-            color: white;
-            font-size: 1.8rem;
+            color: #e0e0e0;
+            font-size: 1.5rem;
             font-weight: bold;
             text-align: center;
         }
@@ -279,7 +280,7 @@
 
 .beer-request-form {
     .form-group {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
     }
 
     button[type="submit"] {
@@ -301,18 +302,18 @@
     }
 
     .profile-container {
-        padding: 1rem;
+        padding: 0.5rem;
     }
 
     .profile-header {
-        padding: 1rem;
+        padding: 0.5rem;
     }
 
     .profile-section {
-        padding: 1rem;
+        padding: 0.5rem;
     }
 
     .btn {
-        padding: 0.5rem 1rem;
+        padding: 0.4rem 0.8rem;
     }
 }
