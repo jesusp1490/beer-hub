@@ -37,8 +37,9 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.afAuth.authState.pipe(takeUntil(this.unsubscribe$)).subscribe(user => {
-      if (user) {
-        this.userId = user.uid;
+      this.userId = user ? user.uid : null;
+      if (this.beer) {
+        this.updateUserRating();
       }
     });
 
@@ -63,15 +64,19 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
           this.beer = beer;
           this.loadBrandData(beer.brandId);
           this.loadCountryData(beer.countryId);
-
-          if (this.userId && beer.rating) {
-            const userRating = beer.rating[this.userId];
-            this.userRating = userRating !== undefined ? userRating : null;
-          }
-
+          this.updateUserRating();
           this.updateFavoriteIcon();
         }
       });
+  }
+
+  private updateUserRating(): void {
+    if (this.userId && this.beer && this.beer.rating) {
+      const userRating = this.beer.rating[this.userId];
+      this.userRating = userRating !== undefined ? userRating : null;
+    } else {
+      this.userRating = null;
+    }
   }
 
   private loadBrandData(brandId: string): void {
@@ -94,7 +99,12 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
   }
 
   rateBeer(rating: number): void {
-    if (!this.userId || !this.beer) return;
+    if (!this.userId) {
+      this.showRegisterModal = true;
+      return;
+    }
+
+    if (!this.beer) return;
 
     const ratings = this.beer.rating || {};
     ratings[this.userId] = rating;

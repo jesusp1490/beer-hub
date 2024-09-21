@@ -1,206 +1,257 @@
 @import 'src/styles/_variables.scss';
 
 .beer-details-container {
+    font-family: $font-family-primary;
     display: flex;
     justify-content: center;
     align-items: center;
-    // min-height: 100vh;
-    // background-color: $color-background-dark;
     color: $color-text-light;
-    padding: 2rem;
-    position: relative;
 
     .info-card {
+        font-family: $font-family-primary;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 2rem;
+        width: 95%;
+        max-width: 1400px;
+    }
+
+    .left-section,
+    .right-section {
+        font-family: $font-family-primary;
         display: flex;
-        // background-image: url('../../../assets/desktop-wallpaper-wood-black-wood-bedroom-wood-background-dark-wood.jpg');
-        // opacity: 0.5;
-        border-radius: 1rem;
-        overflow: hidden;
-        position: relative;
-        width: 80%;
-        z-index: 1;
+        flex-direction: column;
+        margin-top: 50px;
+        gap: 2rem;
+    }
 
-        .left-section {
-            width: 50%;
-            padding: 2rem;
+    .center-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-            .country-info {
-                display: flex;
-                align-items: center;
-                margin-bottom: 1rem;
-                margin-left: 3rem;
-                font-size: 1.8rem;
+    .beer-image-container {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 5rem 0 5rem;
 
-                .country-flag {
-                    width: 2.2rem;
-                    height: 2.2rem;
-                    margin-right: 0.5rem;
-                    object-fit: contain;
-                }
+        .beer-image {
+            width: 210px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.1));
+        }
+    }
+
+    .country-info {
+        font-family: $font-family-primary;
+        display: flex;
+        align-items: center;
+        font-size: 1.5rem;
+
+        .country-flag {
+            width: 2rem;
+            height: 2rem;
+            margin-right: 0.5rem;
+            object-fit: contain;
+        }
+    }
+
+    .map-and-brand {
+        display: flex;
+        align-items: center;
+        gap: 1.3rem;
+
+        .country-map {
+            flex: 1;
+
+            .map-image {
+                width: 100%;
+                max-width: 400px;
+                height: auto;
+                opacity: 0.7;
             }
+        }
 
-            .country-map {
-                margin-bottom: 1rem;
+        .brand-logo {
+            width: 100%;
+            max-width: 200px;
+            object-fit: contain;
+        }
+    }
 
-                .map-image {
-                    width: 80%;
-                    height: auto;
-                }
-            }
+    .beer-stats {
+        display: flex;
+        justify-content: space-around;
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 1rem;
+        border-radius: 0.5rem;
 
-            .rating-section {
-                margin-bottom: 1rem;
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: $font-family-primary;
 
-                h2 {
-                    font-size: 1.8rem;
-                    margin-bottom: 0.5rem;
-                }
-
-                .user-rating {
-                    h3 {
-                        font-size: 1.5rem;
-                        margin-bottom: 0.5rem;
-                    }
-
-                    .beer-rate {
-                        display: flex;
-                        gap: 5px;
-
-                        img {
-                            width: 50px;
-                            height: auto;
-                            cursor: pointer;
-
-                            &:hover {
-                                opacity: 0.8;
-                            }
-                        }
-                    }
-                }
-            }
-
-            .beer-description {
+            .label {
+                font-size: 1.2rem;
+                margin-bottom: 0.5rem;
                 color: $color-text-secondary;
-                font-size: 0.9rem;
             }
 
-            .web {
-                margin-top: 30px;
+            .value {
+                font-size: 2rem;
+                font-weight: bold;
+                color: #f3b200;
+            }
+        }
+    }
 
-                h2 {
-                    font-weight: 500;
-                }
+    .rating-section {
+        font-family: $font-family-primary;
 
-                a {
-                    text-decoration: none;
-                    color: #f3b200;
-                }   
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: $color-text-secondary;
+        }
+
+        .rating-section {
+
+            h2,
+            h3 {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+                color: $color-text-secondary;
             }
 
+            .beer-rate {
+                display: flex;
+                gap: 5px;
+
+
+            }
+        }
+
+        .beer-rate-icon {
+            width: 60px; 
+            height: auto;
+            cursor: pointer;
+            transition: transform 0.2s;
+
+            &:hover {
+                transform: scale(1.1);
+            }
+        }
+    }
+
+    .beer-name {
+        font-family: $font-family-primary;
+        font-size: 3rem;
+        font-weight: 600;
+        display: flex;
+        align-items: flex-start;
+        word-break: break-word;
+        hyphens: auto;
+        max-width: 100%;
+        line-height: 1.1;
+
+        .favorite-icon {
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+            margin-top: 0.5rem;
+            margin-left: 0.5rem;
+
+            &:hover {
+                transform: scale(1.1);
+            }
+        }
+    }
+
+    .beer-info,
+    .description-section,
+    .web,
+    .ingredients-section {
+
+        h2 {
+            font-family: $font-family-primary;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: $color-text-secondary;
+        }
+
+        p,
+        a {
+            font-family: $font-family-primary;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        a {
+            font-family: $font-family-primary;
+            color: #f3b200;
+            text-decoration: none;
+            transition: color 0.2s;
+
+            &:hover {
+                color: lighten(#f3b200, 10%);
+            }
+        }
+    }
+
+    .beer-info {
+        p {
+            font-size: 2rem;
+            font-weight: 700;
+            color: $color-primary;
             
         }
+    }
 
-        .right-section {
-            width: 50%;
-            padding: 2rem;
-            padding-left: 35%;
+    .ingredients-section {
+        .ingredients-list {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1.2rem;
 
-            .brand-logo {
-                width: 250px;
-                object-fit: contain;
-                margin-bottom: 1rem;
-            }
+            .ingredient-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
 
-            .beer-name {
-                font-size: 2rem;
-                margin-bottom: 1rem;
-            }
-
-            .favorite-icon {
-                cursor: pointer;
-                width: 40px;
-                height: 40px;
-                margin-bottom: -5px;
-            }
-
-            .beer-info,
-            .ingredients-section,
-            .description-section {
-                margin-bottom: 2rem;
-
-                h2 {
-                    font-size: 1.5rem;
+                .ingredient-icon-container {
+                    width: 80px;
+                    height: 80px;
+                    background-color: rgba(255, 255, 255, 0.1);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                     margin-bottom: 0.5rem;
                 }
 
-                p {
-                    font-size: 1.2rem;
+                .ingredient-icon {
+                    width: 50px;
+                    height: 50px;
+                    object-fit: contain;
                 }
-            }
 
-            .ingredients-list {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 1rem;
-
-                .ingredient-item {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    margin-top: 15px;
-
-                    .ingredient-icon {
-                        width: 30px;
-                        height: 30px;
-                        object-fit: contain;
-                    }
-
-                    .ingredient-name {
-                        font-size: 1rem;
-                    }
-                }
-            }
-
-            .beer-stats {
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-                margin-top: 1rem;
-
-                .stat {
-                    .label {
-                        font-size: 1.3rem;
-                        color: $color-text-secondary;
-                        margin-right: 10px;
-                    }
-
-                    .value {
-                        font-size: 2rem;
-                        font-weight: bold;
-                    }
+                .ingredient-name {
+                    font-size: 0.9rem;
+                    color: $color-primary;
                 }
             }
         }
     }
 }
 
-.beer-image-container {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 
-    .beer-image {
-        height: 90%;
-        width: auto;
-        object-fit: contain;
-    }
-}
 
 .modal {
     position: fixed;
@@ -208,7 +259,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -216,26 +267,81 @@
 }
 
 .modal-content {
-    background: #fff;
+    font-family: $font-family-primary;
+    background: #2c2c2c;
+    color: $color-text-light;
     padding: 2rem;
     border-radius: 5px;
     position: relative;
     width: 80%;
     max-width: 400px;
+
+    .close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    h2 {
+        margin: 0 0 1rem;
+    }
+
+    p {
+        margin: 1rem 0;
+    }
+
+    button {
+        font-family: $font-family-primary;
+        background-color: #f3b200;
+        color: #1c1c1c;
+        border: none;
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: lighten(#f3b200, 10%);
+        }
+    }
 }
 
-.modal-content .close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 1.5rem;
-    cursor: pointer;
+@media (max-width: 1200px) {
+    .info-card {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto auto;
+    }
+
+    .center-section {
+        grid-column: 1 / -1;
+        order: -1;
+    }
 }
 
-.modal-content h2 {
-    margin: 0;
-}
+@media (max-width: 768px) {
+    .info-card {
+        grid-template-columns: 1fr;
+    }
 
-.modal-content p {
-    margin: 1rem 0;
+    .right-section {
+        order: -1;
+    }
+
+    .map-and-brand {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .beer-name {
+        font-size: 2rem;
+        line-height: 1.3;
+    }
+
+    .ingredients-section {
+        .ingredients-list {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
 }
