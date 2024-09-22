@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Observable, of } from 'rxjs';
-import { map, shareReplay, switchMap } from 'rxjs/operators';
+import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { Beer } from '../components/beers/beers.interface';
 import { Brand } from '../components/country/brand.interface';
 import { Country } from '../components/country/country.interface';
@@ -14,6 +14,7 @@ export class BeerService {
   private cachedBeers$: Observable<Beer[]> | null = null;
   private cachedBrands$: Observable<Brand[]> | null = null;
   private cachedCountries$: Observable<Country[]> | null = null;
+  private cachedCountryBeerCounts$: Observable<{ [countryId: string]: number }> | null = null;
 
   constructor(
     private firestore: AngularFirestore,
@@ -30,18 +31,21 @@ export class BeerService {
   }
 
   getCountryBeerCounts(): Observable<{ [countryId: string]: number }> {
-    return this.firestore.collection<Beer>('beers').valueChanges().pipe(
-      map(beers => {
-        const countryCounts: { [countryId: string]: number } = {};
-        beers.forEach(beer => {
-          if (beer.countryId) {
-            countryCounts[beer.countryId] = (countryCounts[beer.countryId] || 0) + 1;
-          }
-        });
-        return countryCounts;
-      }),
-      shareReplay(1)
-    );
+    if (!this.cachedCountryBeerCounts$) {
+      this.cachedCountryBeerCounts$ = this.firestore.collection<Beer>('beers').valueChanges().pipe(
+        map(beers => {
+          const countryCounts: { [countryId: string]: number } = {};
+          beers.forEach(beer => {
+            if (beer.countryId) {
+              countryCounts[beer.countryId] = (countryCounts[beer.countryId] || 0) + 1;
+            }
+          });
+          return countryCounts;
+        }),
+        shareReplay(1)
+      );
+    }
+    return this.cachedCountryBeerCounts$;
   }
 
   private getBeers(): Observable<Beer[]> {
@@ -200,5 +204,12 @@ export class BeerService {
   refreshBeers(): void {
     this.cachedBeers$ = null;
     this.getBeers();
+  }
+
+  refreshCache(): void {
+    this.cachedBeers$ = null;
+    this.cachedBrands$ = null;
+    this.cachedCountries$ = null;
+    this.cachedCountryBeerCounts$ = null;
   }
 }
