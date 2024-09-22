@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable, forkJoin, of } from 'rxjs';
-import { map, tap, shareReplay, switchMap, take } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, shareReplay, switchMap } from 'rxjs/operators';
 import { Beer } from '../components/beers/beers.interface';
 import { Brand } from '../components/country/brand.interface';
 import { Country } from '../components/country/country.interface';
@@ -67,9 +67,14 @@ export class BeerService {
       map(beers => beers
         .filter(beer => beer.averageRating !== undefined)
         .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
-        .slice(0, 5)
+        .slice(0, 6)
       )
     );
+  }
+
+  private getRandomSubset<T>(array: T[], n: number): T[] {
+    const shuffled = array.sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, n);
   }
 
   getUserFavoriteBeers(): Observable<Beer[]> {
@@ -84,68 +89,60 @@ export class BeerService {
               return of([]);
             }
             const beerIds = favorites.map(f => f.beerId);
-            return this.firestore.collection<Beer>('beers', ref => 
-              ref.where('id', 'in', beerIds).limit(5)
-            ).valueChanges({ idField: 'id' });
+            return this.getBeers().pipe(
+              map(beers => beers.filter(beer => beerIds.includes(beer.id)).slice(0, 6))
+            );
           })
         );
       })
     );
   }
 
-  getRandomFavoriteBeers(): Observable<Beer[]> {
-    return this.getBeers().pipe(
-      take(1),
-      map(beers => {
-        const shuffled = beers.sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, 5);
-      })
-    );
-  }
-
   getPopularBrands(): Observable<Brand[]> {
     return this.getBrands().pipe(
-      map(brands => brands
-        .sort((a, b) => b.beersCount - a.beersCount)
-        .slice(0, 5)
-      )
+      map(brands => {
+        const sortedBrands = brands.sort((a, b) => b.beersCount - a.beersCount);
+        const topBrands = sortedBrands.slice(0, Math.min(20, sortedBrands.length));
+        return this.getRandomSubset(topBrands, 6);
+      })
     );
   }
 
   getLatestBeers(): Observable<Beer[]> {
     return this.getBeers().pipe(
       map(beers => beers
+        .filter(beer => beer.addedDate !== undefined)
         .sort((a, b) => {
           const dateA = a.addedDate ? new Date(a.addedDate).getTime() : 0;
           const dateB = b.addedDate ? new Date(b.addedDate).getTime() : 0;
           return dateB - dateA;
         })
-        .slice(0, 5)
+        .slice(0, 6)
       )
     );
   }
 
   getFilteredBeers(filters: any): Observable<Beer[]> {
     return this.getBeers().pipe(
-      map(beers => this.applyFilters(beers, filters))
+      map(beers => beers.filter(beer => {
+        const matchesSearchTerm = filters.searchTerm ?
+          beer.name?.toLowerCase().includes(filters.searchTerm.toLowerCase()) : true;
+
+        const matchesBrand = filters.brand ?
+          beer.brandId?.toLowerCase().includes(filters.brand.toLowerCase()) : true;
+
+        const matchesBeerType = filters.beerTypes && filters.beerTypes.length > 0 ?
+          filters.beerTypes.includes(beer.beerType) : true;
+
+        const matchesIngredient = filters.ingredient ?
+          beer.ingredients?.some(ing => ing.name?.toLowerCase().includes(filters.ingredient.toLowerCase())) : true;
+
+        const matchesAbv = beer.ABV !== undefined ?
+          (beer.ABV >= filters.abvMin && beer.ABV <= filters.abvMax) : true;
+
+        return matchesSearchTerm && matchesBrand && matchesBeerType && matchesIngredient && matchesAbv;
+      }))
     );
-  }
-
-  private applyFilters(beers: Beer[], filters: any): Beer[] {
-    return beers.filter(beer => {
-      const matchesSearchTerm = filters.searchTerm ? 
-        ((beer.name && beer.name.toLowerCase().includes(filters.searchTerm.toLowerCase())) || 
-         (beer.brand && beer.brand.toLowerCase().includes(filters.searchTerm.toLowerCase()))) : true;
-      const matchesBeerType = filters.beerTypes && filters.beerTypes.length > 0 ? 
-        (beer.beerType && filters.beerTypes.includes(beer.beerType)) : true;
-      const matchesAbv = filters.abvRange ? (beer.ABV !== undefined && beer.ABV <= filters.abvRange) : true;
-      const matchesIngredient = filters.ingredient ?
-        (beer.ingredients && Array.isArray(beer.ingredients) && 
-         beer.ingredients.some(ing => ing && ing.name && ing.name.toLowerCase().includes(filters.ingredient.toLowerCase()))) :
-        true;
-
-      return matchesSearchTerm && matchesBeerType && matchesAbv && matchesIngredient;
-    });
   }
 
   getBeersByBrand(brandId: string): Observable<Beer[]> {
@@ -158,5 +155,50 @@ export class BeerService {
     return this.getBeers().pipe(
       map(beers => beers.find(beer => beer.id === beerId))
     );
+  }
+
+  getPopularFavoriteBeers(): Observable<Beer[]> {
+    return this.firestore.collectionGroup('favorites').valueChanges().pipe(
+      map(favorites => {
+        const beerCounts: { [key: string]: number } = {};
+        favorites.forEach((fav: any) => {
+          beerCounts[fav.beerId] = (beerCounts[fav.beerId] || 0) + 1;
+        });
+        return Object.entries(beerCounts)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 6)
+          .map(([beerId]) => beerId);
+      }),
+      switchMap(popularBeerIds =>
+        this.getBeers().pipe(
+          map(beers => beers.filter(beer => popularBeerIds.includes(beer.id)))
+        )
+      )
+    );
+  }
+
+  validateBeer(beer: Partial<Beer>): beer is Required<Beer> {
+    return (
+      typeof beer.name === 'string' &&
+      typeof beer.brand === 'string' &&
+      typeof beer.beerType === 'string' &&
+      Array.isArray(beer.ingredients) &&
+      beer.ingredients.every(ing => typeof ing.name === 'string') &&
+      typeof beer.ABV === 'number'
+    );
+  }
+
+  addBeer(beer: Partial<Beer>): Promise<string> {
+    if (this.validateBeer(beer)) {
+      return this.firestore.collection('beers').add(beer)
+        .then(docRef => docRef.id);
+    } else {
+      return Promise.reject(new Error('Invalid beer data'));
+    }
+  }
+
+  refreshBeers(): void {
+    this.cachedBeers$ = null;
+    this.getBeers();
   }
 }

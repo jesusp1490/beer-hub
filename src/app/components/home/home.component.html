@@ -1,81 +1,64 @@
-<div class="homepage-container">
+<div class="home-container">
   <section class="hero">
-    <h1>Discover Your Perfect Beer</h1>
-    <p>Explore our vast collection of craft beers from around the world</p>
+    <div class="hero-content">
+      <h1>Discover Your Perfect Beer</h1>
+      <p>Explore our vast collection of craft beers from around the world</p>
+    </div>
   </section>
 
-  <aside class="filter-sidebar">
-    <app-filter-search (searchResults)="onSearchResults($event)"></app-filter-search>
-  </aside>
+  <div class="content-wrapper">
+    <aside class="filter-sidebar">
+      <app-filter-search (searchResults)="onSearch($event)"></app-filter-search>
+    </aside>
 
-  <main class="main-content" *ngIf="!searchActive">
-    <section class="section best-rated">
-      <h2>Best Rated Beers</h2>
-      <div class="beer-grid">
-        <div *ngFor="let beer of bestRatedBeers" class="beer-card" (click)="viewBeerDetails(beer)">
-          <img [src]="beer.beerImageUrl" [alt]="beer.name" loading="lazy">
+    <main class="main-content">
+      
+      <section class="best-rated" *ngIf="activeTab !== 'search-results'">
+        <h2>Best Rated Beers</h2>
+        <div class="beer-grid" *ngIf="activeTab === 'best-rated'">
+          <div *ngFor="let beer of bestRatedBeers$ | async" class="beer-card" (click)="onViewBeerDetails(beer.id)">
+            <img [src]="beer.beerImageUrl" [alt]="beer.name">
+            <div class="beer-info">
+              <h3>{{ beer.name }}</h3>
+              <div class="rating">
+                <i class="fas fa-star"></i>
+                <span>{{ beer.averageRating | number:'1.1-1' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="popular-brands" *ngIf="activeTab !== 'search-results'">
+        <h2>Popular Brands</h2>
+        <div class="brand-grid">
+          <div *ngFor="let brand of popularBrands$ | async" class="brand-card" (click)="onViewBrandBeers(brand.id)">
+            <img [src]="brand.logoUrl" [alt]="brand.name">
+            <div class="brand-info">
+              <h3>{{ brand.name }}</h3>
+              <p>{{ brand.beersCount }} beers</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="beer-grid" *ngIf="activeTab === 'search-results'">
+        <div *ngIf="filteredBeers.length === 0" class="no-results">
+          <p>No beers found matching your search.</p>
+        </div>
+
+        <div *ngFor="let beer of filteredBeers" class="beer-card" (click)="onViewBeerDetails(beer.id)">
+          <img [src]="beer.beerImageUrl" [alt]="beer.name">
           <div class="beer-info">
             <h3>{{ beer.name }}</h3>
-            <p class="rating">Rating: {{ beer.averageRating | number:'1.1-1' }}</p>
+            <div class="rating">
+              <i class="fas fa-star"></i>
+              <span>{{ beer.averageRating | number:'1.1-1' }}</span>
+            </div>
           </div>
         </div>
       </div>
-    </section>
 
-    <section class="section user-favorites" *ngIf="userFavoriteBeers.length > 0">
-      <h2>{{ isLoggedIn ? 'Your Favorite Beers' : 'Popular Favorite Beers' }}</h2>
-      <div class="beer-grid">
-        <div *ngFor="let beer of userFavoriteBeers" class="beer-card" (click)="viewBeerDetails(beer)">
-          <img [src]="beer.beerImageUrl" [alt]="beer.name" loading="lazy">
-          <div class="beer-info">
-            <h3>{{ beer.name }}</h3>
-            <p class="rating">Rating: {{ beer.averageRating | number:'1.1-1' }}</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section popular-brands">
-      <h2>Popular Brands</h2>
-      <div class="brand-grid">
-        <div *ngFor="let brand of popularBrands" class="brand-card" (click)="viewBrandBeers(brand)">
-          <img [src]="brand.logoUrl" [alt]="brand.name" loading="lazy">
-          <div class="brand-info">
-            <h3>{{ brand.name }}</h3>
-            <p>{{ brand.beersCount }} beers</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section latest-beers">
-      <h2>Latest Added Beers</h2>
-      <div class="beer-grid">
-        <div *ngFor="let beer of latestBeers" class="beer-card" (click)="viewBeerDetails(beer)">
-          <img [src]="beer.beerImageUrl" [alt]="beer.name" loading="lazy">
-          <div class="beer-info">
-            <h3>{{ beer.name }}</h3>
-            <p>Added: {{ beer.addedDate | date:'mediumDate' }}</p>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <div class="search-results" *ngIf="searchActive">
-    <h2>Search Results</h2>
-    <div class="beer-grid" *ngIf="filteredBeers.length > 0">
-      <div *ngFor="let beer of filteredBeers" class="beer-card" (click)="viewBeerDetails(beer)">
-        <img [src]="beer.beerImageUrl" [alt]="beer.name" loading="lazy">
-        <div class="beer-info">
-          <h3>{{ beer.name }}</h3>
-          <p>{{ beer.ABV }}% ABV | {{ beer.beerType }}</p>
-          <p class="rating">Rating: {{ beer.averageRating | number:'1.1-1' }}</p>
-        </div>
-      </div>
-    </div>
-    <div *ngIf="filteredBeers.length === 0" class="no-results">
-      <p>No results found.</p>
-    </div>
+    </main>
   </div>
 </div>

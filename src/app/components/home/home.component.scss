@@ -1,116 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 @import 'src/styles/_variables.scss';
-
-.homepage-container {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    grid-template-rows: auto 1fr;
-    gap: 2rem;
-    height: 100vh;
-    padding: 2rem;
-    box-sizing: border-box;
-    // background-color: $background-color;
+.home-container {
+    font-family: $font-family-primary;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 .hero {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 4rem 0;
-    background-color: $color-primary;
-    color: $color-text-light;
-    border-radius: 8px;
+    height: 60vh;
+    background-image: url('https://picsum.photos/1600/900?beer');
+    background-size: cover;
+    background-position: center;
+    position: relative;
 
-    h1 {
-        font-size: 3rem;
-        margin-bottom: 1rem;
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
     }
 
-    p {
-        font-size: 1.2rem;
-        max-width: 600px;
-        margin: 0 auto;
-    }
-}
+    .hero-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        padding-top: 20vh;
 
-.filter-sidebar {
-    grid-row: 2 / 3;
-}
-
-.main-content,
-.search-results {
-    grid-column: 2 / 3;
-    grid-row: 2 / 3;
-    overflow-y: auto;
-}
-
-.section {
-    margin-bottom: 3rem;
-
-    h2 {
-        font-size: 1.8rem;
-        margin-bottom: 1.5rem;
-        color: $color-text-light;
-    }
-}
-
-.beer-grid,
-.brand-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 2rem;
-    margin-left: 60px;
-}
-
-.beer-card,
-.brand-card {
-    // background-color: $card-background-color;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
-    cursor: pointer;
-    width: 200px;
-
-    &:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    img {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-    }
-
-    .beer-info,
-    .brand-info {
-        padding: 1rem;
-
-        h3 {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-            color: $color-text-light;
+        h1 {
+            font-family: $font-family-primary;
+            font-size: 3rem;
+            margin-bottom: 1rem;
         }
 
         p {
-            font-size: 0.9rem;
-            color: $color-text-secondary;
-            margin-bottom: 0.25rem;
-        }
-
-        .rating {
-            font-weight: 500;
-            color: red;
-        }
-
-        .ingredients {
-            font-size: 0.8rem;
-            color: $color-text-secondary;
+            font-family: $font-family-primary;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
         }
     }
 }
 
-.no-results {
-    text-align: center;
-    color: $color-text-secondary;
-    font-size: 1.2rem;
-    margin-top: 2rem;
-}
+    .content-wrapper {
+        display: flex;
+        flex: 1;
+    }
+
+    .filter-sidebar {
+        width: 300px;
+        padding: 1rem;
+        // background-color: #f5f5f5;
+        // border-right: 1px solid #e0e0e0;
+    }
+
+    .main-content {
+        flex: 1;
+        padding: 2rem;
+    }
+
+    .beer-grid,
+    .brand-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .beer-card,
+    .brand-card {
+        // background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s;
+        cursor: pointer;
+
+        &:hover {
+            transform: translateY(-5px);
+        }
+
+        img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .beer-info,
+        .brand-info {
+            padding: 1rem;
+
+            h3 {
+                font-family: $font-family-primary;
+                margin: 0 0 0.5rem;
+                font-size: 1.1rem;
+            }
+
+            .rating {
+                font-family: $font-family-primary;
+                display: flex;
+                align-items: center;
+                font-size: 0.9rem;
+                color: #666;
+
+                i {
+                    margin-right: 0.3rem;
+                }
+            }
+        }
+    }
+
+    .best-rated {     
+        margin-top: 1rem;
+
+        h2 {
+            font-family: $font-family-primary;
+            font-weight: 700;
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+    }
+
+    .popular-brands {
+        margin-top: 1rem;
+
+        h2 {
+            font-family: $font-family-primary;
+            font-weight: 700;
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 2rem;
+        font-size: 1.2rem;
+        color: #666;
+    }

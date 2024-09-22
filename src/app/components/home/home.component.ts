@@ -1,120 +1,58 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BeerService } from '../../services/beer.service';
 import { AuthService } from '../../services/auth.service';
 import { Beer } from '../beers/beers.interface';
 import { Brand } from '../country/brand.interface';
 import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit, OnDestroy {
-  searchActive = false;
+export class HomeComponent implements OnInit {
+  activeTab: 'best-rated' | 'favorites' | 'latest' | 'search-results' = 'best-rated';
+  bestRatedBeers$: Observable<Beer[]>;
+  popularBrands$: Observable<Brand[]>;
+  favoriteBeers$: Observable<Beer[]>;
+  latestBeers$: Observable<Beer[]>;
+  isLoggedIn$: Observable<boolean>;
   filteredBeers: Beer[] = [];
-  bestRatedBeers: Beer[] = [];
-  popularBrands: Brand[] = [];
-  userFavoriteBeers: Beer[] = [];
-  latestBeers: Beer[] = [];
-  isLoggedIn: boolean = false;
-  private unsubscribe$ = new Subject<void>();
 
   constructor(
     private beerService: BeerService,
     private authService: AuthService,
     private router: Router
-  ) { }
+  ) {
+    this.isLoggedIn$ = this.authService.isLoggedIn();
+    this.bestRatedBeers$ = this.beerService.getBestRatedBeers();
+    this.popularBrands$ = this.beerService.getPopularBrands();
+    this.latestBeers$ = this.beerService.getLatestBeers();
+    this.favoriteBeers$ = this.isLoggedIn$.pipe(
+      switchMap(isLoggedIn => isLoggedIn ? this.beerService.getUserFavoriteBeers() : this.beerService.getPopularFavoriteBeers())
+    );
+  }
 
   ngOnInit(): void {
-    this.getBestRatedBeers();
-    this.getPopularBrands();
-    this.getLatestBeers();
-    this.getFavoriteBeers();
+    // Additional initialization if needed
   }
 
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+  setActiveTab(tab: 'best-rated' | 'favorites' | 'latest'): void {
+    this.activeTab = tab;
   }
 
-  getFavoriteBeers(): void {
-    this.authService.user$.pipe(takeUntil(this.unsubscribe$)).subscribe(user => {
-      this.isLoggedIn = !!user;
-      if (this.isLoggedIn) {
-        this.getUserFavoriteBeers();
-      } else {
-        this.getRandomFavoriteBeers();
-      }
-    });
-  }
-
-  onSearchResults(results: Beer[]): void {
+  onSearch(results: Beer[]): void {
     this.filteredBeers = results;
-    this.searchActive = results.length > 0;
+    this.activeTab = 'search-results';
   }
 
-  getBestRatedBeers(): void {
-    this.beerService.getBestRatedBeers().pipe(takeUntil(this.unsubscribe$)).subscribe(
-      (beers: Beer[]) => {
-        this.bestRatedBeers = beers;
-      }
-    );
+  onViewBeerDetails(beerId: string): void {
+    this.router.navigate(['/beers', beerId]);
   }
 
-  getUserFavoriteBeers(): void {
-    this.beerService.getUserFavoriteBeers().pipe(takeUntil(this.unsubscribe$)).subscribe(
-      (beers: Beer[]) => {
-        this.userFavoriteBeers = beers;
-        console.log('User favorite beers:', this.userFavoriteBeers);
-      },
-      (error) => {
-        console.error('Error fetching user favorite beers:', error);
-      }
-    );
-  }
-
-  getRandomFavoriteBeers(): void {
-    this.beerService.getRandomFavoriteBeers().pipe(takeUntil(this.unsubscribe$)).subscribe(
-      (beers: Beer[]) => {
-        this.userFavoriteBeers = beers;
-        console.log('Random favorite beers:', this.userFavoriteBeers);
-      },
-      (error) => {
-        console.error('Error fetching random favorite beers:', error);
-      }
-    );
-  }
-
-  getPopularBrands(): void {
-    this.beerService.getPopularBrands().pipe(takeUntil(this.unsubscribe$)).subscribe(
-      (brands: Brand[]) => {
-        this.popularBrands = brands;
-      }
-    );
-  }
-
-  getLatestBeers(): void {
-    this.beerService.getLatestBeers().pipe(takeUntil(this.unsubscribe$)).subscribe(
-      (beers: Beer[]) => {
-        this.latestBeers = beers;
-      }
-    );
-  }
-
-  getIngredients(beer: Beer): string {
-    return beer.ingredients && beer.ingredients.length > 0
-      ? beer.ingredients.map(ing => ing.name).join(', ')
-      : 'No ingredients listed';
-  }
-
-  viewBeerDetails(beer: Beer): void {
-    this.router.navigate(['/beers', beer.id]);
-  }
-
-  viewBrandBeers(brand: Brand): void {
-    this.router.navigate(['/brands', brand.id, 'beers']);
+  onViewBrandBeers(brandId: string): void {
+    this.router.navigate(['/brands', brandId, 'beers']);
   }
 }

@@ -44,8 +44,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     MapComponent,
     CountryComponent,
     FilterSearchComponent,
-    HomeComponent,
     BackButtonComponent,
+    HomeComponent,
     // AboutComponent,
     // ContactComponent
   ],
@@ -75,6 +75,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     ReactiveFormsModule,
     ProfileModule,
     CommonModule,
+    
   ],
   exports: [
     BackButtonComponent
