@@ -8,12 +8,44 @@ import { Country } from '../country/country.interface';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 
 @Component({
   selector: 'app-beer-details',
   templateUrl: './beer-details.component.html',
-  styleUrls: ['./beer-details.component.scss']
+  styleUrls: ['./beer-details.component.scss'],
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('500ms', style({ opacity: 1 })),
+      ]),
+    ]),
+    trigger('slideInFromLeft', [
+      transition(':enter', [
+        style({ transform: 'translateX(-100%)', opacity: 0 }),
+        animate('500ms ease-out', style({ transform: 'translateX(0)', opacity: 1 })),
+      ]),
+    ]),
+    trigger('slideInFromRight', [
+      transition(':enter', [
+        style({ transform: 'translateX(100%)', opacity: 0 }),
+        animate('500ms ease-out', style({ transform: 'translateX(0)', opacity: 1 })),
+      ]),
+    ]),
+    trigger('staggerList', [
+      transition(':enter', [
+        query(':enter', [
+          style({ opacity: 0, transform: 'translateY(50px)' }),
+          stagger('100ms', [
+            animate('500ms ease-out', style({ opacity: 1, transform: 'translateY(0px)' })),
+          ]),
+        ], { optional: true }),
+      ]),
+    ]),
+  ],
 })
+
 export class BeerDetailsComponent implements OnInit, OnDestroy {
   beer: Beer | undefined;
   brandName: string = '';
@@ -26,6 +58,21 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
   favoriteIconUrl: string = 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-crown.webp?alt=media&token=d6a7a1e5-1dcb-4c2d-8f34-87df6a9d2548';
   showRegisterModal: boolean = false;
   private unsubscribe$ = new Subject<void>();
+
+  animationState = {
+    beerImageUrl: false,
+    countryInfo: false,
+    mapAndBrand: false,
+    beerStats: false,
+    ratingSection: false,
+    web: false,
+    beerName: false,
+    beerInfo: false,
+    description: false,
+    ingredients: false,
+    leftSection: false,
+    rightSection: false,
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -49,6 +96,20 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
         this.loadBeerData(beerId);
       }
     });
+
+    // Trigger animations sequentially
+    setTimeout(() => this.animationState.beerImageUrl = true, 0);
+    setTimeout(() => this.animationState.countryInfo = true, 500);
+    setTimeout(() => this.animationState.mapAndBrand = true, 1000);
+    setTimeout(() => this.animationState.beerStats = true, 1500);
+    setTimeout(() => this.animationState.ratingSection = true, 2000);
+    setTimeout(() => this.animationState.web = true, 2500);
+    setTimeout(() => this.animationState.beerName = true, 3000);
+    setTimeout(() => this.animationState.beerInfo = true, 3500);
+    setTimeout(() => this.animationState.description = true, 4000);
+    setTimeout(() => this.animationState.ingredients = true, 4500);
+    setTimeout(() => this.animationState.leftSection = true, 5000);
+    setTimeout(() => this.animationState.rightSection = true, 5500);
   }
 
   ngOnDestroy(): void {
