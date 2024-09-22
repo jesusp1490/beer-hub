@@ -1,5 +1,10 @@
 <div class="home-container">
   <section class="hero">
+    <video autoplay loop muted playsinline class="hero-video">
+      <source src="../../../assets/2356468-uhd_3840_2160_24fps.mp4"
+        type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
     <div class="hero-content">
       <h1>Discover Your Perfect Beer</h1>
       <p>Explore our vast collection of craft beers from around the world</p>
@@ -12,7 +17,7 @@
     </aside>
 
     <main class="main-content">
-      
+
       <section class="best-rated" *ngIf="activeTab !== 'search-results'">
         <h2>Best Rated Beers</h2>
         <div class="beer-grid" *ngIf="activeTab === 'best-rated'">
