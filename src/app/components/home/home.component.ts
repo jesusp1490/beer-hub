@@ -5,7 +5,7 @@ import { Beer } from '../beers/beers.interface';
 import { Brand } from '../country/brand.interface';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -54,5 +54,10 @@ export class HomeComponent implements OnInit {
 
   onViewBrandBeers(brandId: string): void {
     this.router.navigate(['/brands', brandId, 'beers']);
+  }
+
+  getBeerTypeIcon(beerType: string): string {
+    // This function now returns a generic icon for all beer types
+    return 'beer';
   }
 }

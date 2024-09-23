@@ -18,19 +18,25 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     trigger('fadeIn', [
       transition(':enter', [
         style({ opacity: 0 }),
-        animate('500ms', style({ opacity: 1 })),
+        animate('1000ms', style({ opacity: 1 })),
       ]),
     ]),
     trigger('slideInFromLeft', [
       transition(':enter', [
         style({ transform: 'translateX(-100%)', opacity: 0 }),
-        animate('500ms ease-out', style({ transform: 'translateX(0)', opacity: 1 })),
+        animate('2000ms ease-out', style({ transform: 'translateX(0)', opacity: 1 })),
       ]),
     ]),
     trigger('slideInFromRight', [
       transition(':enter', [
         style({ transform: 'translateX(100%)', opacity: 0 }),
-        animate('500ms ease-out', style({ transform: 'translateX(0)', opacity: 1 })),
+        animate('1500ms ease-out', style({ transform: 'translateX(0)', opacity: 1 })),
+      ]),
+    ]),
+    trigger('slideInFromBottom', [
+      transition(':enter', [
+        style({ transform: 'translateY(100%)', opacity: 0 }),
+        animate('1500ms ease-out', style({ transform: 'translateY(0)', opacity: 1 })),
       ]),
     ]),
     trigger('staggerList', [
@@ -38,14 +44,13 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
         query(':enter', [
           style({ opacity: 0, transform: 'translateY(50px)' }),
           stagger('100ms', [
-            animate('500ms ease-out', style({ opacity: 1, transform: 'translateY(0px)' })),
+            animate('1500ms ease-out', style({ opacity: 1, transform: 'translateY(0px)' })),
           ]),
         ], { optional: true }),
       ]),
     ]),
   ],
 })
-
 export class BeerDetailsComponent implements OnInit, OnDestroy {
   beer: Beer | undefined;
   brandName: string = '';
@@ -61,17 +66,15 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
 
   animationState = {
     beerImageUrl: false,
-    countryInfo: false,
-    mapAndBrand: false,
-    beerStats: false,
-    ratingSection: false,
-    web: false,
     beerName: false,
-    beerInfo: false,
+    countryInfo: false,
+    brandInfo: false,
+    beerType: false,
+    beerRating: false,
     description: false,
+    web: false,
+    stats: false,
     ingredients: false,
-    leftSection: false,
-    rightSection: false,
   };
 
   constructor(
@@ -98,18 +101,22 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
     });
 
     // Trigger animations sequentially
-    setTimeout(() => this.animationState.beerImageUrl = true, 0);
-    setTimeout(() => this.animationState.countryInfo = true, 500);
-    setTimeout(() => this.animationState.mapAndBrand = true, 1000);
-    setTimeout(() => this.animationState.beerStats = true, 1500);
-    setTimeout(() => this.animationState.ratingSection = true, 2000);
-    setTimeout(() => this.animationState.web = true, 2500);
-    setTimeout(() => this.animationState.beerName = true, 3000);
-    setTimeout(() => this.animationState.beerInfo = true, 3500);
-    setTimeout(() => this.animationState.description = true, 4000);
-    setTimeout(() => this.animationState.ingredients = true, 4500);
-    setTimeout(() => this.animationState.leftSection = true, 5000);
-    setTimeout(() => this.animationState.rightSection = true, 5500);
+    setTimeout(() => this.animationState.beerImageUrl = true, 2000);
+    setTimeout(() => {
+      this.animationState.beerName = true;
+      this.animationState.countryInfo = true;
+    }, 2000);
+    setTimeout(() => {
+      this.animationState.brandInfo = true;
+      this.animationState.beerType = true;
+    }, 3000);
+    setTimeout(() => {
+      this.animationState.beerRating = true;
+      this.animationState.description = true;
+    }, 4000);
+    setTimeout(() => this.animationState.web = true, 6000);
+    setTimeout(() => this.animationState.ingredients = true, 7000);
+    setTimeout(() => this.animationState.stats = true, 20000);
   }
 
   ngOnDestroy(): void {

@@ -1,8 +1,7 @@
 <div class="home-container">
   <section class="hero">
     <video autoplay loop muted playsinline class="hero-video">
-      <source src="../../../assets/Hero-video.mp4"
-        type="video/mp4">
+      <!-- <source src="../../../assets/Hero-video.mp4" type="video/mp4"> -->
       Your browser does not support the video tag.
     </video>
     <div class="hero-content">
@@ -17,14 +16,20 @@
     </aside>
 
     <main class="main-content">
-
       <section class="best-rated" *ngIf="activeTab !== 'search-results'">
         <h2>Best Rated Beers</h2>
         <div class="beer-grid" *ngIf="activeTab === 'best-rated'">
           <div *ngFor="let beer of bestRatedBeers$ | async" class="beer-card" (click)="onViewBeerDetails(beer.id)">
-            <img [src]="beer.beerImageUrl" [alt]="beer.name">
+            <div class="beer-label">
+              <!-- <img [src]="beer.beerLabelUrl" [alt]="beer.name" onerror="this.src='assets/default-beer-label.png'"> -->
+            </div>
             <div class="beer-info">
               <h3>{{ beer.name }}</h3>
+              <p class="brand">{{ beer.brand }}</p>
+              <p class="beer-type">
+                <i class="fas fa-{{ getBeerTypeIcon(beer.beerType) }}"></i>
+                {{ beer.beerType }}
+              </p>
               <div class="rating">
                 <i class="fas fa-star"></i>
                 <span>{{ beer.averageRating | number:'1.1-1' }}</span>
@@ -38,7 +43,9 @@
         <h2>Popular Brands</h2>
         <div class="brand-grid">
           <div *ngFor="let brand of popularBrands$ | async" class="brand-card" (click)="onViewBrandBeers(brand.id)">
-            <img [src]="brand.logoUrl" [alt]="brand.name">
+            <div class="brand-logo">
+              <img [src]="brand.logoUrl" [alt]="brand.name" onerror="this.src='assets/default-brand-logo.png'">
+            </div>
             <div class="brand-info">
               <h3>{{ brand.name }}</h3>
               <p>{{ brand.beersCount }} beers</p>
@@ -53,9 +60,16 @@
         </div>
 
         <div *ngFor="let beer of filteredBeers" class="beer-card" (click)="onViewBeerDetails(beer.id)">
-          <img [src]="beer.beerImageUrl" [alt]="beer.name">
+          <div class="beer-label">
+            <!-- <img [src]="beer.beerLabelUrl" [alt]="beer.name" onerror="this.src='assets/default-beer-label.png'"> -->
+          </div>
           <div class="beer-info">
             <h3>{{ beer.name }}</h3>
+            <p class="brand">{{ beer.brand }}</p>
+            <p class="beer-type">
+              <i class="fas fa-{{ getBeerTypeIcon(beer.beerType) }}"></i>
+              {{ beer.beerType }}
+            </p>
             <div class="rating">
               <i class="fas fa-star"></i>
               <span>{{ beer.averageRating | number:'1.1-1' }}</span>
@@ -63,7 +77,6 @@
           </div>
         </div>
       </div>
-
     </main>
   </div>
 </div>

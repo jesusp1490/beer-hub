@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable, of } from 'rxjs';
-import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { Observable, of, BehaviorSubject } from 'rxjs';
+import { map, shareReplay, switchMap, tap, take, catchError } from 'rxjs/operators';
 import { Beer } from '../components/beers/beers.interface';
 import { Brand } from '../components/country/brand.interface';
 import { Country } from '../components/country/country.interface';
@@ -11,28 +11,52 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class BeerService {
-  private cachedBeers$: Observable<Beer[]> | null = null;
-  private cachedBrands$: Observable<Brand[]> | null = null;
-  private cachedCountries$: Observable<Country[]> | null = null;
-  private cachedCountryBeerCounts$: Observable<{ [countryId: string]: number }> | null = null;
+  private cachedBeers$ = new BehaviorSubject<Beer[]>([]);
+  private cachedBrands$ = new BehaviorSubject<Brand[]>([]);
+  private cachedCountries$ = new BehaviorSubject<Country[]>([]);
+  private cachedCountryBeerCounts$ = new BehaviorSubject<{ [countryId: string]: number }>({});
+  private lastFetchTime: number = 0;
+  private cacheExpirationTime = 5 * 60 * 1000; // 5 minutes
 
   constructor(
     private firestore: AngularFirestore,
     private authService: AuthService
-  ) { }
+  ) {
+    this.initializeCache();
+  }
+
+  private initializeCache(): void {
+    this.getBeers().pipe(take(1)).subscribe();
+    this.getBrands().pipe(take(1)).subscribe();
+    this.getCountries().pipe(take(1)).subscribe();
+    this.getCountryBeerCounts().pipe(take(1)).subscribe();
+  }
+
+  private shouldRefetchCache(): boolean {
+    return Date.now() - this.lastFetchTime > this.cacheExpirationTime;
+  }
 
   getCountries(): Observable<Country[]> {
-    if (!this.cachedCountries$) {
-      this.cachedCountries$ = this.firestore.collection<Country>('countries').valueChanges({ idField: 'id' }).pipe(
-        shareReplay(1)
-      );
+    if (this.shouldRefetchCache()) {
+      this.firestore.collection<Country>('countries').valueChanges({ idField: 'id' }).pipe(
+        take(1),
+        tap(countries => {
+          this.cachedCountries$.next(countries);
+          this.lastFetchTime = Date.now();
+        }),
+        catchError(error => {
+          console.error('Error fetching countries:', error);
+          return of([]);
+        })
+      ).subscribe();
     }
-    return this.cachedCountries$;
+    return this.cachedCountries$.asObservable();
   }
 
   getCountryBeerCounts(): Observable<{ [countryId: string]: number }> {
-    if (!this.cachedCountryBeerCounts$) {
-      this.cachedCountryBeerCounts$ = this.firestore.collection<Beer>('beers').valueChanges().pipe(
+    if (this.shouldRefetchCache()) {
+      this.getBeers().pipe(
+        take(1),
         map(beers => {
           const countryCounts: { [countryId: string]: number } = {};
           beers.forEach(beer => {
@@ -42,28 +66,51 @@ export class BeerService {
           });
           return countryCounts;
         }),
-        shareReplay(1)
-      );
+        tap(counts => {
+          this.cachedCountryBeerCounts$.next(counts);
+          this.lastFetchTime = Date.now();
+        }),
+        catchError(error => {
+          console.error('Error calculating country beer counts:', error);
+          return of({});
+        })
+      ).subscribe();
     }
-    return this.cachedCountryBeerCounts$;
+    return this.cachedCountryBeerCounts$.asObservable();
   }
 
   private getBeers(): Observable<Beer[]> {
-    if (!this.cachedBeers$) {
-      this.cachedBeers$ = this.firestore.collection<Beer>('beers').valueChanges({ idField: 'id' }).pipe(
-        shareReplay(1)
-      );
+    if (this.shouldRefetchCache()) {
+      this.firestore.collection<Beer>('beers').valueChanges({ idField: 'id' }).pipe(
+        take(1),
+        tap(beers => {
+          this.cachedBeers$.next(beers);
+          this.lastFetchTime = Date.now();
+        }),
+        catchError(error => {
+          console.error('Error fetching beers:', error);
+          return of([]);
+        })
+      ).subscribe();
     }
-    return this.cachedBeers$;
+    return this.cachedBeers$.asObservable();
   }
 
   private getBrands(): Observable<Brand[]> {
-    if (!this.cachedBrands$) {
-      this.cachedBrands$ = this.firestore.collection<Brand>('brands').valueChanges({ idField: 'id' }).pipe(
-        shareReplay(1)
-      );
+    if (this.shouldRefetchCache()) {
+      this.firestore.collection<Brand>('brands').valueChanges({ idField: 'id' }).pipe(
+        take(1),
+        tap(brands => {
+          this.cachedBrands$.next(brands);
+          this.lastFetchTime = Date.now();
+        }),
+        catchError(error => {
+          console.error('Error fetching brands:', error);
+          return of([]);
+        })
+      ).subscribe();
     }
-    return this.cachedBrands$;
+    return this.cachedBrands$.asObservable();
   }
 
   getBestRatedBeers(): Observable<Beer[]> {
@@ -71,7 +118,7 @@ export class BeerService {
       map(beers => beers
         .filter(beer => beer.averageRating !== undefined)
         .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
-        .slice(0, 6)
+        .slice(0, 5)
       )
     );
   }
@@ -88,13 +135,14 @@ export class BeerService {
           return of([]);
         }
         return this.firestore.collection(`users/${user.uid}/favorites`).valueChanges({ idField: 'id' }).pipe(
+          take(1),
           switchMap((favorites: any[]) => {
             if (favorites.length === 0) {
               return of([]);
             }
             const beerIds = favorites.map(f => f.beerId);
             return this.getBeers().pipe(
-              map(beers => beers.filter(beer => beerIds.includes(beer.id)).slice(0, 6))
+              map(beers => beers.filter(beer => beerIds.includes(beer.id)).slice(0, 5))
             );
           })
         );
@@ -107,7 +155,7 @@ export class BeerService {
       map(brands => {
         const sortedBrands = brands.sort((a, b) => b.beersCount - a.beersCount);
         const topBrands = sortedBrands.slice(0, Math.min(20, sortedBrands.length));
-        return this.getRandomSubset(topBrands, 6);
+        return this.getRandomSubset(topBrands, 5);
       })
     );
   }
@@ -121,7 +169,7 @@ export class BeerService {
           const dateB = b.addedDate ? new Date(b.addedDate).getTime() : 0;
           return dateB - dateA;
         })
-        .slice(0, 6)
+        .slice(0, 5)
       )
     );
   }
@@ -163,6 +211,7 @@ export class BeerService {
 
   getPopularFavoriteBeers(): Observable<Beer[]> {
     return this.firestore.collectionGroup('favorites').valueChanges().pipe(
+      take(1),
       map(favorites => {
         const beerCounts: { [key: string]: number } = {};
         favorites.forEach((fav: any) => {
@@ -195,21 +244,17 @@ export class BeerService {
   addBeer(beer: Partial<Beer>): Promise<string> {
     if (this.validateBeer(beer)) {
       return this.firestore.collection('beers').add(beer)
-        .then(docRef => docRef.id);
+        .then(docRef => {
+          this.refreshCache();
+          return docRef.id;
+        });
     } else {
       return Promise.reject(new Error('Invalid beer data'));
     }
   }
 
-  refreshBeers(): void {
-    this.cachedBeers$ = null;
-    this.getBeers();
-  }
-
   refreshCache(): void {
-    this.cachedBeers$ = null;
-    this.cachedBrands$ = null;
-    this.cachedCountries$ = null;
-    this.cachedCountryBeerCounts$ = null;
+    this.lastFetchTime = 0;
+    this.initializeCache();
   }
 }
