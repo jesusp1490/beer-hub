@@ -24,7 +24,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     trigger('slideInFromLeft', [
       transition(':enter', [
         style({ transform: 'translateX(-100%)', opacity: 0 }),
-        animate('2000ms ease-out', style({ transform: 'translateX(0)', opacity: 1 })),
+        animate('1800ms ease-out', style({ transform: 'translateX(0)', opacity: 1 })),
       ]),
     ]),
     trigger('slideInFromRight', [

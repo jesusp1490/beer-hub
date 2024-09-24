@@ -6,21 +6,24 @@
     align-items: center;
     justify-content: flex-start;
     font-family: $font-family-primary;
-    min-height: 100vh;
-    margin: 0;
+    margin-top: 100px;
     padding: 20px;
     box-sizing: border-box;
     background-color: $color-background-dark;
     color: $color-text-light;
 
     h2 {
+        font-family: $font-family-primary;
         margin-bottom: 20px;
         font-size: 2rem;
         color: $color-text-light;
     }
 
+    
     form {
+        font-family: $font-family-primary;
         background-color: $color-card-background;
+        border-bottom: 2px solid $color-primary;;
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         padding: 20px;
@@ -29,23 +32,37 @@
         margin: 0 auto;
 
         mat-form-field {
+            font-family: $font-family-primary;
             width: 100%;
             margin-bottom: 16px;
+            
         }
 
         button {
             width: 100%;
             margin-top: 16px;
+            background-color: $color-primary;
+            font-family: $font-family-primary;
+        }
+
+        input {
+            font-family: $font-family-primary;
+            background-color: transparent;
+            // border-bottom: 2px solid $color-primary;
         }
     }
 
     button[color="accent"] {
+        background-color: white;
+        font-family: $font-family-primary;
         margin-top: 16px;
         width: 100%;
         max-width: 500px;
 
         i {
+            font-size: 25px;
             margin-right: 8px;
+            color: $color-secondary;
         }
     }
 }

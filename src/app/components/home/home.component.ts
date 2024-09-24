@@ -5,7 +5,7 @@ import { Beer } from '../beers/beers.interface';
 import { Brand } from '../country/brand.interface';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { switchMap, map } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',

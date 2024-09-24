@@ -21,11 +21,11 @@
         <div class="beer-grid" *ngIf="activeTab === 'best-rated'">
           <div *ngFor="let beer of bestRatedBeers$ | async" class="beer-card" (click)="onViewBeerDetails(beer.id)">
             <div class="beer-label">
-              <!-- <img [src]="beer.beerLabelUrl" [alt]="beer.name" onerror="this.src='assets/default-beer-label.png'"> -->
+              <img [src]="beer.beerLabelUrl" [alt]="beer.name">
             </div>
             <div class="beer-info">
               <h3>{{ beer.name }}</h3>
-              <p class="brand">{{ beer.brand }}</p>
+              <p class="brand">{{ beer.brandId }}</p>
               <p class="beer-type">
                 <i class="fas fa-{{ getBeerTypeIcon(beer.beerType) }}"></i>
                 {{ beer.beerType }}
@@ -44,7 +44,7 @@
         <div class="brand-grid">
           <div *ngFor="let brand of popularBrands$ | async" class="brand-card" (click)="onViewBrandBeers(brand.id)">
             <div class="brand-logo">
-              <img [src]="brand.logoUrl" [alt]="brand.name" onerror="this.src='assets/default-brand-logo.png'">
+              <img [src]="brand.logoUrl" [alt]="brand.name">
             </div>
             <div class="brand-info">
               <h3>{{ brand.name }}</h3>
@@ -58,10 +58,9 @@
         <div *ngIf="filteredBeers.length === 0" class="no-results">
           <p>No beers found matching your search.</p>
         </div>
-
         <div *ngFor="let beer of filteredBeers" class="beer-card" (click)="onViewBeerDetails(beer.id)">
           <div class="beer-label">
-            <!-- <img [src]="beer.beerLabelUrl" [alt]="beer.name" onerror="this.src='assets/default-beer-label.png'"> -->
+            <img [src]="beer.beerLabelUrl" [alt]="beer.name">
           </div>
           <div class="beer-info">
             <h3>{{ beer.name }}</h3>

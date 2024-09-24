@@ -12,6 +12,7 @@ export interface Beer {
   IBU: number;
   description: string;
   beerImageUrl: string;
+  beerLabelUrl: string;
   ingredients: { name: string; ingImageUrl: string }[];
   brandId: string;
   countryId: string;
