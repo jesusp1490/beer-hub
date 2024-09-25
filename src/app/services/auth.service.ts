@@ -59,9 +59,35 @@ export class AuthService {
     return this.afAuth.signOut();
   }
 
-  signInWithGoogle(): Promise<firebase.auth.UserCredential> {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    return this.afAuth.signInWithPopup(provider);
+  async signInWithGoogle(): Promise<firebase.auth.UserCredential> {
+    try {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      const result = await this.afAuth.signInWithPopup(provider);
+      const user = result.user;
+      if (user) {
+        const userRef = this.firestore.doc(`users/${user.uid}`);
+        const snapshot = await userRef.get().toPromise();
+        if (snapshot && !snapshot.exists) {
+          // Create a new user profile
+          const newUser = {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            country: '',
+            dob: '',
+            firstName: user.displayName?.split(' ')[0] || '',
+            lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
+            username: user.email?.split('@')[0] || ''
+          };
+          await userRef.set(newUser);
+        }
+      }
+      return result;
+    } catch (error) {
+      console.error('Error in signInWithGoogle:', error);
+      throw error;
+    }
   }
 
   isLoggedIn(): Observable<boolean> {

@@ -247,7 +247,37 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private updateLegend(): void {
-    // Implement legend update logic here
+    const beerCounts = Object.values(this.countryBeerCounts);
+    const maxCount = Math.max(...beerCounts, 1);
+    const minCount = Math.min(...beerCounts, 0);
+
+    const legendScale = this.isHeatMap ? this.heatMapColorScale : this.colorScale;
+
+    const legendGradient = this.svg.select('.legend-gradient');
+    if (legendGradient.empty()) {
+      this.svg.append('linearGradient')
+        .attr('id', 'legend-gradient')
+        .attr('x1', '0%')
+        .attr('y1', '0%')
+        .attr('x2', '100%')
+        .attr('y2', '0%')
+        .selectAll('stop')
+        .data(legendScale.ticks().map((t, i, n) => ({ offset: `${100*i/n.length}%`, color: legendScale(t) })))
+        .enter().append('stop')
+        .attr('offset', d => d.offset)
+        .attr('stop-color', d => d.color);
+    } else {
+      legendGradient.selectAll('stop')
+        .data(legendScale.ticks().map((t, i, n) => ({ offset: `${100*i/n.length}%`, color: legendScale(t) })))
+        .attr('offset', d => d.offset)
+        .attr('stop-color', d => d.color);
+    }
+
+    d3.select('.legend-gradient')
+      .style('background', 'linear-gradient(to right, ' + legendScale.range().join(',') + ')');
+
+    d3.select('.legend-labels')
+      .html(`<span>${minCount}</span><span>${maxCount}</span>`);
   }
 
   zoomToRegion(region: string): void {

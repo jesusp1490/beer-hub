@@ -18,7 +18,9 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Puedes añadir lógica de inicialización aquí si es necesario
+    this.user$.subscribe(user => {
+      console.log('Current user:', user); // Add this line for debugging
+    });
   }
 
   goToSignUp(): void {

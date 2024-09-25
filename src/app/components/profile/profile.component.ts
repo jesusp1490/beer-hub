@@ -7,9 +7,22 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/storage';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Inject } from '@angular/core';
+
+interface UserProfile {
+  country: string;
+  dob: string;
+  firstName: string;
+  lastName: string;
+  photoURL: string;
+  username: string;
+  email: string;
+}
 
 interface FavoriteBeer {
-  beerImageUrl: any;
+  beerImageUrl: string;
   id: string;
   name: string;
 }
@@ -21,21 +34,32 @@ interface FavoriteBeer {
 })
 export class ProfileComponent implements OnInit, OnDestroy {
   user$: Observable<firebase.User | null> = this.afAuth.authState;
-  userProfile: any = {};
+  userProfile: UserProfile = {
+    country: '',
+    dob: '',
+    firstName: '',
+    lastName: '',
+    photoURL: '',
+    username: '',
+    email: '',
+  };
   selectedFile: File | null = null;
   newPassword: string = '';
   confirmPassword: string = '';
   user: firebase.User | null = null;
-  showNewBeerModal: boolean = false;
   newBeer: any = { name: '', description: '' };
   favoriteBeers: FavoriteBeer[] = [];
   private unsubscribe$ = new Subject<void>();
+  isLoading: boolean = false;
 
   constructor(
     private afAuth: AngularFireAuth,
     private firestore: AngularFirestore,
-    private router: Router
-  ) {}
+    private router: Router,
+    private authService: AuthService,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
+  ) { }
 
   ngOnInit(): void {
     this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe(user => {
@@ -53,10 +77,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   private loadUserProfile(userId: string): void {
-    this.firestore.doc(`users/${userId}`).valueChanges()
+    this.firestore.doc<UserProfile>(`users/${userId}`).valueChanges()
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(profile => {
-        this.userProfile = profile || {};
+        if (profile) {
+          this.userProfile = { ...profile };
+          console.log('Loaded user profile:', this.userProfile); // Add this line for debugging
+        } else {
+          console.log('No user profile found'); // Add this line for debugging
+        }
+      }, error => {
+        console.error('Error loading user profile:', error); // Add this line for debugging
       });
   }
 
@@ -65,7 +96,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       .valueChanges({ idField: 'id' })
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(favorites => {
-        const beerPromises = favorites.map((favorite: any) => 
+        const beerPromises = favorites.map((favorite: any) =>
           this.firestore.doc(`beers/${favorite.id}`).get().toPromise()
         );
 
@@ -92,6 +123,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   private async uploadProfilePicture(): Promise<void> {
     if (this.selectedFile && this.user) {
+      this.isLoading = true;
       const storageRef = firebase.storage().ref();
       const userProfilePicRef = storageRef.child(`profilePictures/${this.user.uid}`);
 
@@ -102,75 +134,125 @@ export class ProfileComponent implements OnInit, OnDestroy {
         await this.firestore.doc(`users/${this.user.uid}`).update({ photoURL });
 
         this.userProfile.photoURL = photoURL;
+        this.snackBar.open('Profile picture updated successfully!', 'Close', { duration: 3000 });
       } catch (error) {
         console.error('Error updating profile picture:', error);
+        this.snackBar.open('Error updating profile picture. Please try again.', 'Close', { duration: 3000 });
+      } finally {
+        this.isLoading = false;
       }
     }
   }
 
   async updatePassword(): Promise<void> {
     if (this.newPassword !== this.confirmPassword) {
-      alert('Passwords do not match.');
+      this.snackBar.open('Passwords do not match.', 'Close', { duration: 3000 });
       return;
     }
 
     if (this.user) {
+      this.isLoading = true;
       try {
         await this.user.updatePassword(this.newPassword);
-        alert('Password updated successfully!');
+        this.snackBar.open('Password updated successfully!', 'Close', { duration: 3000 });
         this.newPassword = '';
         this.confirmPassword = '';
       } catch (error) {
-        alert(`Error updating password: ${(error as any).message}`);
+        this.snackBar.open(`Error updating password: ${(error as any).message}`, 'Close', { duration: 3000 });
+      } finally {
+        this.isLoading = false;
       }
     }
   }
 
   signOut(): void {
-    this.afAuth.signOut().then(() => {
+    this.authService.signOut().then(() => {
       this.router.navigate(['/login']);
     }).catch(error => {
-      alert(`Error signing out: ${(error as any).message}`);
+      this.snackBar.open(`Error signing out: ${(error as any).message}`, 'Close', { duration: 3000 });
     });
   }
 
   openNewBeerModal(): void {
-    this.showNewBeerModal = true;
+    const dialogRef = this.dialog.open(NewBeerRequestComponent, {
+      width: '400px',
+      data: { newBeer: this.newBeer }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.submitNewBeerRequest(result);
+      }
+    });
   }
 
-  closeNewBeerModal(): void {
-    this.showNewBeerModal = false;
-    this.newBeer = { name: '', description: '' };
-  }
-
-  submitNewBeerRequest(): void {
-    if (this.newBeer.name && this.newBeer.description) {
-      this.firestore.collection('beerRequests').add({
-        ...this.newBeer,
-        userId: this.user?.uid,
-        userEmail: this.user?.email,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      }).then(() => {
-        alert('New beer request submitted!');
-        this.closeNewBeerModal();
-      }).catch(error => {
-        alert('Error submitting request: ' + error);
-      });
-    } else {
-      alert('Please fill out all fields.');
-    }
+  submitNewBeerRequest(newBeer: any): void {
+    this.isLoading = true;
+    this.firestore.collection('beerRequests').add({
+      ...newBeer,
+      userId: this.user?.uid,
+      userEmail: this.user?.email,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    }).then(() => {
+      this.snackBar.open('New beer request submitted!', 'Close', { duration: 3000 });
+    }).catch(error => {
+      this.snackBar.open('Error submitting request: ' + error, 'Close', { duration: 3000 });
+    }).finally(() => {
+      this.isLoading = false;
+    });
   }
 
   async removeFavoriteBeer(beerId: string): Promise<void> {
     if (this.user) {
+      this.isLoading = true;
       try {
-        const idToken = await this.user.getIdToken();
         await this.firestore.collection('users').doc(this.user.uid).collection('favorites').doc(beerId).delete();
-        console.log('Favorite beer removed successfully');
+        this.snackBar.open('Favorite beer removed successfully', 'Close', { duration: 3000 });
       } catch (error) {
         console.error('Error removing favorite beer:', error);
-        alert('Error removing favorite beer. Please try again.');
+        this.snackBar.open('Error removing favorite beer. Please try again.', 'Close', { duration: 3000 });
+      } finally {
+        this.isLoading = false;
       }
     }
+  }
+}
+
+@Component({
+  selector: 'app-new-beer-request',
+  template: `
+    <h2 mat-dialog-title>Request New Beer</h2>
+    <mat-dialog-content>
+      <form #beerForm="ngForm">
+        <mat-form-field appearance="fill">
+          <mat-label>Beer Name</mat-label>
+          <input matInput type="text" [(ngModel)]="data.newBeer.name" name="beerName" required>
+          <mat-icon matSuffix>local_drink</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Description</mat-label>
+          <textarea matInput [(ngModel)]="data.newBeer.description" name="beerDescription" required></textarea>
+          <mat-icon matSuffix>description</mat-icon>
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button (click)="onNoClick()">Cancel</button>
+      <button mat-raised-button color="primary" [disabled]="!beerForm.form.valid" (click)="onSubmit()">Submit Request</button>
+    </mat-dialog-actions>
+  `
+})
+export class NewBeerRequestComponent {
+  constructor(
+    public dialogRef: MatDialogRef<NewBeerRequestComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { newBeer: any }
+  ) { }
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+
+  onSubmit(): void {
+    this.dialogRef.close(this.data.newBeer);
   }
 }

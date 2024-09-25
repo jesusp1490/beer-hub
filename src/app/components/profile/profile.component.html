@@ -1,73 +1,114 @@
 <div class="profile-container">
-  <div class="profile-header">
-    <div class="profile-avatar-container">
-      <img [src]="userProfile.photoURL || 'assets/user-baseImg.png'" alt="Profile Picture" class="profile-avatar">
-      <label for="file-upload" class="custom-file-upload">
-        <i class="fas fa-camera"></i>
-      </label>
-      <input id="file-upload" type="file" (change)="onFileSelected($event)">
-    </div>
-    <h1>{{ userProfile.username }}</h1>
-  </div>
-
   <div class="profile-content">
-    <div class="profile-section personal-info">
-      <h2>Personal Information</h2>
-      <p><strong>Name:</strong> {{ userProfile.firstName }} {{ userProfile.lastName }}</p>
-      <p><strong>Email:</strong> {{ user?.email }}</p>
-      <p><strong>Country:</strong> {{ userProfile.country || 'Not specified' }}</p>
-      <p><strong>Date of Birth:</strong> {{ userProfile.dateOfBirth || 'Not specified' }}</p>
-    </div>
-
-    <div class="profile-section password-change">
-      <h2>Change Password</h2>
-      <form (ngSubmit)="updatePassword()" class="password-form">
-        <div class="form-group">
-          <label for="newPassword">New Password</label>
-          <input type="password" id="newPassword" [(ngModel)]="newPassword" name="newPassword" required>
-        </div>
-        <div class="form-group">
-          <label for="confirmPassword">Confirm New Password</label>
-          <input type="password" id="confirmPassword" [(ngModel)]="confirmPassword" name="confirmPassword" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Update Password</button>
-      </form>
-    </div>
-
-    <div class="profile-section favorite-beers">
-      <h2>Favorite Beers</h2>
-      <div class="favorite-beers-list">
-        <div *ngFor="let beer of favoriteBeers" class="favorite-beer-item">
-          <img [src]="beer.beerImageUrl || 'assets/default-beer.png'" alt="{{ beer.name }}">
-          <span>{{ beer.name }}</span>
-          <button class="remove-favorite" (click)="removeFavoriteBeer(beer.id)">Remove</button>
-        </div>
+    <div class="profile-header">
+      <div class="profile-avatar-container">
+        <img [src]="userProfile.photoURL || 'assets/user-baseImg.png'" alt="Profile Picture" class="profile-avatar">
+        <label for="file-upload" class="custom-file-upload">
+          <mat-icon>camera_alt</mat-icon>
+        </label>
+        <input id="file-upload" type="file" (change)="onFileSelected($event)">
       </div>
+      <h1>{{ userProfile.username }}</h1>
     </div>
 
-    <div class="profile-section new-beer-request">
-      <h2>Request New Beer</h2>
-      <button (click)="openNewBeerModal()" class="btn btn-secondary">Request New Beer</button>
-    </div>
+    <mat-tab-group animationDuration="0ms" class="profile-tabs">
 
-    <button (click)="signOut()" class="btn btn-danger logout-btn">Logout</button>
+      <mat-tab label="Personal Information">
+        <div class="profile-section personal-info">
+
+          <mat-list>
+            <mat-list-item>
+              <div matLine class="list-item-content">
+                <h3 class="info-title"><mat-icon matListIcon class="info-icon">person</mat-icon>Name</h3>
+                <p class="info-p">{{ userProfile.firstName }}</p>
+              </div>
+            </mat-list-item>
+
+            <mat-list-item>
+              <div matLine class="list-item-content">
+                <h3 class="info-title"><mat-icon matListIcon class="info-icon">group</mat-icon>Last Name</h3>
+                <p class="info-p">{{ userProfile.lastName }}</p>
+              </div>
+            </mat-list-item>
+
+            <mat-list-item>  
+              <div matLine class="list-item-content">
+                <h3 class="info-title"><mat-icon matListIcon class="info-icon">account_circle</mat-icon>Username</h3>
+                <p class="info-p">{{ userProfile.username || 'Not specified' }}</p>
+              </div>
+            </mat-list-item>
+
+            <mat-list-item>
+              <div matLine class="list-item-content">
+                <h3 class="info-title"><mat-icon matListIcon class="info-icon">public</mat-icon>Country</h3>
+                <p class="info-p">{{ userProfile.country || 'Not specified' }}</p>
+              </div>
+            </mat-list-item>
+
+            <mat-list-item>
+              <div matLine class="list-item-content">
+                <h3 class="info-title"><mat-icon matListIcon class="info-icon">cake</mat-icon>Date of Birth</h3>
+                <p class="info-p">{{ userProfile.dob || 'Not specified' }}</p>
+              </div>
+            </mat-list-item>
+
+          </mat-list>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Change Password">
+        <div class="profile-section password-change">
+          <form (ngSubmit)="updatePassword()" class="password-form">
+            <mat-form-field appearance="fill">
+              <mat-label>New Password</mat-label>
+              <input matInput type="password" [(ngModel)]="newPassword" name="newPassword" required>
+              <mat-icon matSuffix>lock</mat-icon>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Confirm New Password</mat-label>
+              <input matInput type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required>
+              <mat-icon matSuffix>lock_outline</mat-icon>
+            </mat-form-field>
+            <button mat-raised-button color="primary" type="submit" [disabled]="isLoading">
+              <mat-icon>update</mat-icon>
+              Update Password
+            </button>
+          </form>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Favorite Beers">
+        <div class="profile-section favorite-beers">
+          <mat-grid-list cols="3" rowHeight="1:1" gutterSize="16px">
+            <mat-grid-tile *ngFor="let beer of favoriteBeers">
+              <mat-card class="favorite-beer-card">
+                <img mat-card-image [src]="beer.beerImageUrl || 'assets/default-beer.png'" alt="{{ beer.name }}">
+                <mat-card-content>
+                  <p>{{ beer.name }}</p>
+                </mat-card-content>
+                <mat-card-actions>
+                  <button mat-icon-button color="warn" (click)="removeFavoriteBeer(beer.id)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </mat-card-actions>
+              </mat-card>
+            </mat-grid-tile>
+          </mat-grid-list>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+
+    <div class="profile-actions">
+      <button mat-raised-button class="request-beer-btn" (click)="openNewBeerModal()">
+        <mat-icon>add</mat-icon>
+        Request New Beer
+      </button>
+      <button mat-raised-button class="logout-btn" (click)="signOut()">
+        <mat-icon>exit_to_app</mat-icon>
+        Logout
+      </button>
+    </div>
   </div>
 </div>
 
-<div *ngIf="showNewBeerModal" class="modal">
-  <div class="modal-content">
-    <span (click)="closeNewBeerModal()" class="close">&times;</span>
-    <h2>Request New Beer</h2>
-    <form (ngSubmit)="submitNewBeerRequest()" class="beer-request-form">
-      <div class="form-group">
-        <label for="beerName">Beer Name</label>
-        <input type="text" id="beerName" [(ngModel)]="newBeer.name" name="beerName" required>
-      </div>
-      <div class="form-group">
-        <label for="beerDescription">Description</label>
-        <textarea id="beerDescription" [(ngModel)]="newBeer.description" name="beerDescription" required></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary">Submit Request</button>
-    </form>
-  </div>
-</div>
+<mat-progress-spinner *ngIf="isLoading" mode="indeterminate"></mat-progress-spinner>

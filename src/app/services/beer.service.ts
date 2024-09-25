@@ -54,9 +54,8 @@ export class BeerService {
   }
 
   getCountryBeerCounts(): Observable<{ [countryId: string]: number }> {
-    if (this.shouldRefetchCache()) {
-      this.getBeers().pipe(
-        take(1),
+    return this.firestore.collection<Beer>('beers').valueChanges()
+      .pipe(
         map(beers => {
           const countryCounts: { [countryId: string]: number } = {};
           beers.forEach(beer => {
@@ -66,17 +65,11 @@ export class BeerService {
           });
           return countryCounts;
         }),
-        tap(counts => {
-          this.cachedCountryBeerCounts$.next(counts);
-          this.lastFetchTime = Date.now();
-        }),
         catchError(error => {
-          console.error('Error calculating country beer counts:', error);
+          console.error('Error fetching country beer counts:', error);
           return of({});
         })
-      ).subscribe();
-    }
-    return this.cachedCountryBeerCounts$.asObservable();
+      );
   }
 
   private getBeers(): Observable<Beer[]> {
