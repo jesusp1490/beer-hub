@@ -3,10 +3,11 @@
     <h2>Welcome Back</h2>
     <p class="subtitle">Please log in to continue</p>
     <form (ngSubmit)="login()" #loginForm="ngForm">
-      <mat-form-field appearance="fill" color="warn">
+      <mat-form-field appearance="fill">
         <mat-label>Email</mat-label>
         <input matInput type="email" [(ngModel)]="email" name="email" required email #emailInput="ngModel">
         <mat-icon matSuffix>email</mat-icon>
+        
         <mat-error *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)">
           Please enter a valid email address
         </mat-error>

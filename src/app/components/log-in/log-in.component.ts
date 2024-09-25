@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AuthService } from '../../services/auth.service';
 import { MatInputModule } from '@angular/material/input';
@@ -25,7 +25,8 @@ import { DomSanitizer } from '@angular/platform-browser';
     MatFormFieldModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    RouterModule
   ]
 })
 export class LogInComponent implements OnInit {

@@ -8,8 +8,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-sign-up',
@@ -23,7 +25,11 @@ import { Router } from '@angular/router';
     MatButtonModule,
     MatFormFieldModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatSnackBarModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    RouterModule
   ]
 })
 export class SignUpComponent {
@@ -34,6 +40,8 @@ export class SignUpComponent {
   password: string = '';
   country: string = '';
   dob: Date | null = null;
+  hidePassword: boolean = true;
+  isLoading: boolean = false;
 
   constructor(
     private afAuth: AngularFireAuth, 
@@ -43,6 +51,7 @@ export class SignUpComponent {
   ) { }
 
   async signUp() {
+    this.isLoading = true;
     try {
       const result = await this.afAuth.createUserWithEmailAndPassword(this.email, this.password);
       const uid = result.user?.uid;
@@ -56,22 +65,28 @@ export class SignUpComponent {
           dob: this.dob,
         });
 
-        this.snackBar.open('Sign Up successful!', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'top',
-        });
-
-        // Redirect to the profile page or home page after successful registration
-        this.router.navigate(['/profile']); // or '/home' depending on your route setup
+        this.showSuccessMessage('Sign Up successful!');
+        this.router.navigate(['/profile']);
       }
     } catch (error) {
       console.error(`Error: ${(error as any).message}`);
-      this.snackBar.open(`Registration failed: ${(error as any).message}`, 'Close', {
-        duration: 5000,
-        horizontalPosition: 'center',
-        verticalPosition: 'top',
-      });
+      this.showErrorMessage(`Registration failed: ${(error as any).message}`);
+    } finally {
+      this.isLoading = false;
     }
+  }
+
+  private showSuccessMessage(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 3000,
+      panelClass: ['success-snackbar']
+    });
+  }
+
+  private showErrorMessage(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      panelClass: ['error-snackbar']
+    });
   }
 }
