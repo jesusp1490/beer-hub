@@ -23,6 +23,7 @@ interface UserProfile {
 
 interface FavoriteBeer {
   beerImageUrl: string;
+  beerLabelUrl: string;
   id: string;
   name: string;
 }
@@ -106,7 +107,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
             return {
               id: beer?.id || '',
               name: beerData.name,
-              beerImageUrl: beerData.beerImageUrl
+              beerLabelUrl: beerData.beerLabelUrl,
+              beerImageUrl: beerData.beerImageUrl || '' // Ensure beerImageUrl is included
             };
           });
         });

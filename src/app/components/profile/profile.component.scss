@@ -68,6 +68,7 @@
     }
 }
 
+//PROFILE
 .profile-tabs {
     margin-bottom: 3rem;
 
@@ -150,8 +151,7 @@
 }
 
 
-
-
+//PASSWORD
 .password-form {
     display: flex;
     flex-direction: column;
@@ -176,10 +176,15 @@
 .favorite-beer-card {
     width: 100%;
     max-width: 200px;
+    background-color: transparent;
 
     img {
-        height: 150px;
+        height: 200px;
         object-fit: cover;
+    }
+
+    h3 {
+        color: wheat;
     }
 
     .mat-card-content {

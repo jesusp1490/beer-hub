@@ -82,14 +82,17 @@
           <mat-grid-list cols="3" rowHeight="1:1" gutterSize="16px">
             <mat-grid-tile *ngFor="let beer of favoriteBeers">
               <mat-card class="favorite-beer-card">
-                <img mat-card-image [src]="beer.beerImageUrl || 'assets/default-beer.png'" alt="{{ beer.name }}">
+                <img mat-card-image [src]="beer.beerLabelUrl || 'assets/default-beer.png'" alt="{{ beer.name }}">
                 <mat-card-content>
                   <p>{{ beer.name }}</p>
                 </mat-card-content>
                 <mat-card-actions>
-                  <button mat-icon-button color="warn" (click)="removeFavoriteBeer(beer.id)">
-                    <mat-icon>delete</mat-icon>
-                  </button>
+                  <div class="remove">
+                    <button mat-icon-button color="warn" (click)="removeFavoriteBeer(beer.id)">
+                      <mat-icon>delete</mat-icon>
+                      <h3>Delete</h3>
+                    </button>
+                  </div>
                 </mat-card-actions>
               </mat-card>
             </mat-grid-tile>
