@@ -1,19 +1,40 @@
 <div class="login-container">
-  <h2>LOG-IN</h2>
-  <form (ngSubmit)="login()">
-    <mat-form-field appearance="fill">
-      <mat-label>Email</mat-label>
-      <input matInput type="email" [(ngModel)]="email" name="email" required>
-    </mat-form-field>
+  <div class="login-card">
+    <h2>Welcome Back</h2>
+    <p class="subtitle">Please log in to continue</p>
+    <form (ngSubmit)="login()" #loginForm="ngForm">
+      <mat-form-field appearance="fill" color="warn">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" [(ngModel)]="email" name="email" required email #emailInput="ngModel">
+        <mat-icon matSuffix>email</mat-icon>
+        <mat-error *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)">
+          Please enter a valid email address
+        </mat-error>
+      </mat-form-field>
 
-    <mat-form-field appearance="fill">
-      <mat-label>Password</mat-label>
-      <input matInput type="password" [(ngModel)]="password" name="password" required>
-    </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Password</mat-label>
+        <input matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="password" name="password" required #passwordInput="ngModel">
+        <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+          <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+        <mat-error *ngIf="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)">
+          Password is required
+        </mat-error>
+      </mat-form-field>
 
-    <button mat-raised-button color="primary" type="submit">Login</button>
-  </form>
-  <button mat-raised-button color="accent" (click)="loginWithGoogle()">
-    <i class="fab fa-google"></i> Login with Google
-  </button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="!loginForm.form.valid || isLoading">
+        <ng-container *ngIf="!isLoading">Login</ng-container>
+        <mat-spinner *ngIf="isLoading" diameter="24" class="spinner"></mat-spinner>
+      </button>
+    </form>
+    <div class="divider">
+      <span>or</span>
+    </div>
+    <button mat-stroked-button class="google-button" (click)="loginWithGoogle()" [disabled]="isLoading">
+      <mat-icon svgIcon="google-logo" class="google-icon"></mat-icon>
+      <span>Login with Google</span>
+    </button>
+    <p class="signup-link">Don't have an account? <a routerLink="/signup">Sign up</a></p>
+  </div>
 </div>

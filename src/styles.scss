@@ -1,6 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 @import '~@fortawesome/fontawesome-free/css/all.min.css';
 @import '~@angular/material/prebuilt-themes/purple-green.css';
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+.success-snackbar {
+    background: #43a047;
+    color: #fff;
+}
+
+.error-snackbar {
+    background: #d32f2f;
+    color: #fff;
+}
 
 body {
     background-color: #121212;
