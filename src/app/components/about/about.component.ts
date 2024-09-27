@@ -14,8 +14,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 export class AboutComponent {
   teamMembers = [
     { name: 'Jesús Pérez', role: 'Founder & Beer Enthusiast', image: 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/profilePictures%2FolUaCy9gcpSwKiWGLA42KWbaedj2?alt=media&token=734e3df4-7794-4c47-bf6f-a7f3971ff043' },
-    { name: 'NukeDev', role: 'Head of Content', image: 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/profilePictures%2FUqRBL0iHpegayh3gmcR93kg1bnq2?alt=media&token=a8bd80d4-cacf-4d36-a18d-32c163f71019' },
-    { name: 'Mike Johnson', role: 'Chief Tasting Officer', image: 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fmedium-shot-man-celebrating-new-year-s-eve.webp?alt=media&token=b47e359b-a1b2-4706-8ccf-0f6e78b6dd45' }
+    { name: 'NukeDev', role: 'FullStack Developer', image: 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/profilePictures%2FUqRBL0iHpegayh3gmcR93kg1bnq2?alt=media&token=a8bd80d4-cacf-4d36-a18d-32c163f71019' },
+    { name: 'John Doe', role: 'Chief Tasting Officer', image: 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fmedium-shot-man-celebrating-new-year-s-eve.webp?alt=media&token=b47e359b-a1b2-4706-8ccf-0f6e78b6dd45' }
   ];
 
   constructor() { }

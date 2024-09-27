@@ -1,31 +1,31 @@
 <nav class="navbar">
-  <div class="navbar-left">
-    <a class="navbar-logo" routerLink="/">BH</a>
-    <a class="navbar-link" routerLink="/home">Home</a> <!-- Página de filtros -->
-    <a class="navbar-link" routerLink="/map">Map</a> <!-- Página del mapa -->
-    <a class="navbar-link" routerLink="/about">About Us</a>
-    <a class="navbar-link" routerLink="/contact">Contact</a>
+  <div class="navbar-content">
+    <a class="navbar-logo" routerLink="/">
+      <img src="https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2FBH-logo.webp?alt=media&token=73720b7f-bb1e-444f-82e4-919d064cd7d6" alt="BeerHub Logo">
+    </a>
+    <div class="navbar-links">
+      <a class="navbar-link" routerLink="/home" routerLinkActive="active">Home</a>
+      <a class="navbar-link" routerLink="/map" routerLinkActive="active">Map</a>
+      <a class="navbar-link" routerLink="/about" routerLinkActive="active">About Us</a>
+      <a class="navbar-link" routerLink="/contact" routerLinkActive="active">Contact</a>
+    </div>
+    <div class="navbar-actions">
+      <ng-container *ngIf="user$ | async as user; else loggedOut">
+        <img 
+          [src]="user.photoURL || 'assets/user-baseImg.png'" 
+          class="user-avatar" 
+          (click)="goToProfile()" 
+          alt="User Avatar"
+        />
+      </ng-container>
+      <ng-template #loggedOut>
+        <button class="navbar-button" (click)="goToLogin()">Log In</button>
+        <button class="navbar-button" (click)="goToSignUp()">Sign Up</button>
+      </ng-template>
+      <!-- <select [(ngModel)]="selectedLanguage" (change)="changeLanguage($event)" class="language-select">
+        <option value="en">EN</option>
+        <option value="es">ES</option>
+      </select> -->
+    </div>
   </div>
-
-  <div class="navbar-right">
-  <ng-container *ngIf="user$ | async as user; else loggedOut">
-    <img 
-      [src]="user.photoURL || 'assets/user-baseImg.png'" 
-      class="user-avatar" 
-      (click)="goToProfile()" 
-      alt="User Avatar"
-    />
-  </ng-container>
-
-  <ng-template #loggedOut>
-    <button (click)="goToLogin()">Log In</button>
-    <button (click)="goToSignUp()">Sign Up</button>
-  </ng-template>
-
-  <!-- Selector de idioma -->
-  <select [(ngModel)]="selectedLanguage" (change)="changeLanguage($event)">
-    <option value="en">English</option>
-    <option value="es">Español</option>
-  </select>
-</div>
 </nav>

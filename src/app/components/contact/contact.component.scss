@@ -5,58 +5,121 @@
     font-size: $font-size-base;
     background-color: $color-background-dark;
     color: $color-text-light;
-    padding: $spacing-large;
+    max-width: 70%;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-left: 270px;
+    padding: $spacing-medium;
 }
 
-.page-title {
-    font-size: $font-size-large;
-    color: $color-primary;
-    text-align: center;
-    margin-bottom: $spacing-large;
-}
+.contact-tabs {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 
-.contact-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: $spacing-large;
+    ::ng-deep {
+        .mat-mdc-tab-body-wrapper {
+            flex-grow: 1;
+        }
 
-    @media (max-width: 768px) {
-        grid-template-columns: 1fr;
+        .mat-mdc-tab-body-content {
+            overflow: hidden;
+        }
+
+        .mdc-tab__text-label {
+            font-size: 1.2rem;
+        }
+
+        .mat-mdc-tab .mdc-tab__text-label {
+            color: $color-text-light;
+        }
+
+        .mat-mdc-tab:not(.mat-mdc-tab-disabled).mdc-tab--active .mdc-tab__text-label {
+            color: $color-primary;
+        }
     }
 }
 
 .contact-card,
 .faq-card {
     background-color: $color-card-background;
-    border-radius: $border-radius;
+    height: 100%;
+    overflow: auto;
 
     mat-card-content {
-        padding: $spacing-large;
+        height: 100%;
+        padding: $spacing-medium;
+        overflow: auto;
+    }
+}
 
-        h2 {
-            color: $color-secondary;
-            font-size: $font-size-large;
-            margin-bottom: $spacing-medium;
+.contact-content {
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.contact-form {
+    width: 48%;
+
+    h2 {
+        color: $color-primary;
+        margin-bottom: $spacing-medium;
+    }
+
+    mat-form-field {
+        width: 100%;
+        margin-bottom: $spacing-small;
+    }
+
+    button {
+        background-color: $color-primary;
+        color: $color-text-light;
+
+        &:hover:not([disabled]) {
+            background-color: $color-secondary;
+        }
+
+        &[disabled] {
+            background-color: $color-tag-background;
+            color: $color-text-secondary;
         }
     }
 }
 
 .contact-info {
+    width: 48%;
+
+    h2,
+    h3 {
+        color: $color-primary;
+        margin-bottom: 3rem;
+    }
+
+    h3 {
+        margin-top: 3rem;
+        margin-bottom: 1rem;
+    }
+
     p {
         display: flex;
         align-items: center;
-        margin-bottom: $spacing-small;
+        margin-bottom: 1rem;
+        
 
         mat-icon {
-            margin-right: $spacing-small;
             color: $color-secondary;
+            margin-right: 0.5rem;
         }
     }
 }
 
 .social-links {
     display: flex;
-    gap: $spacing-small;
 
     a {
         color: $color-text-light;
@@ -65,36 +128,28 @@
         &:hover {
             color: $color-primary;
         }
+
+        mat-icon {
+            font-size: 24px;
+            width: 24px;
+            height: 24px;
+        }
     }
 }
 
-mat-form-field {
-    width: 100%;
-    margin-bottom: $spacing-small;
-}
-
-button[type="submit"] {
-    background-color: $color-primary;
-    color: $color-text-light;
-
-    &:hover:not([disabled]) {
-        background-color: $color-secondary;
-    }
-
-    &[disabled] {
-        background-color: $color-tag-background;
-        color: $color-text-secondary;
-    }
-}
-
-.faq-card {
-    margin-top: $spacing-large;
+mat-accordion {
+    display: block;
+    margin-top: $spacing-medium;
 }
 
 mat-expansion-panel {
     background-color: $color-hover;
     color: $color-text-light;
     margin-bottom: $spacing-small;
+
+    &:not(.mat-expanded) {
+        background-color: $color-tag-background;
+    }
 
     mat-expansion-panel-header {
         background-color: $color-tag-background;

@@ -1,72 +1,61 @@
 <div class="contact-container">
-  <h1 class="page-title">Contact Us</h1>
-
-  <div class="contact-content">
-    <mat-card class="contact-card">
-      <mat-card-content>
-        <h2>Get in Touch</h2>
-        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
-          <mat-form-field appearance="fill">
-            <mat-label>Name</mat-label>
-            <input matInput formControlName="name" required>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill">
-            <mat-label>Email</mat-label>
-            <input matInput formControlName="email" required type="email">
-          </mat-form-field>
-
-          <mat-form-field appearance="fill">
-            <mat-label>Message</mat-label>
-            <textarea matInput formControlName="message" required rows="4"></textarea>
-          </mat-form-field>
-
-          <button mat-raised-button color="primary" type="submit" [disabled]="!contactForm.valid">Send Message</button>
-        </form>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="contact-card">
-      <mat-card-content>
-        <h2>Contact Information</h2>
-        <div class="contact-info">
-          <p><mat-icon>email</mat-icon> info&#64;beerlovers.com</p>
-          <p><mat-icon>phone</mat-icon> +1 (123) 456-7890</p>
-          <p><mat-icon>location_on</mat-icon> 123 Beer St, Hopville, BW 12345</p>
-        </div>
-
-        <h3>Follow Us</h3>
-        <div class="social-links">
-          <a href="#" mat-icon-button><mat-icon>facebook</mat-icon></a>
-          <a href="#" mat-icon-button><mat-icon>twitter</mat-icon></a>
-          <a href="#" mat-icon-button><mat-icon>instagram</mat-icon></a>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
-
-  <mat-card class="faq-card">
-    <mat-card-content>
-      <h2>Frequently Asked Questions</h2>
-      <mat-accordion>
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              How can I join the BeerLovers community?
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <p>You can sign up for an account on our website to start rating beers and interacting with other beer enthusiasts.</p>
-        </mat-expansion-panel>
-
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              Do you offer brewery tours?
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <p>While we don't operate our own brewery, we often organize tours to local craft breweries. Check our events page for upcoming tours!</p>
-        </mat-expansion-panel>
-      </mat-accordion>
-    </mat-card-content>
-  </mat-card>
+  <mat-tab-group animationDuration="0ms" class="contact-tabs">
+    <mat-tab label="Contact Us">
+      <mat-card class="contact-card">
+        <mat-card-content>
+          <div class="contact-content">
+            <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
+              <h2>Get in Touch</h2>
+              <mat-form-field appearance="fill">
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="name" required>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" required type="email">
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>Message</mat-label>
+                <textarea matInput formControlName="message" required rows="4"></textarea>
+              </mat-form-field>
+              <button mat-raised-button color="primary" type="submit" [disabled]="!contactForm.valid">Send Message</button>
+            </form>
+            <div class="contact-info">
+              <h2>Contact Information</h2>
+              <!-- <p><mat-icon>email</mat-icon> info&#64;beerhub.com</p> -->
+              <p><mat-icon>location_on</mat-icon> Madrid, Spain</p>
+              <h3>Follow Us</h3>
+              <div class="social-links">
+                <a href="https://www.instagram.com/thebeerhub_/" mat-icon-button aria-label="Instagram">
+                  <i class="fa-brands fa-instagram"></i>
+                </a>
+                <a href="#" mat-icon-button aria-label="Twitter">
+                  <i class="fa-brands fa-x-twitter"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
+    <mat-tab label="FAQs">
+      <mat-card class="faq-card">
+        <mat-card-content>
+          <h2>Frequently Asked Questions</h2>
+          <mat-accordion>
+            @for (faq of faqs; track faq.question) {
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    {{ faq.question }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <p>{{ faq.answer }}</p>
+              </mat-expansion-panel>
+            }
+          </mat-accordion>
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
+  </mat-tab-group>
 </div>

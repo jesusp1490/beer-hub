@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
 import { AppRoutingModule } from './app-routing.module';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
@@ -31,7 +32,6 @@ import { CommonModule } from '@angular/common';
 import { BeersModule } from './components/beers/beers.module'; 
 import { FilterSearchComponent } from './components/filters-search/filters-search.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
-
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -66,6 +66,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatFormFieldModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatIconModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFirestoreModule,
     AngularFireAuthModule,
@@ -75,7 +76,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     ReactiveFormsModule,
     ProfileModule,
     CommonModule,
-    
   ],
   exports: [
     BackButtonComponent

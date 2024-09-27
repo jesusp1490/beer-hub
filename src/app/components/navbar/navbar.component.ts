@@ -19,7 +19,7 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     this.user$.subscribe(user => {
-      console.log('Current user:', user); // Add this line for debugging
+      console.log('Current user:', user); 
     });
   }
 
@@ -39,7 +39,7 @@ export class NavbarComponent implements OnInit {
     const select = event.target as HTMLSelectElement;
     const language = select.value;
     this.selectedLanguage = language;
-    // Aquí implementa la lógica para cambiar el idioma
+    // Implement language change logic here
     console.log(`Language changed to: ${language}`);
   }
 }

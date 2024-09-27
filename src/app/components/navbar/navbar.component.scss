@@ -1,64 +1,74 @@
 @import 'src/styles/_variables.scss';
 
 .navbar {
+  background-color: $color-background-dark;
+  padding: $spacing-medium;
+  font-family: $font-family-primary;
+}
+
+.navbar-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  color: white;
-  font-family: $font-family-primary;
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-  .navbar-left {
-    display: flex;
-    align-items: center;
+.navbar-logo img {
+  width: 130px;
+  height: auto;
+}
 
-    .navbar-logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: white;
-      text-decoration: none;
-      margin-right: 40rem;
-      margin-left: 3rem;
-    }
+.navbar-links {
+  display: flex;
+  gap: $spacing-large;
+}
 
-    .navbar-link {
-      margin-right: 3rem;
-      color: white;
-      text-decoration: none;
+.navbar-link {
+  color: $color-text-light;
+  text-decoration: none;
+  font-size: $font-size-base;
+  transition: color 0.3s ease;
 
-      &:hover {
-        text-decoration: underline;
-      }
-    }
+  &:hover,
+  &.active {
+    color: $color-primary;
   }
+}
 
-  .navbar-right {
-    display: flex;
-    align-items: center;
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-medium;
+}
 
-    button {
-      margin-left: 1rem;
-      background-color: #555;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-    }
+.navbar-button {
+  background-color: $color-secondary;
+  color: $color-text-light;
+  border: none;
+  padding: $spacing-small $spacing-medium;
+  border-radius: $border-radius;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      object-fit: cover;
-    }
-
-    select {
-      margin-left: 1rem;
-      background-color: #555;
-      color: white;
-      border: none;
-      padding: 0.5rem;
-    }
+  &:hover {
+    background-color: $color-primary;
   }
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  object-fit: cover;
+}
+
+.language-select {
+  background-color: $color-card-background;
+  color: $color-text-light;
+  border: 1px solid $color-text-secondary;
+  padding: $spacing-small;
+  border-radius: $border-radius;
+  cursor: pointer;
 }
