@@ -1,0 +1,130 @@
+@import 'src/styles/_variables.scss';
+
+.about-container {
+    font-family: $font-family-primary;
+    font-size: $font-size-base;
+    background-color: $color-background-dark;
+    color: $color-text-light;
+    max-width: 70%;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-left: 270px;
+    padding: $spacing-medium;
+}
+
+.about-title {
+    font-size: $font-size-large;
+    font-weight: bold;
+    color: $color-primary;
+    margin-right: 1100px;
+    margin-bottom: 50px;
+}
+
+.mat-mdc-tab-group,
+.mat-mdc-tab-nav-bar {
+    --mat-tab-header-active-focus-indicator-color: $color-hover;
+}
+
+.about-tabs {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    margin-top: 320px;
+    width: 100%;
+
+    ::ng-deep {
+        .mat-tab-body-wrapper {
+            background-color: blue;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .mdc-tab__text-label {
+            font-size: 1.2rem;
+        }
+
+        .mat-tab-label-active {
+            color: $color-primary;
+        }
+
+        .mat-ink-bar {
+            background-color: $color-primary;
+        }
+
+        .mat-mdc-tab .mdc-tab-indicator__content--underline {
+            border-color: $color-primary;
+        }
+
+        .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+            color: $color-primary;
+        }
+
+        .mat-mdc-tab .mdc-tab__text-label {
+            color: $color-text-light;
+            display: inline-flex;
+            align-items: center;
+            font-family: $font-family-primary;
+            --mat-tab-header-active-focus-indicator-color: #ff4400;
+        }
+    }
+}
+
+.about-card {
+    background-color: $color-card-background;
+    overflow: auto;
+
+    mat-card-content {
+        padding: $spacing-medium;
+
+        p {
+            margin: $spacing-large;
+        }
+    }
+}
+
+.story-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    margin-top: $spacing-large;
+    border-radius: $border-radius;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-medium;
+    margin: $spacing-large
+}
+
+.team-member {
+    text-align: center;
+
+    .member-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: $spacing-small;
+    }
+
+    h3 {
+        color: $color-primary;
+        margin-bottom: $spacing-small;
+    }
+
+    p {
+        color: $color-text-secondary;
+    }
+}
+
+button {
+    background-color: $color-primary;
+    color: $color-text-light;
+
+    &:hover {
+        background-color: $color-secondary;
+    }
+}

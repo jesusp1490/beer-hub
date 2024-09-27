@@ -1,1 +1,79 @@
-<p>about works!</p>
+<div class="about-container">
+    <mat-tab-group animationDuration="0ms" class="about-tabs">
+        <mat-tab label="Our Story">
+            <mat-card class="about-card">
+                <mat-card-content>
+                    <p>
+                        Founded in 2024, BeerHub started as a passion project by a group of developers who shared a love
+                        for exploring and rating different beers from around the world. We realized there was a need for
+                        a comprehensive platform where beer enthusiasts could come together, share their experiences,
+                        and discover new brews.
+                    </p>
+                    <p>
+                        Our mission is to create a vibrant community for beer lovers, offering a space where they can
+                        rate, review, and learn about various beers. BeerHub is designed for people who want to expand
+                        their beer knowledge, keep track of their tasting journey, and connect with like-minded
+                        enthusiasts.
+                    </p>
+                    <p>
+                        As we continue to grow, we're constantly working on new features to enhance the BeerHub
+                        experience. Our platform is still under development, and we're excited about the future
+                        possibilities. We envision adding more interactive elements, personalized recommendations, and
+                        even organizing virtual tasting events to bring beer lovers closer together, no matter where
+                        they are in the world.
+                    </p>
+                    <img src="https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Flucas-santos-Kzl0IX8fJxQ-unsplash.webp?alt=media&token=974c760d-847e-41ff-ad7f-6c7cd0871cf3"
+                        alt="Beer taps" class="story-image">
+                </mat-card-content>
+            </mat-card>
+
+        </mat-tab>
+
+        <mat-tab label="Our Team">
+            <mat-card class="about-card">
+                <mat-card-content>
+                    <div class="team-grid">
+                        @for (member of teamMembers; track member.name) {
+                        <div class="team-member">
+                            <img [src]="member.image" [alt]="member.name" class="member-avatar">
+                            <h3>{{ member.name }}</h3>
+                            <p>{{ member.role }}</p>
+                        </div>
+                        }
+                    </div>
+                    <img src="https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Flucas-santos-Kzl0IX8fJxQ-unsplash.webp?alt=media&token=974c760d-847e-41ff-ad7f-6c7cd0871cf3"
+                        alt="Beer taps" class="story-image">
+                </mat-card-content>
+            </mat-card>
+
+        </mat-tab>
+
+        <mat-tab label="Our Commitment">
+            <mat-card class="about-card">
+                <mat-card-content>
+                    <p>
+                        At BeerHub, we're committed to building the most comprehensive and user-friendly beer
+                        information platform on the web. While we don't brew beer ourselves, our passion lies in
+                        curating and presenting detailed information about beers from around the world.
+                    </p>
+                    <p>
+                        Our goal is to continually expand our database, adding new beers, breweries, and up-to-date
+                        information. We're dedicated to providing accurate, in-depth content that helps our users make
+                        informed choices and discover new favorites.
+                    </p>
+                    <p>
+                        As we grow, we're exploring ways to offer unique benefits to our community. This could include
+                        online shopping, early access to limited edition beers, or partnerships with breweries to
+                        provide special experiences for BeerHub members.
+                    </p>
+                    <p>
+                        We're always open to feedback and suggestions from our community. Your input helps shape the
+                        future of BeerHub and ensures we're meeting the needs of beer enthusiasts everywhere.
+                    </p>
+                    <img src="https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Flucas-santos-Kzl0IX8fJxQ-unsplash.webp?alt=media&token=974c760d-847e-41ff-ad7f-6c7cd0871cf3"
+                        alt="Beer taps" class="story-image">
+                </mat-card-content>
+            </mat-card>
+        </mat-tab>
+    </mat-tab-group>
+</div>

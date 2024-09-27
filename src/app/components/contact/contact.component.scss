@@ -1,0 +1,110 @@
+@import 'src/styles/_variables.scss';
+
+.contact-container {
+    font-family: $font-family-primary;
+    font-size: $font-size-base;
+    background-color: $color-background-dark;
+    color: $color-text-light;
+    padding: $spacing-large;
+}
+
+.page-title {
+    font-size: $font-size-large;
+    color: $color-primary;
+    text-align: center;
+    margin-bottom: $spacing-large;
+}
+
+.contact-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-large;
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.contact-card,
+.faq-card {
+    background-color: $color-card-background;
+    border-radius: $border-radius;
+
+    mat-card-content {
+        padding: $spacing-large;
+
+        h2 {
+            color: $color-secondary;
+            font-size: $font-size-large;
+            margin-bottom: $spacing-medium;
+        }
+    }
+}
+
+.contact-info {
+    p {
+        display: flex;
+        align-items: center;
+        margin-bottom: $spacing-small;
+
+        mat-icon {
+            margin-right: $spacing-small;
+            color: $color-secondary;
+        }
+    }
+}
+
+.social-links {
+    display: flex;
+    gap: $spacing-small;
+
+    a {
+        color: $color-text-light;
+        transition: color 0.3s ease;
+
+        &:hover {
+            color: $color-primary;
+        }
+    }
+}
+
+mat-form-field {
+    width: 100%;
+    margin-bottom: $spacing-small;
+}
+
+button[type="submit"] {
+    background-color: $color-primary;
+    color: $color-text-light;
+
+    &:hover:not([disabled]) {
+        background-color: $color-secondary;
+    }
+
+    &[disabled] {
+        background-color: $color-tag-background;
+        color: $color-text-secondary;
+    }
+}
+
+.faq-card {
+    margin-top: $spacing-large;
+}
+
+mat-expansion-panel {
+    background-color: $color-hover;
+    color: $color-text-light;
+    margin-bottom: $spacing-small;
+
+    mat-expansion-panel-header {
+        background-color: $color-tag-background;
+
+        &:hover {
+            background-color: $color-hover !important;
+        }
+    }
+
+    mat-panel-title {
+        color: $color-primary;
+    }
+}
