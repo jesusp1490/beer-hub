@@ -12,10 +12,8 @@
     </div>
 
     <mat-tab-group animationDuration="0ms" class="profile-tabs">
-
       <mat-tab label="Personal Information">
         <div class="profile-section personal-info">
-
           <mat-list>
             <mat-list-item>
               <div matLine class="list-item-content">
@@ -51,7 +49,6 @@
                 <p class="info-p">{{ userProfile.dob || 'Not specified' }}</p>
               </div>
             </mat-list-item>
-
           </mat-list>
         </div>
       </mat-tab>
@@ -81,19 +78,16 @@
         <div class="profile-section favorite-beers">
           <mat-grid-list cols="3" rowHeight="1:1" gutterSize="16px">
             <mat-grid-tile *ngFor="let beer of favoriteBeers">
-              <mat-card class="favorite-beer-card">
-                <img mat-card-image [src]="beer.beerLabelUrl || 'assets/default-beer.png'" alt="{{ beer.name }}">
+              <mat-card class="favorite-beer-card" (click)="navigateToBeerDetails(beer.id)">
+                <div class="favorite-beer-image-container">
+                  <img mat-card-image [src]="beer.beerLabelUrl || 'assets/default-beer.png'" alt="{{ beer.name }}">
+                  <button mat-icon-button color="warn" class="delete-button" (click)="removeFavoriteBeer(beer.id); $event.stopPropagation()">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
                 <mat-card-content>
                   <p>{{ beer.name }}</p>
                 </mat-card-content>
-                <mat-card-actions>
-                  <div class="remove">
-                    <button mat-icon-button color="warn" (click)="removeFavoriteBeer(beer.id)">
-                      <mat-icon>delete</mat-icon>
-                      <h3>Delete</h3>
-                    </button>
-                  </div>
-                </mat-card-actions>
               </mat-card>
             </mat-grid-tile>
           </mat-grid-list>

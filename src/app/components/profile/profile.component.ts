@@ -83,12 +83,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
       .subscribe(profile => {
         if (profile) {
           this.userProfile = { ...profile };
-          console.log('Loaded user profile:', this.userProfile); // Add this line for debugging
+          console.log('Loaded user profile:', this.userProfile);
         } else {
-          console.log('No user profile found'); // Add this line for debugging
+          console.log('No user profile found');
         }
       }, error => {
-        console.error('Error loading user profile:', error); // Add this line for debugging
+        console.error('Error loading user profile:', error);
       });
   }
 
@@ -108,7 +108,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
               id: beer?.id || '',
               name: beerData.name,
               beerLabelUrl: beerData.beerLabelUrl,
-              beerImageUrl: beerData.beerImageUrl || '' // Ensure beerImageUrl is included
+              beerImageUrl: beerData.beerImageUrl || ''
             };
           });
         });
@@ -178,7 +178,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
   openNewBeerModal(): void {
     const dialogRef = this.dialog.open(NewBeerRequestComponent, {
       width: '400px',
-      data: { newBeer: this.newBeer }
+      data: { newBeer: this.newBeer },
+      panelClass: 'custom-dialog-container'
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -218,6 +219,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  navigateToBeerDetails(beerId: string): void {
+    this.router.navigate(['/beer-details', beerId]);
+  }
 }
 
 @Component({
@@ -242,7 +247,33 @@ export class ProfileComponent implements OnInit, OnDestroy {
       <button mat-button (click)="onNoClick()">Cancel</button>
       <button mat-raised-button color="primary" [disabled]="!beerForm.form.valid" (click)="onSubmit()">Submit Request</button>
     </mat-dialog-actions>
-  `
+  `,
+  styles: [`
+    :host {
+      display: block;
+      background-color: #424242;
+      color: #e0e0e0;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    mat-form-field {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    .mat-mdc-form-field {
+      --mdc-filled-text-field-container-color: transparent;
+      --mdc-filled-text-field-focus-active-indicator-color: #ff9100;
+      --mdc-filled-text-field-focus-label-text-color: #ff9100;
+      --mdc-filled-text-field-label-text-color: #e0e0e0;
+      --mdc-filled-text-field-input-text-color: #e0e0e0;
+    }
+    .mat-mdc-dialog-actions {
+      justify-content: flex-end;
+    }
+    .mat-mdc-raised-button.mat-primary {
+      background-color: #ff9100;
+    }
+  `]
 })
 export class NewBeerRequestComponent {
   constructor(
