@@ -4,24 +4,121 @@
   background-color: $color-background-dark;
   padding: 0.2rem;
   font-family: $font-family-primary;
+  position: relative;
+  z-index: 1000;
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $spacing-medium;
 }
 
 .navbar-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
 }
 
-.navbar-logo img {
-  width: 130px;
-  height: auto;
+.navbar-logo {
+  flex-shrink: 0;
+
+  img {
+    width: 130px;
+    height: auto;
+  }
+}
+
+.hamburger-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+
+  span {
+    width: 2rem;
+    height: 0.25rem;
+    background: $color-text-light;
+    border-radius: 10px;
+    transition: all 0.3s linear;
+    position: relative;
+    transform-origin: 1px;
+  }
+
+  &.active {
+    span {
+      &:first-child {
+        transform: rotate(45deg);
+      }
+
+      &:nth-child(2) {
+        opacity: 0;
+      }
+
+      &:nth-child(3) {
+        transform: rotate(-45deg);
+      }
+    }
+  }
+
+  @media (min-width: 769px) {
+    display: none;
+  }
+}
+
+.navbar-menu {
+  @media (max-width: 768px) {
+    display: none;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: $color-background-dark;
+    padding: 5rem $spacing-medium $spacing-medium;
+    z-index: 5;
+    overflow-y: auto;
+
+    &.active {
+      display: flex;
+    }
+  }
+
+  @media (min-width: 769px) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
 }
 
 .navbar-links {
   display: flex;
   gap: $spacing-large;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: $spacing-large;
+  }
+
+  @media (min-width: 769px) {
+    justify-content: center;
+    flex: 1;
+    margin-left: $spacing-large * 2;
+    margin-right: $spacing-large * 2;
+  }
+
+  @media (min-width: 769px) and (max-width: 1023px) {
+    gap: $spacing-medium;
+  }
 }
 
 .navbar-link {
@@ -34,12 +131,27 @@
   &.active {
     color: $color-primary;
   }
+
+  @media (max-width: 768px) {
+    padding: $spacing-medium 0;
+    font-size: $font-size-large;
+  }
 }
 
 .navbar-actions {
   display: flex;
   align-items: center;
   gap: $spacing-medium;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  @media (min-width: 769px) and (max-width: 1023px) {
+    gap: $spacing-small;
+  }
 }
 
 .navbar-button {
@@ -54,6 +166,12 @@
   &:hover {
     background-color: $color-primary;
   }
+
+  @media (max-width: 768px) {
+    width: auto; // Changed from 100% to auto
+    min-width: 120px; // Added min-width for consistency
+    margin-bottom: $spacing-small;
+  }
 }
 
 .user-avatar {
@@ -64,11 +182,44 @@
   object-fit: cover;
 }
 
-.language-select {
-  background-color: $color-card-background;
-  color: $color-text-light;
-  border: 1px solid $color-text-secondary;
-  padding: $spacing-small;
-  border-radius: $border-radius;
-  cursor: pointer;
+@media (min-width: 769px) and (max-width: 1023px) {
+  .navbar-container {
+    padding: 0 $spacing-small;
+  }
+}
+
+@media (min-width: 1024px) {
+  .navbar-container {
+    display: flex;
+    justify-content: center;
+  }
+
+  .navbar-content {
+    flex: 1;
+    max-width: 1000px;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .navbar-menu {
+    flex: 1;
+    justify-content: space-between;
+  }
+
+  .navbar-links {
+    margin-left: $spacing-large * 2;
+    margin-right: $spacing-large * 2;
+  }
+}
+
+@media (min-width: 1440px) {
+  .navbar-container {
+    max-width: 1400px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .navbar-container {
+    max-width: 1800px;
+  }
 }

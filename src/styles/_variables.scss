@@ -21,3 +21,41 @@ $border-radius: 4px;
 $spacing-small: 0.5rem;
 $spacing-medium: 1rem;
 $spacing-large: 2rem;
+
+// Breakpoints
+$breakpoint-phone: 480px;
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1024px;
+$breakpoint-large-desktop: 1440px;
+$breakpoint-extra-large-desktop: 1920px;
+
+// Media query mixins
+@mixin phone {
+    @media (max-width: #{$breakpoint-phone}) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media (min-width: #{$breakpoint-phone + 1}) and (max-width: #{$breakpoint-tablet}) {
+        @content;
+    }
+}
+
+@mixin desktop {
+    @media (min-width: #{$breakpoint-tablet + 1}) and (max-width: #{$breakpoint-desktop}) {
+        @content;
+    }
+}
+
+@mixin large-desktop {
+    @media (min-width: #{$breakpoint-desktop + 1}) and (max-width: #{$breakpoint-large-desktop}) {
+        @content;
+    }
+}
+
+@mixin extra-large-desktop {
+    @media (min-width: #{$breakpoint-large-desktop + 1}) {
+        @content;
+    }
+}

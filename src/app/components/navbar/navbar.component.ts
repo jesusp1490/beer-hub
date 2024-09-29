@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service'; 
 import { Observable } from 'rxjs';
@@ -12,6 +12,7 @@ import firebase from 'firebase/compat/app';
 export class NavbarComponent implements OnInit {
   user$: Observable<firebase.User | null>;
   selectedLanguage: string = 'en'; 
+  isMenuOpen: boolean = false;
 
   constructor(private authService: AuthService, private router: Router) {
     this.user$ = this.authService.user$;
@@ -25,14 +26,17 @@ export class NavbarComponent implements OnInit {
 
   goToSignUp(): void {
     this.router.navigate(['/signup']);
+    this.closeMenu();
   }
 
   goToLogin(): void {
     this.router.navigate(['/login']);
+    this.closeMenu();
   }
 
   goToProfile(): void {
     this.router.navigate(['/profile']);
+    this.closeMenu();
   }
 
   changeLanguage(event: Event): void {
@@ -41,5 +45,22 @@ export class NavbarComponent implements OnInit {
     this.selectedLanguage = language;
     // Implement language change logic here
     console.log(`Language changed to: ${language}`);
+  }
+
+  toggleMenu(): void {
+    this.isMenuOpen = !this.isMenuOpen;
+    document.body.style.overflow = this.isMenuOpen ? 'hidden' : '';
+  }
+
+  closeMenu(): void {
+    this.isMenuOpen = false;
+    document.body.style.overflow = '';
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event): void {
+    if (window.innerWidth > 768 && this.isMenuOpen) {
+      this.closeMenu();
+    }
   }
 }
