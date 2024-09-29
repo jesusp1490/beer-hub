@@ -73,7 +73,7 @@ export class CountryComponent implements OnInit, OnDestroy {
   }
 
   private preloadImages(): void {
-    const imageLoadPromises = this.brands.map(brand => {
+    const imageLoadPromises = this.visibleBrands.map(brand => {
       return new Promise<void>((resolve) => {
         const img = new Image();
         img.onload = () => resolve();
@@ -91,6 +91,10 @@ export class CountryComponent implements OnInit, OnDestroy {
     const start = this.page * this.pageSize;
     const end = start + this.pageSize;
     this.visibleBrands = this.filteredBrands.slice(start, end);
+    // Ensure we always have 10 items, even if we need to pad with empty slots
+    while (this.visibleBrands.length < this.pageSize) {
+      this.visibleBrands.push({} as Brand);
+    }
   }
 
   prevPage(): void {
@@ -108,21 +112,15 @@ export class CountryComponent implements OnInit, OnDestroy {
   }
 
   selectBrand(brandId: string): void {
-    console.log('Selected Brand ID:', brandId);
-    const route = `/country/${this.countryId}/brands/${brandId}/beers`;
-    this.router.navigate([route]);
+    if (brandId) {
+      console.log('Selected Brand ID:', brandId);
+      const route = `/country/${this.countryId}/brands/${brandId}/beers`;
+      this.router.navigate([route]);
+    }
   }
 
   get hasMoreBrands(): boolean {
     return (this.page + 1) * this.pageSize < this.filteredBrands.length;
-  }
-
-  getRows(): Brand[][] {
-    const rows: Brand[][] = [];
-    for (let i = 0; i < this.visibleBrands.length; i += 5) {
-      rows.push(this.visibleBrands.slice(i, i + 5));
-    }
-    return rows;
   }
 
   private setupSearch(): void {

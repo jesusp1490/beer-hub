@@ -2,6 +2,9 @@
 
 .country-container {
   font-family: $font-family-primary;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
 
   .loading-spinner {
     display: flex;
@@ -13,6 +16,11 @@
     svg {
       margin-bottom: 20px;
     }
+  }
+
+  .content-container {
+    padding: 0;
+    // width: 100%;
   }
 
   .country-brands {
@@ -36,8 +44,9 @@
       }
 
       .country-flag-image {
-        width: 40px;
+        width: 50px;
         margin-left: 10px;
+        margin-bottom: 10px;
       }
     }
 
@@ -73,26 +82,22 @@
     position: relative;
     width: 100%;
     margin: 0 auto;
-    margin-top: 100px;
+    margin-top: 50px;
   }
 
   .country-carousel {
     overflow: hidden;
+    padding: 0 40px;
+    width: calc(100% - 80px);
   }
 
   .country-carousel-track {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .country-carousel-row {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 30px;
   }
 
   .country-carousel-item {
-    flex: 1;
     text-align: center;
     padding: 10px;
     transition: transform 0.3s ease;
@@ -104,7 +109,8 @@
   }
 
   .country-brand-logo {
-    max-width: 150px;
+    width: 100%;
+    max-width: 130px;
     height: auto;
     object-fit: contain;
   }
@@ -123,6 +129,7 @@
     align-items: center;
     justify-content: center;
     transition: background-color 0.3s ease;
+    z-index: 10;
 
     &:hover {
       background-color: rgba(255, 255, 255, 1);
@@ -159,6 +166,68 @@
   }
 }
 
+@media (min-width: 1441px) {
+  .country-container {
+    max-width: 100%;
+    margin-top: 50px;
+
+    .country-carousel-track {
+      grid-template-columns: repeat(5, 1fr);
+      gap: 60px;
+    }
+
+    .country-brand-logo {
+      max-width: 250px;
+    }
+
+    .country-brands {
+      .country-title {
+        h1 {
+          font-size: 3rem;
+        }
+      }
+
+      .country-description {
+        font-size: 1.3rem;
+      }
+    }
+
+    .search-bar {
+      max-width: 400px;
+      font-size: 1.2rem;
+    }
+
+    .carousel-button {
+      width: 60px;
+      height: 60px;
+
+      &.right {
+        right: -30px;
+      }
+
+      &.left {
+        left: -30px;
+      }
+    }
+  }
+}
+
+@media (max-width: 1400px) {
+  .country-container {
+    .country-carousel-track {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+}
+
+@media (max-width: 1100px) {
+  .country-container {
+    .country-carousel-track {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
+
 @media (max-width: 768px) {
   .country-container {
     padding: 10px;
@@ -171,17 +240,13 @@
       }
     }
 
-    .country-carousel-item {
-      padding: 5px;
-    }
-
-    .country-brand-logo {
-      max-width: 100px;
+    .country-carousel-track {
+      grid-template-columns: repeat(2, 1fr);
     }
 
     .carousel-button {
-      width: 60px;
-      height: 60px;
+      width: 40px;
+      height: 40px;
 
       &.right {
         right: -20px;
@@ -189,6 +254,52 @@
 
       &.left {
         left: -20px;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .country-container {
+    .country-brands {
+      .country-title {
+        h1 {
+          font-size: 1.5rem;
+        }
+
+        .country-flag-image {
+          width: 30px;
+        }
+      }
+
+      .country-description {
+        font-size: 1rem;
+      }
+    }
+
+    .search-bar {
+      font-size: 0.9rem;
+    }
+
+    .country-carousel {
+      padding: 0 20px;
+      width: calc(100% - 40px);
+    }
+
+    .country-carousel-track {
+      gap: 15px;
+    }
+
+    .carousel-button {
+      width: 30px;
+      height: 30px;
+
+      &.right {
+        right: -15px;
+      }
+
+      &.left {
+        left: -15px;
       }
     }
   }
