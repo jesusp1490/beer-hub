@@ -9,10 +9,10 @@
   <div class="map-controls">
     <button (click)="zoomToRegion('Asia')">Asia</button>
     <button (click)="zoomToRegion('Europe')">Europe</button>
-    <button (click)="zoomToRegion('North America')">North America</button>
-    <button (click)="toggleHeatMap()">{{ isHeatMap ? 'Normal View' : 'Heat Map' }}</button>
-    <button (click)="resetZoom()">Reset Zoom</button>
-    <button (click)="simulateDataChange()">Simulate Data Change</button>
+    <button (click)="zoomToRegion('North America')">N. America</button>
+    <button (click)="toggleHeatMap()">{{ isHeatMap ? 'Normal' : 'Heat Map' }}</button>
+    <button (click)="resetZoom()">Reset</button>
+    <button (click)="simulateDataChange()">Simulate</button>
   </div>
   <div class="legend">
     <h3>Beer Availability</h3>

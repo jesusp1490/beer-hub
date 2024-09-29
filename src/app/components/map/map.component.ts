@@ -27,6 +27,7 @@ export class MapComponent implements OnInit, OnDestroy {
   
   public isHeatMap: boolean = false;
   private heatMapColorScale!: d3.ScaleLinear<string, string>;
+  private isMobile: boolean = false;
 
   constructor(
     private el: ElementRef,
@@ -41,6 +42,7 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.checkScreenSize();
     this.setDimensions();
     this.createSvg();
     this.createTooltip();
@@ -54,15 +56,20 @@ export class MapComponent implements OnInit, OnDestroy {
 
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
+    this.checkScreenSize();
     this.setDimensions();
     this.updateSvg();
     this.updateProjection();
   }
 
+  private checkScreenSize(): void {
+    this.isMobile = window.innerWidth < 768;
+  }
+
   private setDimensions(): void {
     const element = this.el.nativeElement.querySelector('.map-container');
     this.width = element.clientWidth;
-    this.height = element.clientHeight;
+    this.height = this.isMobile ? window.innerHeight * 0.6 : element.clientHeight;
   }
 
   private createSvg(): void {
@@ -96,8 +103,9 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private createProjection(): d3.GeoProjection {
+    const scale = this.isMobile ? (this.width / 6.4) * 0.7 : (this.width / 6.4) * 0.9;
     return geoMercator()
-      .scale((this.width / 6.4) * 0.9)
+      .scale(scale)
       .translate([this.width / 2, this.height / 1.5]);
   }
 
@@ -175,6 +183,28 @@ export class MapComponent implements OnInit, OnDestroy {
     return this.isHeatMap ? this.heatMapColorScale(beerCount) : this.colorScale(beerCount);
   }
 
+  private updateTooltipPosition(event: any): void {
+    const tooltipWidth = 150; // Approximate width of the tooltip
+    const tooltipHeight = 60; // Approximate height of the tooltip
+    
+    let left = event.pageX + 10;
+    let top = event.pageY - 28;
+
+    // Adjust position if tooltip would go off the right edge of the screen
+    if (left + tooltipWidth > window.innerWidth) {
+      left = event.pageX - tooltipWidth - 10;
+    }
+
+    // Adjust position if tooltip would go off the bottom of the screen
+    if (top + tooltipHeight > window.innerHeight) {
+      top = event.pageY - tooltipHeight - 10;
+    }
+
+    this.tooltip
+      .style('left', `${left}px`)
+      .style('top', `${top}px`);
+  }
+
   private onMouseOver(event: any, d: any): void {
     const countryName = d.properties.name;
     const beerCount = this.countryBeerCounts[countryName] || 0;
@@ -188,9 +218,8 @@ export class MapComponent implements OnInit, OnDestroy {
     this.tooltip.transition()
       .duration(200)
       .style('opacity', .9);
-    this.tooltip.html(`${countryName}<br>Beers: ${beerCount}`)
-      .style('left', `${event.pageX + 10}px`)
-      .style('top', `${event.pageY - 28}px`);
+    this.tooltip.html(`${countryName}<br>Beers: ${beerCount}`);
+    this.updateTooltipPosition(event);
   }
 
   private onMouseOut(event: any, d: any): void {
