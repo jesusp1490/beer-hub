@@ -131,4 +131,24 @@
     border-radius: 40px 0px 0px 40px;
     transform: translateY(-50%) rotate(180deg);
   }
+
+    .back-button {
+      display: flex;
+      align-items: center;
+      background: none;
+      border: none;
+      color: #ffa726;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 8px;
+      transition: color 0.3s ease;
+    }
+  
+    .back-button:hover {
+      color: #ff9100;
+    }
+  
+    mat-icon {
+      margin-right: 8px;
+    }
 }

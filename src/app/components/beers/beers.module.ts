@@ -1,19 +1,20 @@
 import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
-import { CommonModule } from '@angular/common'; 
+import { CommonModule } from '@angular/common';
 import { BeersComponent } from './beers.component';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BeerDetailsComponent } from '../beer-details/beer-details.component'; 
+import { BeerDetailsComponent } from '../beer-details/beer-details.component';
 import { SlickCarouselModule } from 'ngx-slick-carousel';
+import { PageLayoutComponent } from '../page-layout/page-layout.component';
+import { BackButtonComponent } from '../back-button/back-button.component';
 
 @NgModule({
   declarations: [
     BeersComponent,
     BeerDetailsComponent,
-
   ],
   imports: [
-    CommonModule, 
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     SlickCarouselModule,

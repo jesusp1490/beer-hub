@@ -15,7 +15,7 @@ import { Location } from '@angular/common';
       align-items: center;
       background: none;
       border: none;
-      // color: #ffa726;
+      color: #ffa726;
       cursor: pointer;
       font-size: 16px;
       padding: 8px;
