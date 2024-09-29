@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable, Subject, forkJoin } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Observable, Subject, forkJoin, BehaviorSubject } from 'rxjs';
+import { takeUntil, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { Country } from './country.interface';
 import { Brand } from './brand.interface';
 
@@ -21,7 +21,7 @@ export class CountryComponent implements OnInit, OnDestroy {
   page: number = 0;
   pageSize: number = 10;
   visibleBrands: Brand[] = [];
-  searchTerm: string = '';
+  searchTerm$ = new BehaviorSubject<string>('');
   isLoading: boolean = true;
   private unsubscribe$ = new Subject<void>();
 
@@ -36,6 +36,7 @@ export class CountryComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadCountryData(this.countryId);
+    this.setupSearch();
   }
 
   ngOnDestroy(): void {
@@ -124,12 +125,35 @@ export class CountryComponent implements OnInit, OnDestroy {
     return rows;
   }
 
-  filterBrands(): void {
-    this.filteredBrands = this.brands.filter(brand => 
-      brand.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
-    this.page = 0;
-    this.updateVisibleBrands();
+  private setupSearch(): void {
+    this.searchTerm$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(term => {
+        this.isLoading = true;
+        return this.filterBrands(term);
+      }),
+      takeUntil(this.unsubscribe$)
+    ).subscribe(filteredBrands => {
+      this.filteredBrands = filteredBrands;
+      this.page = 0;
+      this.updateVisibleBrands();
+      this.isLoading = false;
+    });
+  }
+
+  private filterBrands(term: string): Observable<Brand[]> {
+    return new Observable<Brand[]>(observer => {
+      const filtered = this.brands.filter(brand => 
+        brand.name.toLowerCase().includes(term.toLowerCase())
+      );
+      observer.next(filtered);
+      observer.complete();
+    });
+  }
+
+  updateSearchTerm(term: string): void {
+    this.searchTerm$.next(term);
   }
 
   goBack(): void {

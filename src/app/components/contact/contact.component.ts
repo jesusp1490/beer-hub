@@ -40,7 +40,7 @@ export class ContactComponent {
     },
     {
       question: "How can I add a beer that's not listed on BeerHub?",
-      answer: "You can submit new beer entries through our 'Request a new beer' form. Our team will review the submission and add it to our database if it meets our criteria. We are working on a feature to allow the users to upload the beers themselves in the future. "
+      answer: "You can submit new beer entries through our 'Request a new beer' form. Our team will review the submission and add it to our database if it meets our criteria. We are working on a feature to allow the users to upload the beers themselves in the future."
     },
     {
       question: "Can I change my username or email address?",
@@ -49,6 +49,14 @@ export class ContactComponent {
     {
       question: "How does the beer rating system work?",
       answer: "Users can rate beers on a scale of 1 to 5 stars. The overall rating for each beer is an average of all user ratings."
+    },
+    {
+      question: "How does the map work?",
+      answer: "Our interactive map feature displays beer data from around the world. Each country is color-coded based on the number of beers in our database from that country. Darker shades indicate a higher number of beers. You can click on a country to view more detailed information about its beers, including popular brands, styles, and average ratings. This feature allows you to explore beer cultures globally and discover new brews from different regions."
+    },
+    {
+      question: "How can I discover new beers on BeerHub?",
+      answer: "BeerHub offers several ways to discover new beers. You can use our advanced search and filter options to find beers based on style, country, ABV, or user ratings. Our homepage features sections like 'Best Rated' and 'Popular Brands' to help you explore trending and highly-rated beers. Additionally, our interactive map allows you to explore beers from different countries, helping you discover unique brews from around the world. Don't forget to check your personalized recommendations based on your rating history!"
     }
   ];
 

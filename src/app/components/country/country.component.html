@@ -1,53 +1,38 @@
-<div class="country-container">
-  <app-back-button></app-back-button>
-
-  <div *ngIf="isLoading" class="loading-spinner">
-    <svg width="80" height="80" viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg" stroke="#ffa726">
-      <g fill="none" fill-rule="evenodd" transform="translate(1 1)" stroke-width="2">
-        <circle cx="22" cy="22" r="6" stroke-opacity="0">
-          <animate attributeName="r" begin="1.5s" dur="3s" values="6;22" calcMode="linear" repeatCount="indefinite" />
-          <animate attributeName="stroke-opacity" begin="1.5s" dur="3s" values="1;0" calcMode="linear" repeatCount="indefinite" />
-          <animate attributeName="stroke-width" begin="1.5s" dur="3s" values="2;0" calcMode="linear" repeatCount="indefinite" />
-        </circle>
-        <circle cx="22" cy="22" r="6" stroke-opacity="0">
-          <animate attributeName="r" begin="3s" dur="3s" values="6;22" calcMode="linear" repeatCount="indefinite" />
-          <animate attributeName="stroke-opacity" begin="3s" dur="3s" values="1;0" calcMode="linear" repeatCount="indefinite" />
-          <animate attributeName="stroke-width" begin="3s" dur="3s" values="2;0" calcMode="linear" repeatCount="indefinite" />
-        </circle>
-        <circle cx="22" cy="22" r="8">
-          <animate attributeName="r" begin="0s" dur="1.5s" values="6;1;2;3;4;5;6" calcMode="linear" repeatCount="indefinite" />
-        </circle>
-      </g>
-    </svg>
-  </div>
-
-  <div *ngIf="!isLoading && countryName && countryFlagUrl" class="country-content">
-    
-    <div class="country-brands">
-      <div class="country-title">
-        <h1>Brands from {{ countryName }}</h1>
-        <img [src]="countryFlagUrl" alt="{{ countryName }} flag" class="country-flag-image" />
-      </div>
-      <p class="country-description">Select a brand to know more about their beers.</p>
-
-      <input type="text" placeholder="Search brands" [(ngModel)]="searchTerm" (input)="filterBrands()" class="search-bar" />
+<app-page-layout [backButtonText]="'Back to Map'">
+  <div class="country-container">
+    <div *ngIf="isLoading" class="loading-spinner">
+      <svg width="80" height="80" viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg" stroke="#ffa726">
+        <!-- ... (spinner SVG content) ... -->
+      </svg>
     </div>
 
-    <div class="country-carousel-container">
-      <button (click)="prevPage()" [disabled]="page === 0" class="carousel-button left"></button>
+    <div *ngIf="!isLoading && countryName && countryFlagUrl" class="country-content">
+      <div class="country-brands">
+        <div class="country-title">
+          <h1>Brands from {{ countryName }}</h1>
+          <img [src]="countryFlagUrl" alt="{{ countryName }} flag" class="country-flag-image" />
+        </div>
+        <p class="country-description">Select a brand to know more about their beers.</p>
 
-      <div class="country-carousel">
-        <div class="country-carousel-track">
-          <div class="country-carousel-row" *ngFor="let row of getRows()">
-            <div *ngFor="let brand of row" class="country-carousel-item">
-              <img [src]="brand.logoUrl" alt="{{ brand.name }}" class="country-brand-logo"
-                (click)="selectBrand(brand.brandId)" />
+        <input type="text" placeholder="Search brands" [ngModel]="searchTerm$ | async" (ngModelChange)="updateSearchTerm($event)" class="search-bar" />
+      </div>
+
+      <div class="country-carousel-container">
+        <button (click)="prevPage()" [disabled]="page === 0" class="carousel-button left" aria-label="Previous page"></button>
+
+        <div class="country-carousel">
+          <div class="country-carousel-track">
+            <div class="country-carousel-row" *ngFor="let row of getRows()">
+              <div *ngFor="let brand of row" class="country-carousel-item">
+                <img [src]="brand.logoUrl" [alt]="brand.name" class="country-brand-logo"
+                  (click)="selectBrand(brand.brandId)" [title]="brand.name" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <button (click)="nextPage()" [disabled]="!hasMoreBrands" class="carousel-button right"></button>
+        <button (click)="nextPage()" [disabled]="!hasMoreBrands" class="carousel-button right" aria-label="Next page"></button>
+      </div>
     </div>
   </div>
-</div>
+</app-page-layout>

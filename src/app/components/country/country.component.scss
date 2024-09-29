@@ -1,7 +1,6 @@
 @import 'src/styles/_variables.scss';
 
 .country-container {
-  position: relative;
   font-family: $font-family-primary;
 
   .loading-spinner {
@@ -9,7 +8,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 800px;
+    height: 400px;
 
     svg {
       margin-bottom: 20px;
@@ -21,104 +20,74 @@
     justify-content: center;
     align-items: flex-start;
     flex-direction: column;
-    margin-left: 100px;
-    margin-top: 20px;
+    margin-bottom: 30px;
 
     .country-title {
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      font-family: $font-family-primary;
       color: $color-text-light;
-      padding: 0;
-      margin: 0;
+      margin-bottom: 10px;
 
       h1 {
-        font-size: 3rem;
+        font-size: 2.5rem;
         font-weight: bold;
       }
 
       .country-flag-image {
-        width: 60px;
+        width: 40px;
         margin-left: 10px;
-        margin-bottom: 15px;
       }
     }
 
     .country-description {
-      font-family: $font-family-primary;
       color: $color-text-secondary;
-      text-align: center;
-      font-size: 1.3rem;
-      padding: 0;
-      margin: 0;
-      margin-bottom: 10px;
-      margin-top: 5px;
+      font-size: 1.1rem;
+      margin-bottom: 20px;
     }
   }
 
-  input[type="text"] {
-    width: 300px;
-    padding: 10px 5px;
-    font-size: 1.5rem;
+  .search-bar {
+    width: 100%;
+    max-width: 300px;
+    padding: 10px;
+    font-size: 1rem;
     border: none;
-    border-bottom: 1px solid #f3b200;
+    border-bottom: 2px solid $color-primary;
     background-color: transparent;
-    outline: none;
     color: $color-text-light;
+    transition: border-color 0.3s ease;
 
-    input::placeholder {
-      color: #a2a2a2;
-      font-size: 1.2rem;
+    &::placeholder {
+      color: $color-text-secondary;
     }
 
-    @media (max-width: 768px) {
-      width: 150px;
-      font-size: 14px;
+    &:focus {
+      outline: none;
+      border-color: $color-secondary;
     }
   }
-
-  .label {
-    background-color: transparent;
-    height: 30px;
-    left: 5px;
-    transform: translateY(-50%);
-    color: #fff;
-    font-size: 1em;
-    transition: 0.5s;
-    outline: none;
-    border: none;
-  }
-
 
   .country-carousel-container {
     position: relative;
     width: 100%;
     margin: 0 auto;
-    padding-top: 50px;
-
+    margin-top: 100px;
   }
 
   .country-carousel {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     overflow: hidden;
-
   }
 
   .country-carousel-track {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    width: 90%;
   }
 
   .country-carousel-row {
     display: flex;
     justify-content: space-around;
-    align-items: center;
     margin-bottom: 20px;
   }
 
@@ -128,50 +97,99 @@
     padding: 10px;
     transition: transform 0.3s ease;
     cursor: pointer;
-    display: flex;
-    justify-content: center;
-  }
 
-  .country-carousel-item:hover {
-    transform: scale(1.2);
+    &:hover {
+      transform: scale(1.1);
+    }
   }
 
   .country-brand-logo {
-    width: 200px;
+    max-width: 150px;
     height: auto;
+    object-fit: contain;
   }
 
   .carousel-button {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background-color: #fff;
-    // opacity: 0.4;
-    width: 75px;
-    height: 75px;
-    padding: 20px;
-    z-index: 1;
+    background-color: rgba(255, 255, 255, 0.8);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-image: url('https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fflags%2Fright-arrow.webp?alt=media&token=c0c2cd84-8f36-488c-9278-7681720449d3');
-    background-size: 50%;
-    background-position: center;
-    background-repeat: no-repeat;
-    border: none;
-  }
+    transition: background-color 0.3s ease;
 
-  .carousel-button.right {
-    right: 0px;
-    padding-right: 30px;
-    border-radius: 40px 0px 0px 40px;
-  }
+    &:hover {
+      background-color: rgba(255, 255, 255, 1);
+    }
 
-  .carousel-button.left {
-    left: 0px;
-    padding-left: 30px;
-    border-radius: 40px 0px 0px 40px;
-    transform: translateY(-50%) rotate(180deg);
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &.right {
+      right: -25px;
+    }
+
+    &.left {
+      left: -25px;
+    }
+
+    &::before {
+      content: '';
+      width: 10px;
+      height: 10px;
+      border-top: 2px solid $color-primary;
+      border-right: 2px solid $color-primary;
+    }
+
+    &.right::before {
+      transform: rotate(45deg);
+    }
+
+    &.left::before {
+      transform: rotate(-135deg);
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .country-container {
+    padding: 10px;
+
+    .country-brands {
+      .country-title {
+        h1 {
+          font-size: 2rem;
+        }
+      }
+    }
+
+    .country-carousel-item {
+      padding: 5px;
+    }
+
+    .country-brand-logo {
+      max-width: 100px;
+    }
+
+    .carousel-button {
+      width: 60px;
+      height: 60px;
+
+      &.right {
+        right: -20px;
+      }
+
+      &.left {
+        left: -20px;
+      }
+    }
   }
 }

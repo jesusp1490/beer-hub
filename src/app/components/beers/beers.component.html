@@ -1,46 +1,53 @@
-<div class="beers-container">
+<app-page-layout [backButtonText]="'Back to Brands'">
+  <div class="beers-container">
     <app-back-button></app-back-button>
-  <div class="brand-header">
-    <h1>{{ brandName }}</h1>
-  </div>
-  
-  <div *ngIf="isLoading" class="loading-spinner">
-    <svg width="80" height="80" viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg" stroke="#ffa726">
-      <g fill="none" fill-rule="evenodd" transform="translate(1 1)" stroke-width="2">
-        <circle cx="22" cy="22" r="6" stroke-opacity="0">
-          <animate attributeName="r" begin="1.5s" dur="3s" values="6;22" calcMode="linear" repeatCount="indefinite" />
-          <animate attributeName="stroke-opacity" begin="1.5s" dur="3s" values="1;0" calcMode="linear" repeatCount="indefinite" />
-          <animate attributeName="stroke-width" begin="1.5s" dur="3s" values="2;0" calcMode="linear" repeatCount="indefinite" />
-        </circle>
-        <circle cx="22" cy="22" r="6" stroke-opacity="0">
-          <animate attributeName="r" begin="3s" dur="3s" values="6;22" calcMode="linear" repeatCount="indefinite" />
-          <animate attributeName="stroke-opacity" begin="3s" dur="3s" values="1;0" calcMode="linear" repeatCount="indefinite" />
-          <animate attributeName="stroke-width" begin="3s" dur="3s" values="2;0" calcMode="linear" repeatCount="indefinite" />
-        </circle>
-        <circle cx="22" cy="22" r="8">
-          <animate attributeName="r" begin="0s" dur="1.5s" values="6;1;2;3;4;5;6" calcMode="linear" repeatCount="indefinite" />
-        </circle>
-      </g>
-    </svg>
-  </div>
-
-  <div *ngIf="!isLoading && beers.length === 0" class="no-beers-message">
-    <p>No beers found for this brand.</p>
-  </div>
-
-  <div *ngIf="!isLoading && beers.length > 0" class="carousel-container">
-    <button *ngIf="beers.length > 1" class="carousel-button left"></button>
-
-    <div class="carousel-track">
-      <div *ngFor="let beer of beers" class="carousel-item">
-        <img [src]="beer.beerImageUrl" alt="{{ beer.name }} image" class="beer-image" (click)="selectBeer(beer.id)" />
-      </div>
+    <div class="brand-header">
+      <h1>{{ brandName }}</h1>
     </div>
 
-    <button *ngIf="beers.length > 1" class="carousel-button right"></button>
-  </div>
+    <div *ngIf="isLoading" class="loading-spinner">
+      <svg width="80" height="80" viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg" stroke="#ffa726">
+        <g fill="none" fill-rule="evenodd" transform="translate(1 1)" stroke-width="2">
+          <circle cx="22" cy="22" r="6" stroke-opacity="0">
+            <animate attributeName="r" begin="1.5s" dur="3s" values="6;22" calcMode="linear" repeatCount="indefinite" />
+            <animate attributeName="stroke-opacity" begin="1.5s" dur="3s" values="1;0" calcMode="linear"
+              repeatCount="indefinite" />
+            <animate attributeName="stroke-width" begin="1.5s" dur="3s" values="2;0" calcMode="linear"
+              repeatCount="indefinite" />
+          </circle>
+          <circle cx="22" cy="22" r="6" stroke-opacity="0">
+            <animate attributeName="r" begin="3s" dur="3s" values="6;22" calcMode="linear" repeatCount="indefinite" />
+            <animate attributeName="stroke-opacity" begin="3s" dur="3s" values="1;0" calcMode="linear"
+              repeatCount="indefinite" />
+            <animate attributeName="stroke-width" begin="3s" dur="3s" values="2;0" calcMode="linear"
+              repeatCount="indefinite" />
+          </circle>
+          <circle cx="22" cy="22" r="8">
+            <animate attributeName="r" begin="0s" dur="1.5s" values="6;1;2;3;4;5;6" calcMode="linear"
+              repeatCount="indefinite" />
+          </circle>
+        </g>
+      </svg>
+    </div>
 
-  <button class="back-button" (click)="goBack()">
-    <i class="fa-solid fa-arrow-left"></i>
-  </button>
-</div>
+    <div *ngIf="!isLoading && beers.length === 0" class="no-beers-message">
+      <p>No beers found for this brand.</p>
+    </div>
+
+    <div *ngIf="!isLoading && beers.length > 0" class="carousel-container">
+      <button *ngIf="beers.length > 1" class="carousel-button left"></button>
+
+      <div class="carousel-track">
+        <div *ngFor="let beer of beers" class="carousel-item">
+          <img [src]="beer.beerImageUrl" alt="{{ beer.name }} image" class="beer-image" (click)="selectBeer(beer.id)" />
+        </div>
+      </div>
+
+      <button *ngIf="beers.length > 1" class="carousel-button right"></button>
+    </div>
+
+    <button class="back-button" (click)="goBack()">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+  </div>
+</app-page-layout>

@@ -32,6 +32,7 @@ import { CommonModule } from '@angular/common';
 import { BeersModule } from './components/beers/beers.module'; 
 import { FilterSearchComponent } from './components/filters-search/filters-search.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
+import { PageLayoutComponent } from './components/page-layout/page-layout.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -45,6 +46,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     CountryComponent,
     FilterSearchComponent,
     BackButtonComponent,
+    PageLayoutComponent,
     HomeComponent,
     // AboutComponent,
     // ContactComponent
