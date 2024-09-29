@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { BeerService } from '../../services/beer.service';
 import { AuthService } from '../../services/auth.service';
 import { Beer } from '../beers/beers.interface';
@@ -20,6 +20,7 @@ export class HomeComponent implements OnInit {
   latestBeers$: Observable<Beer[]>;
   isLoggedIn$: Observable<boolean>;
   filteredBeers: Beer[] = [];
+  isMobileView: boolean = false;
 
   constructor(
     private beerService: BeerService,
@@ -36,7 +37,16 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Additional initialization if needed
+    this.checkScreenSize();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event): void {
+    this.checkScreenSize();
+  }
+
+  checkScreenSize(): void {
+    this.isMobileView = window.innerWidth < 768;
   }
 
   setActiveTab(tab: 'best-rated' | 'favorites' | 'latest'): void {

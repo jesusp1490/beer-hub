@@ -111,7 +111,7 @@ export class BeerService {
       map(beers => beers
         .filter(beer => beer.averageRating !== undefined)
         .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
-        .slice(0, 5)
+        .slice(0, 4)
       )
     );
   }
@@ -148,7 +148,7 @@ export class BeerService {
       map(brands => {
         const sortedBrands = brands.sort((a, b) => b.beersCount - a.beersCount);
         const topBrands = sortedBrands.slice(0, Math.min(20, sortedBrands.length));
-        return this.getRandomSubset(topBrands, 5);
+        return this.getRandomSubset(topBrands, 4);
       })
     );
   }

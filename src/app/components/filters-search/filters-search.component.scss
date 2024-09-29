@@ -28,7 +28,6 @@
         margin-bottom: 5px;
     }
 
-
     input::placeholder {
         font-family: $font-family-primary;
         font-size: 1rem;
@@ -45,7 +44,7 @@
     .label {
         font-family: $font-family-primary;
         background-color: transparent;
-        height: 20px;;
+        height: 20px;
         left: 5px;
         transform: translateY(-50%);
         color: #fff;
@@ -203,7 +202,8 @@
         }
     }
 
-    .btn, .btn-primary {
+    .btn,
+    .btn-primary {
         font-family: $font-family-primary;
         font-weight: 700;
     }
@@ -227,6 +227,18 @@
 
         &:active {
             transform: translateY(1px);
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .filter-container {
+        padding: 1rem;
+    }
+
+    .beer-types-container {
+        .beer-types-grid {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         }
     }
 }

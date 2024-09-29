@@ -1,5 +1,5 @@
 <div class="home-container">
-  <section class="hero">
+  <section class="hero" *ngIf="!isMobileView">
     <video autoplay loop muted playsinline class="hero-video">
       <source src="../../../assets/Hero-video.mp4" type="video/mp4">
       Your browser does not support the video tag.
@@ -11,7 +11,7 @@
   </section>
 
   <div class="content-wrapper">
-    <aside class="filter-sidebar">
+    <aside class="filter-sidebar" [class.mobile-filter]="isMobileView">
       <app-filter-search (searchResults)="onSearch($event)"></app-filter-search>
     </aside>
 

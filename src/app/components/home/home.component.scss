@@ -188,4 +188,60 @@
     .filter-sidebar {
         width: 100%;
     }
+
+    .mobile-filter {
+        order: -1;
+    }
+
+    .main-content {
+        padding: 1rem;
+    }
+
+    .beer-grid,
+    .brand-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1439px) {
+
+    .beer-grid,
+    .brand-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+}
+
+@media (min-width: 1440px) {
+    .content-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .beer-grid,
+    .brand-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (min-width: 1920px) {
+    .content-wrapper {
+        max-width: 1800px;
+    }
+
+    .beer-grid,
+    .brand-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+@media (min-width: 2560px) {
+    .content-wrapper {
+        max-width: 2400px;
+    }
+
+    .beer-grid,
+    .brand-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
 }
