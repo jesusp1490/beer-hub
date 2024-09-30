@@ -121,8 +121,6 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
     const $carouselTrack = $('.carousel-track');
 
     if ($carouselTrack.length && !$carouselTrack.hasClass('slick-initialized')) {
-      const totalBeers = this.beers.length;
-
       $carouselTrack.slick({
         infinite: true,
         slidesToShow: 5,
@@ -136,15 +134,24 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
         cssEase: 'cubic-bezier(0.645, 0.045, 0.355, 1)',
         responsive: [
           {
+            breakpoint: 1400,
+            settings: {
+              slidesToShow: 5,
+              slidesToScroll: 1,
+            }
+          },
+          {
             breakpoint: 1200,
             settings: {
               slidesToShow: 3,
+              slidesToScroll: 1,
             }
           },
           {
             breakpoint: 992,
             settings: {
               slidesToShow: 3,
+              slidesToScroll: 1,
             }
           },
           {

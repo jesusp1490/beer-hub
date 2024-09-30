@@ -1,15 +1,18 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import firebase from 'firebase/compat/app';
 import { Observable, of } from 'rxjs';
-import { switchMap, map, catchError } from 'rxjs/operators';
+import { switchMap, map, catchError, take } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   user$: Observable<firebase.User | null>;
+  private lastAttempt: number = 0;
+  private attemptLimit: number = 3;
+  private readonly COOLDOWN_TIME = 60000; // 1 minute
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -19,6 +22,7 @@ export class AuthService {
       switchMap((user: firebase.User | null) => {
         if (user) {
           return this.firestore.doc<firebase.User>(`users/${user.uid}`).valueChanges().pipe(
+            take(1),
             map((firebaseUser: firebase.User | undefined) => firebaseUser || null),
             catchError(error => {
               console.error('Error fetching user data:', error);
@@ -36,14 +40,59 @@ export class AuthService {
     );
   }
 
+  private validateEmailAndPassword(email: string, password: string): void {
+    if (!email || !password) {
+      throw new Error('Email and password are required');
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error('Invalid email format');
+    }
+    if (password.length < 8) {
+      throw new Error('Password must be at least 8 characters long');
+    }
+  }
+
+  private sanitizeUserData(userData: any): any {
+    const sanitizedData: any = {};
+    for (const [key, value] of Object.entries(userData)) {
+      if (typeof value === 'string') {
+        sanitizedData[key] = value.replace(/[<>&'"]/g, (char) => {
+          switch (char) {
+            case '<': return '&lt;';
+            case '>': return '&gt;';
+            case '&': return '&amp;';
+            case "'": return '&#39;';
+            case '"': return '&quot;';
+            default: return char;
+          }
+        });
+      } else {
+        sanitizedData[key] = value;
+      }
+    }
+    return sanitizedData;
+  }
+
+  private checkRateLimit(): boolean {
+    const now = Date.now();
+    if (now - this.lastAttempt < this.COOLDOWN_TIME) {
+      this.attemptLimit--;
+      if (this.attemptLimit <= 0) {
+        throw new Error('Too many attempts. Please try again later.');
+      }
+    } else {
+      this.attemptLimit = 3;
+    }
+    this.lastAttempt = now;
+    return true;
+  }
+
   async signUp(email: string, password: string, userData: any): Promise<firebase.auth.UserCredential> {
+    this.validateEmailAndPassword(email, password);
     try {
       const result = await this.afAuth.createUserWithEmailAndPassword(email, password);
-      const uid = result.user?.uid;
-
-      if (uid) {
-        await this.firestore.collection('users').doc(uid).set(userData);
-      }
+      await this.updateUserData(result.user, userData);
       return result;
     } catch (error) {
       console.error('Error in signUp:', error);
@@ -51,43 +100,55 @@ export class AuthService {
     }
   }
 
-  signIn(email: string, password: string): Promise<firebase.auth.UserCredential> {
-    return this.afAuth.signInWithEmailAndPassword(email, password);
+  async signIn(email: string, password: string): Promise<firebase.auth.UserCredential> {
+    this.validateEmailAndPassword(email, password);
+    this.checkRateLimit();
+    try {
+      return await this.afAuth.signInWithEmailAndPassword(email, password);
+    } catch (error) {
+      console.error('Error in signIn:', error);
+      throw error;
+    }
   }
 
-  signOut(): Promise<void> {
-    return this.afAuth.signOut();
+  async signOut(): Promise<void> {
+    try {
+      await this.afAuth.signOut();
+      localStorage.clear();
+    } catch (error) {
+      console.error('Error in signOut:', error);
+      throw error;
+    }
   }
 
   async signInWithGoogle(): Promise<firebase.auth.UserCredential> {
     try {
       const provider = new firebase.auth.GoogleAuthProvider();
       const result = await this.afAuth.signInWithPopup(provider);
-      const user = result.user;
-      if (user) {
-        const userRef = this.firestore.doc(`users/${user.uid}`);
-        const snapshot = await userRef.get().toPromise();
-        if (snapshot && !snapshot.exists) {
-          // Create a new user profile
-          const newUser = {
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
-            country: '',
-            dob: '',
-            firstName: user.displayName?.split(' ')[0] || '',
-            lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
-            username: user.email?.split('@')[0] || ''
-          };
-          await userRef.set(newUser);
-        }
-      }
+      await this.updateUserData(result.user);
       return result;
     } catch (error) {
       console.error('Error in signInWithGoogle:', error);
       throw error;
     }
+  }
+
+  private async updateUserData(user: firebase.User | null, additionalData: any = {}): Promise<void> {
+    if (!user) return;
+
+    const userRef: AngularFirestoreDocument<firebase.User> = this.firestore.doc(`users/${user.uid}`);
+    const userData = {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
+      emailVerified: user.emailVerified,
+      ...additionalData
+    };
+
+    const sanitizedData = this.sanitizeUserData(userData);
+
+    return userRef.set(sanitizedData, { merge: true });
   }
 
   isLoggedIn(): Observable<boolean> {
@@ -98,5 +159,76 @@ export class AuthService {
         return of(false);
       })
     );
+  }
+
+  private async refreshToken(): Promise<string | null> {
+    const user = await this.afAuth.currentUser;
+    if (user) {
+      const token = await user.getIdToken(true);
+      localStorage.setItem('authToken', token);
+      return token;
+    }
+    return null;
+  }
+
+  async getAuthToken(): Promise<string | null> {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      return this.refreshToken();
+    }
+    return token;
+  }
+
+  async sendPasswordResetEmail(email: string): Promise<void> {
+    try {
+      await this.afAuth.sendPasswordResetEmail(email);
+    } catch (error) {
+      console.error('Error sending password reset email:', error);
+      throw error;
+    }
+  }
+
+  async updatePassword(newPassword: string): Promise<void> {
+    const user = await this.afAuth.currentUser;
+    if (user) {
+      try {
+        await user.updatePassword(newPassword);
+      } catch (error) {
+        console.error('Error updating password:', error);
+        throw error;
+      }
+    } else {
+      throw new Error('No authenticated user found');
+    }
+  }
+
+  async updateEmail(newEmail: string): Promise<void> {
+    const user = await this.afAuth.currentUser;
+    if (user) {
+      try {
+        await user.updateEmail(newEmail);
+        await this.updateUserData(user, { email: newEmail });
+      } catch (error) {
+        console.error('Error updating email:', error);
+        throw error;
+      }
+    } else {
+      throw new Error('No authenticated user found');
+    }
+  }
+
+  async deleteAccount(): Promise<void> {
+    const user = await this.afAuth.currentUser;
+    if (user) {
+      try {
+        await this.firestore.doc(`users/${user.uid}`).delete();
+        await user.delete();
+      } catch (error) {
+        console.error('Error deleting account:', error);
+        throw error;
+      }
+    } else {
+      throw new Error('No authenticated user found');
+    }
   }
 }

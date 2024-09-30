@@ -33,6 +33,8 @@ import { BeersModule } from './components/beers/beers.module';
 import { FilterSearchComponent } from './components/filters-search/filters-search.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
 import { PageLayoutComponent } from './components/page-layout/page-layout.component';
+import { ErrorHandler } from '@angular/core';
+import { GlobalErrorHandler } from './services/error-handler.service';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -69,9 +71,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatDatepickerModule,
     MatNativeDateModule,
     MatIconModule,
-    AngularFireModule.initializeApp(environment.firebaseConfig),
-    AngularFirestoreModule,
+    AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
+    AngularFirestoreModule,
     AppRoutingModule,
     RouterModule.forRoot([]),
     FormsModule,
@@ -82,7 +84,7 @@ export function HttpLoaderFactory(http: HttpClient) {
   exports: [
     BackButtonComponent
   ],
-  providers: [AuthService],
+  providers: [AuthService, { provide: ErrorHandler, useClass: GlobalErrorHandler } ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA] 
 })
