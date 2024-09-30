@@ -45,7 +45,6 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntil(this.unsubscribe$)).subscribe(params => {
-      this.countryId = params.get('country') ?? '';
       this.brandId = params.get('brandId') ?? '';
 
       if (this.brandId) {
@@ -53,6 +52,7 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loadBeers(this.brandId);
       } else {
         console.error('Invalid brandId');
+        this.router.navigate(['/home']);
       }
     });
   }
@@ -121,11 +121,15 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
     const $carouselTrack = $('.carousel-track');
 
     if ($carouselTrack.length && !$carouselTrack.hasClass('slick-initialized')) {
+      const totalBeers = this.beers.length;
+      const slidesToShow = totalBeers < 5 ? totalBeers : 5;
+      const centerMode = totalBeers >= 3;
+
       $carouselTrack.slick({
         infinite: true,
-        slidesToShow: 5,
+        slidesToShow: slidesToShow,
         slidesToScroll: 1,
-        centerMode: true,
+        centerMode: centerMode,
         centerPadding: '0px',
         dots: true,
         prevArrow: '.carousel-button.left',
@@ -136,21 +140,21 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
           {
             breakpoint: 1400,
             settings: {
-              slidesToShow: 5,
+              slidesToShow: slidesToShow,
               slidesToScroll: 1,
             }
           },
           {
             breakpoint: 1200,
             settings: {
-              slidesToShow: 3,
+              slidesToShow: totalBeers < 3 ? totalBeers : 3,
               slidesToScroll: 1,
             }
           },
           {
             breakpoint: 992,
             settings: {
-              slidesToShow: 3,
+              slidesToShow: totalBeers < 3 ? totalBeers : 3,
               slidesToScroll: 1,
             }
           },
@@ -176,10 +180,8 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   applyFilters() {
-    // Implement your filter logic here
     this.filteredBeers = this.beers.filter(beer => {
-      // Add your filtering conditions
-      return true; // Replace with actual filtering logic
+      return true; 
     });
     this.updateVisibleBeers();
   }

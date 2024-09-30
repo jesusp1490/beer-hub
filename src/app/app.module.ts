@@ -1,4 +1,4 @@
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatInputModule } from '@angular/material/input';
@@ -33,7 +33,6 @@ import { BeersModule } from './components/beers/beers.module';
 import { FilterSearchComponent } from './components/filters-search/filters-search.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
 import { PageLayoutComponent } from './components/page-layout/page-layout.component';
-import { ErrorHandler } from '@angular/core';
 import { GlobalErrorHandler } from './services/error-handler.service';
 
 export function HttpLoaderFactory(http: HttpClient) {
@@ -51,7 +50,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     PageLayoutComponent,
     HomeComponent,
     // AboutComponent,
-    // ContactComponent
+    // ContactComponent,
+    // SignUpComponent,
+    // LogInComponent
   ],
   imports: [
     BrowserModule,
@@ -84,7 +85,10 @@ export function HttpLoaderFactory(http: HttpClient) {
   exports: [
     BackButtonComponent
   ],
-  providers: [AuthService, { provide: ErrorHandler, useClass: GlobalErrorHandler } ],
+  providers: [
+    AuthService,
+    { provide: ErrorHandler, useClass: GlobalErrorHandler }
+  ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA] 
 })

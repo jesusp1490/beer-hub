@@ -1,9 +1,9 @@
 import { Component, OnInit, HostListener } from '@angular/core';
+import { Router } from '@angular/router';
 import { BeerService } from '../../services/beer.service';
 import { AuthService } from '../../services/auth.service';
 import { Beer } from '../beers/beers.interface';
 import { Brand } from '../country/brand.interface';
-import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
@@ -28,8 +28,8 @@ export class HomeComponent implements OnInit {
     private router: Router
   ) {
     this.isLoggedIn$ = this.authService.isLoggedIn();
-    this.bestRatedBeers$ = this.beerService.getBestRatedBeers();
-    this.popularBrands$ = this.beerService.getPopularBrands();
+    this.bestRatedBeers$ = this.beerService.getRandomBestRatedBeers();
+    this.popularBrands$ = this.beerService.getRandomPopularBrands();
     this.latestBeers$ = this.beerService.getLatestBeers();
     this.favoriteBeers$ = this.isLoggedIn$.pipe(
       switchMap(isLoggedIn => isLoggedIn ? this.beerService.getUserFavoriteBeers() : this.beerService.getPopularFavoriteBeers())
@@ -51,6 +51,9 @@ export class HomeComponent implements OnInit {
 
   setActiveTab(tab: 'best-rated' | 'favorites' | 'latest'): void {
     this.activeTab = tab;
+    if (tab === 'best-rated') {
+      this.bestRatedBeers$ = this.beerService.getRandomBestRatedBeers();
+    }
   }
 
   onSearch(results: Beer[]): void {
@@ -67,7 +70,14 @@ export class HomeComponent implements OnInit {
   }
 
   getBeerTypeIcon(beerType: string): string {
-    // This function now returns a generic icon for all beer types
     return 'beer';
+  }
+
+  refreshRandomBeers(): void {
+    this.bestRatedBeers$ = this.beerService.getRandomBestRatedBeers();
+  }
+
+  refreshRandomBrands(): void {
+    this.popularBrands$ = this.beerService.getRandomPopularBrands();
   }
 }

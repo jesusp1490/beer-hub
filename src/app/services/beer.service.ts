@@ -106,13 +106,24 @@ export class BeerService {
     return this.cachedBrands$.asObservable();
   }
 
-  getBestRatedBeers(): Observable<Beer[]> {
+  getRandomBestRatedBeers(limit: number = 8): Observable<Beer[]> {
     return this.getBeers().pipe(
-      map(beers => beers
-        .filter(beer => beer.averageRating !== undefined)
-        .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
-        .slice(0, 4)
-      )
+      map(beers => {
+        const bestRated = beers
+          .filter(beer => beer.averageRating !== undefined && beer.averageRating >= 4.0)
+          .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
+        return this.getRandomSubset(bestRated, limit);
+      })
+    );
+  }
+
+  getRandomPopularBrands(limit: number = 8): Observable<Brand[]> {
+    return this.getBrands().pipe(
+      map(brands => {
+        const sortedBrands = brands.sort((a, b) => b.beersCount - a.beersCount);
+        const topBrands = sortedBrands.slice(0, Math.min(50, sortedBrands.length));
+        return this.getRandomSubset(topBrands, limit);
+      })
     );
   }
 
@@ -139,16 +150,6 @@ export class BeerService {
             );
           })
         );
-      })
-    );
-  }
-
-  getPopularBrands(): Observable<Brand[]> {
-    return this.getBrands().pipe(
-      map(brands => {
-        const sortedBrands = brands.sort((a, b) => b.beersCount - a.beersCount);
-        const topBrands = sortedBrands.slice(0, Math.min(20, sortedBrands.length));
-        return this.getRandomSubset(topBrands, 4);
       })
     );
   }

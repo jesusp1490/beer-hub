@@ -17,7 +17,9 @@
 
     <main class="main-content">
       <section class="best-rated" *ngIf="activeTab !== 'search-results'">
-        <h2>Best Rated Beers</h2>
+        <div class="section-header">
+          <h2>Best Rated Beers</h2>
+        </div>
         <div class="beer-grid" *ngIf="activeTab === 'best-rated'">
           <div *ngFor="let beer of bestRatedBeers$ | async" class="beer-card" (click)="onViewBeerDetails(beer.id)">
             <div class="beer-label">
@@ -40,7 +42,9 @@
       </section>
 
       <section class="popular-brands" *ngIf="activeTab !== 'search-results'">
-        <h2>Popular Brands</h2>
+        <div class="section-header">
+          <h2>Popular Brands</h2>
+        </div>
         <div class="brand-grid">
           <div *ngFor="let brand of popularBrands$ | async" class="brand-card" (click)="onViewBrandBeers(brand.id)">
             <div class="brand-logo">

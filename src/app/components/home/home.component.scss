@@ -67,6 +67,23 @@
 .main-content {
     flex: 1;
     padding: 2rem;
+
+    .best-rated {
+        h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: $color-secondary;
+        }
+    }
+
+    .popular-brands {
+        h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: $color-secondary;
+            margin-top: 1.5rem;
+        }
+    }
 }
 
 .beer-grid,

@@ -184,18 +184,16 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private updateTooltipPosition(event: any): void {
-    const tooltipWidth = 150; // Approximate width of the tooltip
-    const tooltipHeight = 60; // Approximate height of the tooltip
+    const tooltipWidth = 150;
+    const tooltipHeight = 60; 
     
     let left = event.pageX + 10;
     let top = event.pageY - 28;
 
-    // Adjust position if tooltip would go off the right edge of the screen
     if (left + tooltipWidth > window.innerWidth) {
       left = event.pageX - tooltipWidth - 10;
     }
 
-    // Adjust position if tooltip would go off the bottom of the screen
     if (top + tooltipHeight > window.innerHeight) {
       top = event.pageY - tooltipHeight - 10;
     }
