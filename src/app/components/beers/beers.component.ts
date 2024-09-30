@@ -8,6 +8,8 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Subject, forkJoin } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
+declare var $: any;
+
 @Component({
   selector: 'app-beers',
   templateUrl: './beers.component.html',
@@ -25,7 +27,6 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   filtersForm: FormGroup;
   private unsubscribe$ = new Subject<void>();
   isLoading: boolean = true;
-
 
   constructor(
     private route: ActivatedRoute,
@@ -62,7 +63,7 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    
+    // The slider will be initialized after the beers are loaded
   }
 
   private loadBrandData(brandId: string): void {
@@ -121,11 +122,10 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if ($carouselTrack.length && !$carouselTrack.hasClass('slick-initialized')) {
       const totalBeers = this.beers.length;
-      const slidesToShow = Math.min(totalBeers, 5);
 
       $carouselTrack.slick({
         infinite: true,
-        slidesToShow: slidesToShow,
+        slidesToShow: 5,
         slidesToScroll: 1,
         centerMode: true,
         centerPadding: '0px',
@@ -136,24 +136,31 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
         cssEase: 'cubic-bezier(0.645, 0.045, 0.355, 1)',
         responsive: [
           {
-            breakpoint: 1024,
+            breakpoint: 1200,
             settings: {
-              slidesToShow: Math.min(3, totalBeers),
-              slidesToScroll: 1,
+              slidesToShow: 3,
             }
           },
           {
-            breakpoint: 600,
+            breakpoint: 992,
             settings: {
-              slidesToShow: Math.min(2, totalBeers),
-              slidesToScroll: 1
+              slidesToShow: 3,
             }
           },
           {
-            breakpoint: 480,
+            breakpoint: 768,
             settings: {
               slidesToShow: 1,
-              slidesToScroll: 1
+              centerMode: true,
+              centerPadding: '60px',
+            }
+          },
+          {
+            breakpoint: 576,
+            settings: {
+              slidesToShow: 1,
+              centerMode: true,
+              centerPadding: '40px',
             }
           }
         ]
