@@ -6,8 +6,8 @@ import { Beer } from '../beers/beers.interface';
 import { Brand } from '../country/brand.interface';
 import { Country } from '../country/country.interface';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { Subject, forkJoin } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject, forkJoin, EMPTY, of } from 'rxjs';
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 
 @Component({
@@ -95,9 +95,12 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
     });
 
     this.route.paramMap.pipe(takeUntil(this.unsubscribe$)).subscribe(params => {
-      const beerId = params.get('beerId');
+      const beerId = params.get('id');
       if (beerId) {
         this.loadBeerData(beerId);
+      } else {
+        console.error('Beer ID not found in route parameters');
+        this.isLoading = false;
       }
     });
   }
@@ -110,7 +113,14 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
   private loadBeerData(beerId: string): void {
     this.isLoading = true;
     this.firestore.collection<Beer>('beers').doc(beerId).valueChanges()
-      .pipe(takeUntil(this.unsubscribe$))
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        catchError(error => {
+          console.error('Error loading beer data:', error);
+          this.isLoading = false;
+          return EMPTY;
+        })
+      )
       .subscribe(beer => {
         if (beer) {
           this.beer = beer;
@@ -119,12 +129,18 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
           this.updateUserRating();
           this.updateFavoriteIcon();
           this.preloadImages();
+        } else {
+          console.error('Beer not found');
+          this.isLoading = false;
         }
       });
   }
 
   private preloadImages(): void {
-    if (!this.beer) return;
+    if (!this.beer) {
+      this.isLoading = false;
+      return;
+    }
 
     const imagesToLoad = [
       this.beer.beerImageUrl,
@@ -132,20 +148,27 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
       this.countryFlagUrl,
       this.countryMapUrl,
       ...this.beer.ingredients.map(ing => ing.ingImageUrl)
-    ].filter(url => url); 
+    ].filter(url => url);
 
     const imageLoadPromises = imagesToLoad.map(url => {
       return new Promise<void>((resolve) => {
         const img = new Image();
         img.onload = () => resolve();
-        img.onerror = () => resolve(); 
+        img.onerror = () => resolve();
+        img.src = url;
       });
     });
 
-    forkJoin(imageLoadPromises).subscribe(() => {
-      this.isLoading = false;
-      this.triggerAnimations();
-    });
+    forkJoin(imageLoadPromises).pipe(
+      catchError(error => {
+        console.error('Error preloading images:', error);
+        return of(null);
+      }),
+      finalize(() => {
+        this.isLoading = false;
+        this.triggerAnimations();
+      })
+    ).subscribe();
   }
 
   private updateUserRating(): void {
@@ -158,7 +181,12 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
   }
 
   private loadBrandData(brandId: string): void {
-    this.firestore.collection<Brand>('brands').doc(brandId).valueChanges().subscribe(brand => {
+    this.firestore.collection<Brand>('brands').doc(brandId).valueChanges().pipe(
+      catchError(error => {
+        console.error('Error loading brand data:', error);
+        return EMPTY;
+      })
+    ).subscribe(brand => {
       if (brand) {
         this.brandName = brand.name;
         this.brandLogoUrl = brand.logoUrl;
@@ -167,7 +195,12 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
   }
 
   private loadCountryData(countryId: string): void {
-    this.firestore.collection<Country>('countries').doc(countryId).valueChanges().subscribe(country => {
+    this.firestore.collection<Country>('countries').doc(countryId).valueChanges().pipe(
+      catchError(error => {
+        console.error('Error loading country data:', error);
+        return EMPTY;
+      })
+    ).subscribe(country => {
       if (country) {
         this.countryName = country.name;
         this.countryFlagUrl = country.flagUrl;

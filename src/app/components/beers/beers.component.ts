@@ -193,8 +193,8 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   selectBeer(beerId: string): void {
-    this.router.navigate(['/beers', beerId]);
-  }
+  this.router.navigate(['/beer', beerId]);
+}
 
   goBack(): void {
     this.location.back();

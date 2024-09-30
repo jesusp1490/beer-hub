@@ -198,10 +198,14 @@ export class BeerService {
   }
 
   getBeerDetails(beerId: string): Observable<Beer | undefined> {
-    return this.getBeers().pipe(
-      map(beers => beers.find(beer => beer.id === beerId))
-    );
-  }
+  return this.firestore.doc<Beer>(`beers/${beerId}`).valueChanges().pipe(
+    take(1),
+    catchError(error => {
+      console.error('Error fetching beer details:', error);
+      return of(undefined);
+    })
+  );
+}
 
   getPopularFavoriteBeers(): Observable<Beer[]> {
     return this.firestore.collectionGroup('favorites').valueChanges().pipe(
