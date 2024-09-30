@@ -2,18 +2,15 @@
 
 .beer-details-container {
     font-family: $font-family-primary;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     color: $color-text-light;
-    padding-top: 1rem;
+    padding: 1rem;
 
     .info-card {
         display: grid;
         grid-template-columns: 1fr auto 1fr;
         gap: 2rem;
-        width: 100%;
         max-width: 1400px;
+        margin: 0 auto;
         border-radius: 1rem;
         overflow: hidden;
         padding: 2rem;
@@ -48,7 +45,6 @@
     }
 
     .country-info {
-        font-family: $font-family-primary;
         display: flex;
         align-items: center;
         font-size: 1.5rem;
@@ -190,68 +186,62 @@
         }
     }
 
-    .beer-info {
-        p {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: $color-primary;
+    .beer-info p {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: $color-primary;
+    }
+
+    .description-section .beer-description {
+        max-height: 150px;
+        overflow-y: auto;
+        padding-right: 10px;
+
+        &::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: $color-background-dark;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: $color-primary;
+            border-radius: 20px;
         }
     }
 
-    .description-section {
-        .beer-description {
-            max-height: 150px;
-            overflow-y: auto;
-            padding-right: 10px;
+    .ingredients-section .ingredients-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 1rem;
 
-            &::-webkit-scrollbar {
-                width: 5px;
-            }
+        .ingredient-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
 
-            &::-webkit-scrollbar-track {
-                background: $color-background-dark;
-            }
-
-            &::-webkit-scrollbar-thumb {
-                background-color: $color-primary;
-                border-radius: 20px;
-            }
-        }
-    }
-
-    .ingredients-section {
-        .ingredients-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 1rem;
-
-            .ingredient-item {
+            .ingredient-icon-container {
+                width: 60px;
+                height: 60px;
+                background-color: rgba(255, 255, 255, 0.1);
+                border-radius: 50%;
                 display: flex;
-                flex-direction: column;
                 align-items: center;
-                text-align: center;
+                justify-content: center;
+                margin-bottom: 0.5rem;
+            }
 
-                .ingredient-icon-container {
-                    width: 60px;
-                    height: 60px;
-                    background-color: rgba(255, 255, 255, 0.1);
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    margin-bottom: 0.5rem;
-                }
+            .ingredient-icon {
+                width: 35px;
+                height: 35px;
+                object-fit: contain;
+            }
 
-                .ingredient-icon {
-                    width: 35px;
-                    height: 35px;
-                    object-fit: contain;
-                }
-
-                .ingredient-name {
-                    font-size: 0.8rem;
-                    color: $color-text-secondary;
-                }
+            .ingredient-name {
+                font-size: 0.8rem;
+                color: $color-text-secondary;
             }
         }
     }
@@ -326,10 +316,8 @@
             order: -1;
         }
 
-        .beer-image-container {
-            .beer-image {
-                max-height: 400px;
-            }
+        .beer-image-container .beer-image {
+            max-height: 400px;
         }
     }
 }
@@ -356,16 +344,12 @@
             font-size: 2rem;
         }
 
-        .beer-image-container {
-            .beer-image {
-                max-height: 300px;
-            }
+        .beer-image-container .beer-image {
+            max-height: 300px;
         }
 
-        .ingredients-section {
-            .ingredients-list {
-                grid-template-columns: repeat(3, 1fr);
-            }
+        .ingredients-section .ingredients-list {
+            grid-template-columns: repeat(3, 1fr);
         }
 
         .beer-stats {
@@ -385,16 +369,12 @@
             font-size: 1.5rem;
         }
 
-        .ingredients-section {
-            .ingredients-list {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        .ingredients-section .ingredients-list {
+            grid-template-columns: repeat(2, 1fr);
         }
 
-        .beer-image-container {
-            .beer-image {
-                max-height: 250px;
-            }
+        .beer-image-container .beer-image {
+            max-height: 250px;
         }
     }
 }
