@@ -168,8 +168,8 @@
   }
 
   @media (max-width: 768px) {
-    width: auto; // Changed from 100% to auto
-    min-width: 120px; // Added min-width for consistency
+    width: auto; 
+    min-width: 120px;
     margin-bottom: $spacing-small;
   }
 }

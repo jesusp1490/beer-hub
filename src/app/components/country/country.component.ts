@@ -77,7 +77,7 @@ export class CountryComponent implements OnInit, OnDestroy {
       return new Promise<void>((resolve) => {
         const img = new Image();
         img.onload = () => resolve();
-        img.onerror = () => resolve(); // Resolve even on error to prevent blocking
+        img.onerror = () => resolve();
         img.src = brand.logoUrl;
       });
     });
@@ -91,7 +91,7 @@ export class CountryComponent implements OnInit, OnDestroy {
     const start = this.page * this.pageSize;
     const end = start + this.pageSize;
     this.visibleBrands = this.filteredBrands.slice(start, end);
-    // Ensure we always have 10 items, even if we need to pad with empty slots
+  
     while (this.visibleBrands.length < this.pageSize) {
       this.visibleBrands.push({} as Brand);
     }
@@ -155,6 +155,6 @@ export class CountryComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    // Implement your back navigation logic here
+    
   }
 }

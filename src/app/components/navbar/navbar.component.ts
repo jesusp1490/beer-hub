@@ -43,7 +43,7 @@ export class NavbarComponent implements OnInit {
     const select = event.target as HTMLSelectElement;
     const language = select.value;
     this.selectedLanguage = language;
-    // Implement language change logic here
+
     console.log(`Language changed to: ${language}`);
   }
 

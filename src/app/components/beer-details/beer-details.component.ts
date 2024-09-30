@@ -132,14 +132,13 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
       this.countryFlagUrl,
       this.countryMapUrl,
       ...this.beer.ingredients.map(ing => ing.ingImageUrl)
-    ].filter(url => url); // Filter out any undefined or empty URLs
+    ].filter(url => url); 
 
     const imageLoadPromises = imagesToLoad.map(url => {
       return new Promise<void>((resolve) => {
         const img = new Image();
         img.onload = () => resolve();
-        img.onerror = () => resolve(); // Resolve even if there's an error, to avoid blocking
-        img.src = url;
+        img.onerror = () => resolve(); 
       });
     });
 

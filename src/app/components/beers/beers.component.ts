@@ -63,7 +63,7 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    // The slider will be initialized after the beers are loaded
+    
   }
 
   private loadBrandData(brandId: string): void {

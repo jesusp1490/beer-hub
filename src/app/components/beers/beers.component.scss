@@ -74,19 +74,19 @@
     }
 
     .slick-dots {
-      bottom: -30px; // Adjust this value to position the dots vertically
+      bottom: -30px; 
 
       li {
         margin: 0 5px;
 
         button:before {
           font-size: 12px;
-          color: #d3d3d3; // Color for inactive dots
+          color: #d3d3d3; 
           opacity: 1;
         }
 
         &.slick-active button:before {
-          color: #ffa726; // Color for the active dot (change this to your preferred color)
+          color: #ffa726; 
         }
       }
     }

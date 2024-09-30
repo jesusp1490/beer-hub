@@ -5,7 +5,7 @@ import { environment } from '../environments/environment';
 
 @NgModule({
   providers: [
-    provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore(() => getFirestore())
   ]
 })

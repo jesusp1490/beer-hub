@@ -50,7 +50,6 @@ export class LogInComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Check if user is already logged in
     this.authService.isLoggedIn().subscribe(loggedIn => {
       if (loggedIn) {
         this.router.navigate(['/profile']);
