@@ -34,6 +34,7 @@ import { FilterSearchComponent } from './components/filters-search/filters-searc
 import { BackButtonComponent } from './components/back-button/back-button.component';
 import { PageLayoutComponent } from './components/page-layout/page-layout.component';
 import { GlobalErrorHandler } from './services/error-handler.service';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -87,7 +88,8 @@ export function HttpLoaderFactory(http: HttpClient) {
   ],
   providers: [
     AuthService,
-    { provide: ErrorHandler, useClass: GlobalErrorHandler }
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
+    provideAnimationsAsync()
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA] 

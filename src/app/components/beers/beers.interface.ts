@@ -18,7 +18,7 @@ export interface Beer {
   countryId: string;
   averageRating?: number;
   favoriteUsers?: { [userId: string]: boolean };
-  rating?: Record<string, number>;
+  rating?: { [userId: string]: number };
   addedDate?: string;
   web: string;
 }

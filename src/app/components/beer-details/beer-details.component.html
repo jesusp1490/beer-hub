@@ -1,106 +1,112 @@
-<app-page-layout [backButtonText]="'Back to Beers'">
-  <div *ngIf="isLoading" class="loading-spinner">
-    <svg width="80" height="80" viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg" stroke="#ffa726">
-      <g fill="none" fill-rule="evenodd" transform="translate(1 1)" stroke-width="2">
-        <circle cx="22" cy="22" r="6" stroke-opacity="0">
-          <animate attributeName="r" begin="1.5s" dur="3s" values="6;22" calcMode="linear" repeatCount="indefinite" />
-          <animate attributeName="stroke-opacity" begin="1.5s" dur="3s" values="1;0" calcMode="linear" repeatCount="indefinite" />
-          <animate attributeName="stroke-width" begin="1.5s" dur="3s" values="2;0" calcMode="linear" repeatCount="indefinite" />
-        </circle>
-        <circle cx="22" cy="22" r="6" stroke-opacity="0">
-          <animate attributeName="r" begin="3s" dur="3s" values="6;22" calcMode="linear" repeatCount="indefinite" />
-          <animate attributeName="stroke-opacity" begin="3s" dur="3s" values="1;0" calcMode="linear" repeatCount="indefinite" />
-          <animate attributeName="stroke-width" begin="3s" dur="3s" values="2;0" calcMode="linear" repeatCount="indefinite" />
-        </circle>
-        <circle cx="22" cy="22" r="8">
-          <animate attributeName="r" begin="0s" dur="1.5s" values="6;1;2;3;4;5;6" calcMode="linear" repeatCount="indefinite" />
-        </circle>
-      </g>
-    </svg>
-    <p>Loading beer details...</p>
-  </div>
+<!-- <app-page-layout [backButtonText]="'Back to Beers'"> -->
+<div *ngIf="isLoading" class="loading-spinner">
+  <svg width="80" height="80" viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg" stroke="#ffa726">
+    <g fill="none" fill-rule="evenodd" transform="translate(1 1)" stroke-width="2">
+      <circle cx="22" cy="22" r="6" stroke-opacity="0">
+        <animate attributeName="r" begin="1.5s" dur="3s" values="6;22" calcMode="linear" repeatCount="indefinite" />
+        <animate attributeName="stroke-opacity" begin="1.5s" dur="3s" values="1;0" calcMode="linear"
+          repeatCount="indefinite" />
+        <animate attributeName="stroke-width" begin="1.5s" dur="3s" values="2;0" calcMode="linear"
+          repeatCount="indefinite" />
+      </circle>
+      <circle cx="22" cy="22" r="6" stroke-opacity="0">
+        <animate attributeName="r" begin="3s" dur="3s" values="6;22" calcMode="linear" repeatCount="indefinite" />
+        <animate attributeName="stroke-opacity" begin="3s" dur="3s" values="1;0" calcMode="linear"
+          repeatCount="indefinite" />
+        <animate attributeName="stroke-width" begin="3s" dur="3s" values="2;0" calcMode="linear"
+          repeatCount="indefinite" />
+      </circle>
+      <circle cx="22" cy="22" r="8">
+        <animate attributeName="r" begin="0s" dur="1.5s" values="6;1;2;3;4;5;6" calcMode="linear"
+          repeatCount="indefinite" />
+      </circle>
+    </g>
+  </svg>
+  <p>Loading beer details...</p>
+</div>
 
-  <div *ngIf="!isLoading" class="beer-details-container">
-    <div class="info-card">
-      <div class="left-section">
-        <div class="country-info" [@slideInFromLeft]="animationState.countryInfo">
-          <img [src]="countryFlagUrl" [alt]="countryName + ' flag'" class="country-flag">
-          <span>{{ countryName }}</span>
+<div *ngIf="!isLoading" class="beer-details-container">
+  <div class="info-card">
+    <div class="left-section">
+      <div class="country-info" [@slideInFromLeft]="animationState.countryInfo">
+        <img [src]="countryFlagUrl" [alt]="countryName + ' flag'" class="country-flag">
+        <span>{{ countryName }}</span>
+      </div>
+      <div class="map-and-brand" [@slideInFromLeft]="animationState.brandInfo">
+        <div class="country-map">
+          <img [src]="countryMapUrl" [alt]="countryName + ' map'" class="map-image">
         </div>
-        <div class="map-and-brand" [@slideInFromLeft]="animationState.brandInfo">
-          <div class="country-map">
-            <img [src]="countryMapUrl" [alt]="countryName + ' map'" class="map-image">
-          </div>
-          <img *ngIf="brandLogoUrl" [src]="brandLogoUrl" [alt]="brandName + ' logo'" class="brand-logo" />
+        <img *ngIf="brandLogoUrl" [src]="brandLogoUrl" [alt]="brandName + ' logo'" class="brand-logo" />
+      </div>
+      <div class="beer-stats" [@slideInFromLeft]="animationState.stats">
+        <div class="stat">
+          <span class="label">ABV</span>
+          <span class="value">{{ beer?.ABV }}%</span>
         </div>
-        <div class="beer-stats" [@slideInFromLeft]="animationState.stats">
-          <div class="stat">
-            <span class="label">ABV</span>
-            <span class="value">{{ beer?.ABV }}%</span>
-          </div>
-          <div class="stat">
-            <span class="label">IBU</span>
-            <span class="value">{{ beer?.IBU }}</span>
-          </div>
-          <div class="stat">
-            <span class="label">Users Rating</span>
-            <span class="value">{{ beer?.averageRating | number:'1.1-1' }}</span>
-          </div>
+        <div class="stat">
+          <span class="label">IBU</span>
+          <span class="value">{{ beer?.IBU }}</span>
         </div>
-        <div class="rating-section" [@slideInFromLeft]="animationState.beerRating">
-          <h3>Rate this beer:</h3>
-          <div class="beer-rate">
-            <img *ngFor="let i of [1, 2, 3, 4, 5]" class="beer-rate-icon"
-              [src]="i <= (userRating || 0) ? 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-beer.webp?alt=media&token=a0cbaf82-83ef-41e7-abc5-36a140d10119' : 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-beer.webp?alt=media&token=65bd916f-f7dc-4b23-9efb-45bbdb627ce9'"
-              (click)="rateBeer(i)" [alt]="'Rate ' + i + ' out of 5'" />
-          </div>
-        </div>
-        <div class="web" [@slideInFromLeft]="animationState.web">
-          <h2>Get more info:</h2>
-          <a [href]="beer?.web" target="_blank" rel="noopener noreferrer">{{ beer?.web }}</a>
+        <div class="stat">
+          <span class="label">Users Rating</span>
+          <span class="value">{{ beer?.averageRating | number:'1.1-1' }}</span>
         </div>
       </div>
-
-      <div class="center-section">
-        <div class="beer-image-container" [@fadeIn]="animationState.beerImageUrl">
-          <img [src]="beer?.beerImageUrl" [alt]="beer?.name + ' bottle'" class="beer-image">
+      <div class="rating-section" [@slideInFromLeft]="animationState.beerRating">
+        <h3>Rate this beer:</h3>
+        <div class="beer-rate">
+          <img *ngFor="let i of [1, 2, 3, 4, 5]" class="beer-rate-icon"
+            [src]="i <= (userRating ?? 0) ? 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-beer.webp?alt=media&token=a0cbaf82-83ef-41e7-abc5-36a140d10119' : 'https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-beer.webp?alt=media&token=65bd916f-f7dc-4b23-9efb-45bbdb627ce9'"
+            (click)="rateBeer(i)" [alt]="'Rate ' + i + ' out of 5'" />
         </div>
       </div>
+      <div class="web" [@slideInFromLeft]="animationState.web">
+        <h2>Get more info:</h2>
+        <a [href]="beer?.web" target="_blank" rel="noopener noreferrer">{{ beer?.web }}</a>
+      </div>
+    </div>
 
-      <div class="right-section">
-        <h1 class="beer-name" [@slideInFromRight]="animationState.beerName">
-          <span class="beer-name-text">{{ beer?.name }}</span>
-          <img [src]="favoriteIconUrl" (click)="toggleFavorite()" [alt]="'Add ' + beer?.name + ' to favorites'" class="favorite-icon" />
-        </h1>
-        <div class="beer-info" [@slideInFromRight]="animationState.beerType">
-          <h2>Beer Type</h2>
-          <p>{{ beer?.beerType }}</p>
-        </div>
-        <div class="description-section" [@slideInFromRight]="animationState.description">
-          <h2>Description</h2>
-          <p class="beer-description">{{ beer?.description }}</p>
-        </div>
-        <div class="ingredients-section" [@staggerList]="animationState.ingredients">
-          <h2>Ingredients</h2>
-          <div class="ingredients-list">
-            <div *ngFor="let ingredient of beer?.ingredients" class="ingredient-item">
-              <div class="ingredient-icon-container">
-                <img [src]="ingredient.ingImageUrl" [alt]="ingredient.name + ' icon'" class="ingredient-icon">
-              </div>
-              <span class="ingredient-name">{{ ingredient.name }}</span>
+    <div class="center-section">
+      <div class="beer-image-container" [@fadeIn]="animationState.beerImageUrl">
+        <img [src]="beer?.beerImageUrl" [alt]="beer?.name + ' bottle'" class="beer-image">
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h1 class="beer-name" [@slideInFromRight]="animationState.beerName">
+        <span class="beer-name-text">{{ beer?.name }}</span>
+        <img [src]="favoriteIconUrl" (click)="toggleFavorite()" [alt]="'Add ' + beer?.name + ' to favorites'"
+          class="favorite-icon" />
+      </h1>
+      <div class="beer-info" [@slideInFromRight]="animationState.beerType">
+        <h2>Beer Type</h2>
+        <p>{{ beer?.beerType }}</p>
+      </div>
+      <div class="description-section" [@slideInFromRight]="animationState.description">
+        <h2>Description</h2>
+        <p class="beer-description">{{ beer?.description }}</p>
+      </div>
+      <div class="ingredients-section" [@staggerList]="animationState.ingredients">
+        <h2>Ingredients</h2>
+        <div class="ingredients-list">
+          <div *ngFor="let ingredient of beer?.ingredients" class="ingredient-item">
+            <div class="ingredient-icon-container">
+              <img [src]="ingredient.ingImageUrl" [alt]="ingredient.name + ' icon'" class="ingredient-icon">
             </div>
+            <span class="ingredient-name">{{ ingredient.name }}</span>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <div *ngIf="showRegisterModal" class="modal" [@fadeIn]>
-    <div class="modal-content" role="dialog" aria-labelledby="registerModalTitle">
-      <button (click)="closeRegisterModal()" class="close" aria-label="Close modal">&times;</button>
-      <h2 id="registerModalTitle">Please log in or register</h2>
-      <p>You need to be registered to rate beers or save them as favorites. Please log in or register to continue.</p>
-      <button (click)="goToRegister()">Register</button>
-    </div>
+<div *ngIf="showRegisterModal" class="modal" [@fadeIn]>
+  <div class="modal-content" role="dialog" aria-labelledby="registerModalTitle">
+    <button (click)="closeRegisterModal()" class="close" aria-label="Close modal">&times;</button>
+    <h2 id="registerModalTitle">Please log in or register</h2>
+    <p>You need to be registered to rate beers or save them as favorites. Please log in or register to continue.</p>
+    <button (click)="goToRegister()">Register</button>
   </div>
-</app-page-layout>
+</div>
+<!-- </app-page-layout> -->
