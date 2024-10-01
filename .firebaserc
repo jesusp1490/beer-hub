@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "beer-hub"
-  }
+  },
+  "targets": {
+    "beer-hub": {
+      "hosting": {
+        "beer-hub-new": [
+          "beer-hub-new"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

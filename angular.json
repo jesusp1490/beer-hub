@@ -32,7 +32,7 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/assets",
-              "src/favicon.ico"
+              "./src/assets/favicon.ico"
             ],
             "styles": [
               "node_modules/slick-carousel/slick/slick.scss",
@@ -74,6 +74,7 @@
           },
           "configurations": {
             "production": {
+              "outputPath": "dist/beer-hub",
               "budgets": [
                 {
                   "type": "initial",
