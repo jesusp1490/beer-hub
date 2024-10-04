@@ -138,10 +138,19 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
         cssEase: 'cubic-bezier(0.645, 0.045, 0.355, 1)',
         responsive: [
           {
+            breakpoint: 1920,
+            settings: {
+              slidesToShow: slidesToShow,
+              slidesToScroll: 1,
+              
+            }
+          },
+          {
             breakpoint: 1400,
             settings: {
               slidesToShow: slidesToShow,
               slidesToScroll: 1,
+              
             }
           },
           {
