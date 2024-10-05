@@ -122,15 +122,13 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if ($carouselTrack.length && !$carouselTrack.hasClass('slick-initialized')) {
       const totalBeers = this.beers.length;
-      const slidesToShow = totalBeers < 5 ? totalBeers : 5;
-      const centerMode = totalBeers >= 3;
 
       $carouselTrack.slick({
         infinite: true,
-        slidesToShow: slidesToShow,
+        slidesToShow: 1,
         slidesToScroll: 1,
-        centerMode: centerMode,
-        centerPadding: '0px',
+        centerMode: true,
+        centerPadding: '40px',
         dots: true,
         prevArrow: '.carousel-button.left',
         nextArrow: '.carousel-button.right',
@@ -138,31 +136,25 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
         cssEase: 'cubic-bezier(0.645, 0.045, 0.355, 1)',
         responsive: [
           {
-            breakpoint: 2560,
+            breakpoint: 9999,
             settings: {
-              slidesToShow: slidesToShow,
-              slidesToScroll: 1,
-            }
-          },
-          {
-            breakpoint: 1920,
-            settings: {
-              slidesToShow: slidesToShow,
-              slidesToScroll: 1,
+              slidesToShow: totalBeers < 5 ? totalBeers : 5,
+              centerMode: totalBeers >= 3,
+              centerPadding: '0px',
             }
           },
           {
             breakpoint: 1366,
             settings: {
               slidesToShow: totalBeers < 3 ? totalBeers : 3,
-              slidesToScroll: 1,
+              centerMode: totalBeers >= 3,
+              centerPadding: '0px',
             }
           },
           {
             breakpoint: 768,
             settings: {
               slidesToShow: 1,
-              slidesToScroll: 1,
               centerMode: true,
               centerPadding: '60px',
             }
@@ -171,7 +163,6 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
             breakpoint: 576,
             settings: {
               slidesToShow: 1,
-              slidesToScroll: 1,
               centerMode: true,
               centerPadding: '40px',
             }
