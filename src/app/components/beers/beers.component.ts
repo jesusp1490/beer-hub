@@ -63,7 +63,7 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    
+
   }
 
   private loadBrandData(brandId: string): void {
@@ -138,30 +138,21 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
         cssEase: 'cubic-bezier(0.645, 0.045, 0.355, 1)',
         responsive: [
           {
+            breakpoint: 2560,
+            settings: {
+              slidesToShow: slidesToShow,
+              slidesToScroll: 1,
+            }
+          },
+          {
             breakpoint: 1920,
             settings: {
               slidesToShow: slidesToShow,
               slidesToScroll: 1,
-              
             }
           },
           {
-            breakpoint: 1400,
-            settings: {
-              slidesToShow: slidesToShow,
-              slidesToScroll: 1,
-              
-            }
-          },
-          {
-            breakpoint: 1200,
-            settings: {
-              slidesToShow: totalBeers < 3 ? totalBeers : 3,
-              slidesToScroll: 1,
-            }
-          },
-          {
-            breakpoint: 992,
+            breakpoint: 1366,
             settings: {
               slidesToShow: totalBeers < 3 ? totalBeers : 3,
               slidesToScroll: 1,
@@ -171,6 +162,7 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
             breakpoint: 768,
             settings: {
               slidesToShow: 1,
+              slidesToScroll: 1,
               centerMode: true,
               centerPadding: '60px',
             }
@@ -179,6 +171,7 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
             breakpoint: 576,
             settings: {
               slidesToShow: 1,
+              slidesToScroll: 1,
               centerMode: true,
               centerPadding: '40px',
             }
@@ -190,7 +183,7 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
 
   applyFilters() {
     this.filteredBeers = this.beers.filter(beer => {
-      return true; 
+      return true;
     });
     this.updateVisibleBeers();
   }
@@ -202,8 +195,8 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   selectBeer(beerId: string): void {
-  this.router.navigate(['/beer', beerId]);
-}
+    this.router.navigate(['/beer', beerId]);
+  }
 
   goBack(): void {
     this.location.back();
