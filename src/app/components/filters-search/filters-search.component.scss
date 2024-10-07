@@ -3,7 +3,8 @@
 .filter-container {
     font-family: $font-family-primary;
     padding: $spacing-large;
-    max-width: 800px;
+    max-width: 100%;
+    width: 100%;
     background-color: $color-card-background;
     border-radius: $border-radius;
 

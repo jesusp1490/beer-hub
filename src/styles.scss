@@ -42,5 +42,17 @@ body {
 .mat-input-element {
     caret-color: #e0e0e0;
 }
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+html, body { 
+    height: 100%; 
+    overflow-x: hidden;
+}
+
+body { 
+    margin: 0; 
+    font-family: 'Montserrat', sans-serif; 
+}
+
+* {
+    box-sizing: border-box;
+}

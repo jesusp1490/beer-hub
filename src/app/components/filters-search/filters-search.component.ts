@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { BeerService } from '../../services/beer.service';
@@ -68,6 +68,8 @@ export class FilterSearchComponent implements OnInit {
   ];
 
   @Output() searchResults = new EventEmitter<Beer[]>();
+  @Output() searchPerformed = new EventEmitter<void>();
+  @ViewChild('filterForm') filterForm: ElementRef | undefined;
 
   constructor(private fb: FormBuilder, private beerService: BeerService) {
     this.filtersForm = this.fb.group({
@@ -94,6 +96,7 @@ export class FilterSearchComponent implements OnInit {
     this.beerService.getFilteredBeers(filters).subscribe(
       (beers: Beer[]) => {
         this.searchResults.emit(beers);
+        this.searchPerformed.emit();
       },
       (error) => {
         console.error('Error fetching filtered beers:', error);

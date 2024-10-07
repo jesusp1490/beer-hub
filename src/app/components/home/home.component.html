@@ -12,7 +12,7 @@
 
   <div class="content-wrapper">
     <aside class="filter-sidebar" [class.mobile-filter]="isMobileView">
-      <app-filter-search (searchResults)="onSearch($event)"></app-filter-search>
+      <app-filter-search (searchResults)="onSearch($event)" (searchPerformed)="scrollToSearchResults()"></app-filter-search>
     </aside>
 
     <main class="main-content">
@@ -58,7 +58,7 @@
         </div>
       </section>
 
-      <div class="beer-grid" *ngIf="activeTab === 'search-results'">
+      <div #searchResults class="beer-grid" *ngIf="activeTab === 'search-results'">
         <div *ngIf="filteredBeers.length === 0" class="no-results">
           <p>No beers found matching your search.</p>
         </div>

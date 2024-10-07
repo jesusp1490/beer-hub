@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { BeerService } from '../../services/beer.service';
 import { AuthService } from '../../services/auth.service';
@@ -21,6 +21,8 @@ export class HomeComponent implements OnInit {
   isLoggedIn$: Observable<boolean>;
   filteredBeers: Beer[] = [];
   isMobileView: boolean = false;
+
+  @ViewChild('searchResults') searchResultsElement: ElementRef | undefined;
 
   constructor(
     private beerService: BeerService,
@@ -59,6 +61,15 @@ export class HomeComponent implements OnInit {
   onSearch(results: Beer[]): void {
     this.filteredBeers = results;
     this.activeTab = 'search-results';
+    this.scrollToSearchResults();
+  }
+
+  scrollToSearchResults(): void {
+    setTimeout(() => {
+      if (this.searchResultsElement && this.isMobileView) {
+        this.searchResultsElement.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   }
 
   onViewBeerDetails(beerId: string): void {
