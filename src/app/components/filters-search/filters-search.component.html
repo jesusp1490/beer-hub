@@ -13,24 +13,38 @@
 
     <div class="beer-types-container">
       <h3>Beer Types</h3>
-      <div class="beer-types-grid">
-        <div *ngFor="let type of beerTypes" class="beer-type-checkbox">
-          <label>
-            <input type="checkbox" [value]="type" (change)="updateBeerTypes($event, type)">
-            <span>{{ type }}</span>
-          </label>
-        </div>
+      <div class="beer-types-accordion">
+        <mat-accordion>
+          <mat-expansion-panel *ngFor="let category of beerTypeCategories">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                {{ category.name }}
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="beer-types-grid">
+              <div *ngFor="let type of category.types" class="beer-type-checkbox">
+                <mat-checkbox [value]="type" (change)="updateBeerTypes($event, type)" color="accent">
+                  {{ type }}
+                </mat-checkbox>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
       </div>
     </div>
 
     <div class="abv-range-container">
       <h3>ABV Range</h3>
       <label for="abvMin">Min ABV: {{ filtersForm.get('abvMin')?.value }}%</label>
-      <input type="range" id="abvMin" formControlName="abvMin" min="0" max="20" step="0.1">
+      <mat-slider min="0" max="20" step="0.1" [displayWith]="formatLabel">
+        <input matSliderThumb formControlName="abvMin">
+      </mat-slider>
       <label for="abvMax">Max ABV: {{ filtersForm.get('abvMax')?.value }}%</label>
-      <input type="range" id="abvMax" formControlName="abvMax" min="0" max="20" step="0.1">
+      <mat-slider min="0" max="20" step="0.1" [displayWith]="formatLabel">
+        <input matSliderThumb formControlName="abvMax">
+      </mat-slider>
     </div>
 
-    <button type="submit" class="btn btn-primary">Apply Filters</button>
+    <button mat-raised-button color="primary" type="submit">Apply Filters</button>
   </form>
 </div>

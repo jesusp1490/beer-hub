@@ -35,6 +35,10 @@ import { BackButtonComponent } from './components/back-button/back-button.compon
 import { PageLayoutComponent } from './components/page-layout/page-layout.component';
 import { GlobalErrorHandler } from './services/error-handler.service';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSliderModule } from '@angular/material/slider';
+
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -82,6 +86,10 @@ export function HttpLoaderFactory(http: HttpClient) {
     ReactiveFormsModule,
     ProfileModule,
     CommonModule,
+    MatExpansionModule,
+    MatCheckboxModule,
+    MatSliderModule,
+    MatButtonModule,
   ],
   exports: [
     BackButtonComponent

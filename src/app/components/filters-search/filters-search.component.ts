@@ -3,6 +3,12 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { BeerService } from '../../services/beer.service';
 import { Beer } from '../beers/beers.interface';
+import { ThemePalette } from '@angular/material/core';
+
+interface BeerTypeCategory {
+  name: string;
+  types: string[];
+}
 
 @Component({
   selector: 'app-filter-search',
@@ -10,16 +16,55 @@ import { Beer } from '../beers/beers.interface';
   styleUrls: ['./filters-search.component.scss']
 })
 export class FilterSearchComponent implements OnInit {
+  checkboxColor: ThemePalette = 'accent';
   filtersForm: FormGroup;
-  beerTypes: string[] = [
-    'ABBAYE BELGIAN STYLE', 'ALE', 'AMERICAN LAGER', 'AMERICAN PALE ALE', 'AMERICAN INDIA PALE ALE', 'AMERICAN WHEAT', 'AMBER ALE',
-    'ALSATIAN', 'ALTBIER', 'BALTIC PORTER', 'BARLEYWINE', 'BARREL AGED BEER', 'BELGIAN BLONDE ALE', 'BELGIAN DARK ALE', 'BELGIAN DUBBLE', 'BELGIAN STRONG ALE', 'BELGIAN TRIPEL',
-    'BLONDE ALE', 'BOCK', 'BOHEMIAN PILSNER', 'BROWN ALE', 'CIDER', 'DARK LAGER', 'DOUBLE INDIA PALE ALE', 'DOPPELBOCK', 'DRY STOUT', 'DUBBEL', 'DUNKEL', 'DUNKEL BOCK', 'FRUIT BEER', 'GERMAN PILSNER',
-    'GINGER PALE ALE', 'GOSE', 'HEFEWEIZEN', 'HELLES', 'HELLES BOCK', 'IMPERIAL STOUT', 'INDIA PALE ALE', 'IRISH RED ALE', 'KÖLSH', 'LAGER', 'LAMBIC', 'LOW ALCOHOL',
-    'MÄRZEN', 'MILK STOUT', 'MÜNCHNER DUNKEL', 'NEIPA', 'NON-ALCOHOLIC LAGER', 'NON-ALCOHOLIC MALT', 'NON-ALCOHOLIC STOUT', 'NON-ALCOHOLIC WEISSBIER', 
-    'OATMEAL STOUT', 'PALE ALE', 'PALE LAGER', 'PILSNER', 'PORTER', 'PUMPKIN ALE', 'RADLER', 'RED ALE', 'RED INDIA PALE ALE', 'ROBUST PORTER',
-    'QUADRUPEL', 'SAISON', 'SCHWARZBIER', 'SCOTCH ALE', 'SHANDY', 'SOUR ALE', 'SPECIAL BEER', 'SPICE ALE', 'SPICED BEER', 'STOUT', 'STRONG LAGER',
-    'VIENNA LAGER', 'WEISSBIER', 'WITBIER', 'BARLEYWINE', 'BERLINER WEISSE'
+  beerTypeCategories: BeerTypeCategory[] = [
+    {
+      name: 'Ale',
+      types: [
+        'ALE', 'AMBER ALE', 'AMERICAN INDIA PALE ALE', 'AMERICAN PALE ALE',
+        'DOUBLE INDIA PALE ALE', 'INDIA PALE ALE', 'NEIPA', 'PALE ALE',
+        'RED ALE', 'RED INDIA PALE ALE', 'BELGIAN BLONDE ALE', 'BELGIAN DARK ALE',
+        'BELGIAN DUBBLE', 'BELGIAN STRONG ALE', 'BELGIAN TRIPEL', 'BROWN ALE',
+        'FRUIT BEER', 'GINGER PALE ALE', 'GOSE', 'HEFEWEIZEN', 'SAISON',
+        'SCOTCH ALE', 'SOUR ALE', 'SPICE ALE', 'SPICED BEER', 'PUMPKIN ALE'
+      ]
+    },
+    {
+      name: 'Lager',
+      types: [
+        'AMERICAN LAGER', 'DARK LAGER', 'LAGER', 'PALE LAGER', 'BOHEMIAN PILSNER',
+        'GERMAN PILSNER', 'MÄRZEN', 'VIENNA LAGER', 'HELLES', 'HELLES BOCK',
+        'SCHWARZBIER', 'STRONG LAGER'
+      ]
+    },
+    {
+      name: 'Pilsner',
+      types: ['PILSNER']
+    },
+    {
+      name: 'Porter and Stout',
+      types: [
+        'BALTIC PORTER', 'DRY STOUT', 'IMPERIAL STOUT', 'MILK STOUT',
+        'OATMEAL STOUT', 'PORTER', 'ROBUST PORTER', 'DUNKEL BOCK'
+      ]
+    },
+    {
+      name: 'Bock',
+      types: ['BOCK', 'DOPPELBOCK', 'DUNKEL']
+    },
+    {
+      name: 'Wheat and Others',
+      types: ['AMERICAN WHEAT', 'WEISSBIER', 'WITBIER', 'KÖLSH']
+    },
+    {
+      name: 'Specialties',
+      types: [
+        'ABBAYE BELGIAN STYLE', 'BARLEYWINE', 'BARREL AGED BEER', 'LAMBIC',
+        'LOW ALCOHOL', 'NON-ALCOHOLIC LAGER', 'NON-ALCOHOLIC MALT',
+        'NON-ALCOHOLIC STOUT', 'NON-ALCOHOLIC WEISSBIER', 'RADLER', 'BERLINER WEISSE'
+      ]
+    }
   ];
 
   @Output() searchResults = new EventEmitter<Beer[]>();
@@ -56,9 +101,9 @@ export class FilterSearchComponent implements OnInit {
     );
   }
 
-  updateBeerTypes(event: Event, type: string): void {
+  updateBeerTypes(event: any, type: string): void {
     const beerTypes = this.filtersForm.get('beerTypes')?.value as string[];
-    if ((event.target as HTMLInputElement).checked) {
+    if (event.checked) {
       beerTypes.push(type);
     } else {
       const index = beerTypes.indexOf(type);
@@ -67,5 +112,9 @@ export class FilterSearchComponent implements OnInit {
       }
     }
     this.filtersForm.patchValue({ beerTypes });
+  }
+
+  formatLabel(value: number): string {
+    return value + '%';
   }
 }

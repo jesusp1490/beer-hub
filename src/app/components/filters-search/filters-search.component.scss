@@ -1,143 +1,67 @@
-@import 'src/styles/_variables.scss';
+@import 'src/styles/variables';
 
 .filter-container {
     font-family: $font-family-primary;
-    padding: 2rem;
+    padding: $spacing-large;
     max-width: 800px;
+    background-color: $color-card-background;
+    border-radius: $border-radius;
 
     h2 {
         font-family: $font-family-primary;
-        font-size: 1.3rem;
+        font-size: $font-size-large;
         font-weight: 700;
-        color: #dadada;
+        color: $color-secondary;
+        margin-bottom: $spacing-medium;
     }
 
     form {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
-    }
-
-    input {
-        font-family: $font-family-primary;
-        color: $color-text-light;
-        font-size: 1rem;
-        outline: none;
-        border: none;
-        background-color: transparent;
-        margin-bottom: 5px;
-    }
-
-    input::placeholder {
-        font-family: $font-family-primary;
-        font-size: 1rem;
-        color: #a2a2a2;
+        gap: $spacing-large;
     }
 
     .input-group {
         font-family: $font-family-primary;
-        margin: 10px 0;
-        border-bottom: 1px solid #f3b200;
+        margin: $spacing-medium 0;
+        border-bottom: 1px solid $color-primary;
         background-color: transparent;
-    }
 
-    .label {
-        font-family: $font-family-primary;
-        background-color: transparent;
-        height: 20px;
-        left: 5px;
-        transform: translateY(-50%);
-        color: #fff;
-        font-size: 1em;
-        transition: 0.5s;
-        outline: none;
-        border: none;
+        input {
+            font-family: $font-family-primary;
+            color: $color-text-light;
+            font-size: $font-size-base;
+            outline: none;
+            border: none;
+            background-color: transparent;
+            margin-bottom: $spacing-small;
+            width: 100%;
+
+            &::placeholder {
+                font-family: $font-family-primary;
+                font-size: $font-size-base;
+                color: $color-text-secondary;
+            }
+        }
     }
 
     .beer-types-container {
         h3 {
             font-family: $font-family-primary;
-            font-size: 1.2rem;
+            font-size: $font-size-large;
             font-weight: 700;
-            margin-bottom: 1rem;
-            color: #dadada;
+            margin-bottom: $spacing-medium;
+            color: $color-secondary;
         }
 
-        .beer-types-grid {
+        .beer-types-accordion {
             font-family: $font-family-primary;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-            max-height: 300px;
-            overflow-y: auto;
-            padding-right: 1rem;
-
-            &::-webkit-scrollbar {
-                width: 8px;
-            }
-
-            &::-webkit-scrollbar-track {
-                background: #f1f1f100;
-                border-radius: 4px;
-            }
-
-            &::-webkit-scrollbar-thumb {
-                background: #c1c1c1;
-                border-radius: 4px;
-            }
-
-            &::-webkit-scrollbar-thumb:hover {
-                background: #a8a8a8;
-            }
-        }
-
-        .beer-type-checkbox {
-            font-family: $font-family-primary;
-            display: flex;
-            align-items: center;
-            margin-bottom: 0.5rem;
-
-            label {
-                font-family: $font-family-primary;
-                display: flex;
-                align-items: center;
-                cursor: pointer;
-                font-size: 0.9rem;
-                color: #ffffff;
-
-                input[type="checkbox"] {
-                    font-family: $font-family-primary;
-                    appearance: none;
-                    -webkit-appearance: none;
-                    width: 18px;
-                    height: 18px;
-                    border: 2px solid #f3b200;
-                    border-radius: 4px;
-                    margin-right: 0.5rem;
-                    position: relative;
-                    cursor: pointer;
-                    transition: background-color 0.3s, border-color 0.3s;
-
-                    &:checked {
-                        background-color: #f3b200;
-                        border-color: #f3b200;
-
-                        &::after {
-                            content: '\2714';
-                            font-size: 12px;
-                            color: white;
-                            position: absolute;
-                            top: 50%;
-                            left: 50%;
-                            transform: translate(-50%, -50%);
-                        }
-                    }
-
-                    &:focus {
-                        outline: none;
-                        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
-                    }
-                }
+            .beer-types-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: $spacing-small;
+                margin-top: $spacing-small;
+                
             }
         }
     }
@@ -145,84 +69,41 @@
     .abv-range-container {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
-
-        label {
-            font-family: $font-family-primary;
-            font-weight: 700;
-            font-size: 1rem;
-            color: #dadada;
-            font-weight: 600;
-            margin: 10px;
-        }
+        gap: $spacing-small;
 
         h3 {
             font-family: $font-family-primary;
             font-weight: 700;
-            font-size: 1rem;
+            font-size: $font-size-base;
+            color: $color-secondary;
         }
 
-        input[type="range"] {
+        label {
             font-family: $font-family-primary;
-            -webkit-appearance: none;
-            width: 100%;
-            height: 6px;
-            background: #e0e0e0;
-            border-radius: 3px;
-            outline: none;
-
-            &::-webkit-slider-thumb {
-                font-family: $font-family-primary;
-                -webkit-appearance: none;
-                appearance: none;
-                width: 18px;
-                height: 18px;
-                background: #f3b200;
-                border-radius: 50%;
-                cursor: pointer;
-                transition: background-color 0.3s;
-
-                &:hover {
-                    background: #7b7b7b;
-                }
-            }
-
-            &::-moz-range-thumb {
-                width: 18px;
-                height: 18px;
-                background: #4a90e2;
-                border-radius: 50%;
-                cursor: pointer;
-                transition: background-color 0.3s;
-
-                &:hover {
-                    background: #3a7bc8;
-                }
-            }
+            font-weight: 600;
+            font-size: $font-size-small;
+            color: $color-text-light;
         }
-    }
 
-    .btn,
-    .btn-primary {
-        font-family: $font-family-primary;
-        font-weight: 700;
+        .mat-slider {
+            width: 100%;
+        }
     }
 
     button[type="submit"] {
         font-family: $font-family-primary;
         font-weight: 700;
-        background-color: #f3b200;
-        color: white;
+        background-color: $color-primary;
+        color: $color-background-dark;
         border: none;
-        padding: 0.75rem 1.5rem;
-        font-size: 1rem;
-        border-radius: 8px;
+        padding: $spacing-medium $spacing-large;
+        font-size: $font-size-base;
+        border-radius: $border-radius;
         cursor: pointer;
         transition: background-color 0.3s, transform 0.1s;
 
         &:hover {
-            background-color: #dadada;
-            color: #7b7b7b;
+            background-color: $color-secondary;
         }
 
         &:active {
@@ -231,14 +112,131 @@
     }
 }
 
-@media (max-width: 768px) {
-    .filter-container {
-        padding: 1rem;
+::ng-deep {
+    .mat-expansion-panel {
+        background-color: $color-card-background !important;
+        color: $color-secondary !important;
     }
 
-    .beer-types-container {
-        .beer-types-grid {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    .mat-expansion-panel-header-title {
+        color: $color-primary !important;
+    }
+
+    .mdc-form-field>label {
+        color: $color-primary;
+    }
+
+    .mat-expansion-panel-header {
+        font-family: $font-family-primary;
+        font-weight: 600;
+        padding: $spacing-medium;
+
+        &:hover {
+            background-color: $color-hover !important;
+        }
+    }
+
+    .mdc-checkbox {
+
+        .mdc-checkbox__background {
+            .mdc-checkbox__checkmark {
+                color: $color-background-dark !important;
+            }
+        }
+
+        .mdc-checkbox__ripple {
+            background-color: $color-secondary !important;
+        }
+    }
+
+    .mat-mdc-checkbox .mdc-checkbox .mdc-checkbox__native-control:enabled:not(:checked):not(:indeterminate):not([data-indeterminate=true])~.mdc-checkbox__background {
+        border-color: $color-secondary !important;
+    }
+
+    .mat-mdc-checkbox .mdc-checkbox .mdc-checkbox__native-control:enabled:checked~.mdc-checkbox__background,
+    .mat-mdc-checkbox .mdc-checkbox .mdc-checkbox__native-control:enabled:indeterminate~.mdc-checkbox__background,
+    .mat-mdc-checkbox .mdc-checkbox .mdc-checkbox__native-control[data-indeterminate=true]:enabled~.mdc-checkbox__background {
+        border-color: $color-secondary !important;
+        background-color: $color-primary !important;
+    }
+
+    .mat-mdc-checkbox .mdc-checkbox:hover .mdc-checkbox__native-control:enabled:not(:checked):not(:indeterminate):not([data-indeterminate=true])~.mdc-checkbox__background {
+        border-color: $color-secondary !important;
+    }
+
+    .mat-mdc-checkbox .mdc-form-field {
+        color: $color-text-light !important;
+    }
+}
+
+@include phone {
+    .filter-container {
+        padding: $spacing-medium;
+
+        .beer-types-container {
+            .beer-types-accordion {
+                .beer-types-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                }
+            }
+        }
+    }
+}
+
+@include tablet {
+    .filter-container {
+        padding: $spacing-large;
+
+        .beer-types-container {
+            .beer-types-accordion {
+                .beer-types-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                }
+            }
+        }
+    }
+}
+
+@include desktop {
+    .filter-container {
+        padding: $spacing-large;
+
+        .beer-types-container {
+            .beer-types-accordion {
+                .beer-types-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                }
+            }
+        }
+    }
+}
+
+@include large-desktop {
+    .filter-container {
+        padding: $spacing-large;
+        max-width: 1000px;
+
+        .beer-types-container {
+            .beer-types-accordion {
+                .beer-types-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                }
+            }
+        }
+    }
+}
+
+@include extra-large-desktop {
+    .filter-container {
+        padding: $spacing-large;
+        max-width: 1200px;
+
+        .beer-types-container {
+            .beer-types-accordion {
+                .beer-types-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                }
+            }
         }
     }
 }
