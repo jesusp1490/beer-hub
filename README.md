@@ -34,13 +34,7 @@ Database: Firebase Firestore
 Authentication: Firebase Authentication
 Storage: Firebase Storage
 Data Visualization: D3.js (interactive maps for beer locations)
-Getting Started
-Clone the repository: git clone https://github.com/yourusername/beerhub.git
-Install dependencies: npm install
-Configure Firebase settings in the environment files (src/environments/) with your Firebase project credentials.
-Run the app: ng serve
-Contributing
-We welcome all contributions, whether through issues, pull requests, or suggestions for new features. This is a community project, and any input from fellow beer lovers or developers is highly appreciated!
+
 
 License
 BeerHub is licensed under the MIT License.
