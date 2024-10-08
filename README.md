@@ -36,7 +36,7 @@ This initial release includes brands from Spain and Portugal. New countries/regi
 
 ## Technologies
 
-- **Frontend:** Angular 18
+- **Frontend:** Angular 17
 - **Database:** Firebase Firestore
 - **Authentication:** Firebase Authentication
 - **Storage:** Firebase Storage
