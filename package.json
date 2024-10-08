@@ -3,11 +3,10 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "npm run prestart && ng serve",
+    "start": "npm run prebuild && ng serve",
     "build": "npm run prebuild && ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "prestart": "node set-env.js",
     "prebuild": "node set-env.js"
   },
   "private": true,
