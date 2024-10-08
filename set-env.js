@@ -20,6 +20,9 @@ environmentFiles.forEach(({ example, target }) => {
         content = content.replace(/YOUR_MESSAGING_SENDER_ID/g, process.env.FIREBASE_MESSAGING_SENDER_ID || 'YOUR_MESSAGING_SENDER_ID');
         content = content.replace(/YOUR_APP_ID/g, process.env.FIREBASE_APP_ID || 'YOUR_APP_ID');
 
+        // Add any additional environment variables you need
+        content = content.replace(/YOUR_API_URL/g, process.env.API_URL || 'YOUR_API_URL');
+
         // Set production flag based on target file name
         content = content.replace(/"production": false/, `"production": ${target.includes('prod')}`);
 
