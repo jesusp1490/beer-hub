@@ -1,27 +1,49 @@
 # BeerHub
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.14.
+**BeerHub** is a global platform designed for beer enthusiasts to discover, rate, and favorite beers from around the world. Currently in early access, the platform starts with 10 brands from Spain and Portugal, but new countries and regions will be added weekly.
 
-## Development server
+## Features
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- **Explore Beers:** View detailed information about beers including:
+  - Name
+  - Description
+  - Country of origin
+  - Brand
+  - Alcohol by Volume (ABV)
+  - Bitterness
+- **Rate and Favorite:** Registered users can rate beers and mark them as favorites.
+- **Request Beers:** Users can suggest new beers that are not yet available.
+- **Advanced Filters:** Search for beers by name, brand, ingredients, ABV, or type.
+- **Top Rated Beers:** See the highest-rated beers and the most popular brands.
+- **Interactive Map:** Explore beers by selecting a country and diving into the available brands and their beers.
 
-## Code scaffolding
+## Early Access and Future Updates
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+This initial release includes brands from Spain and Portugal. New countries/regions will be added weekly to expand the selection.
 
-## Build
+### Coming Soon:
+- Full Spanish translation (currently in English)
+- Random Beer of the Day feature
+- Improvements to responsive design and accessibility
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### Planned Features:
+- Android and iOS apps
+- Loyalty program
+- Online store for beer products
+- Find local sellers using postal codes
+- Support for more languages
+- User-uploaded beers for unlisted beers
 
-## Running unit tests
+## Technologies
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+- **Frontend:** Angular 17
+- **Database:** Firebase Firestore
+- **Authentication:** Firebase Authentication
+- **Storage:** Firebase Storage
+- **Data Visualization:** D3.js (interactive maps for beer locations)
 
-## Running end-to-end tests
+## Contributing
+We welcome all contributions, whether through issues, pull requests, or suggestions for new features. This is a community project, and any input from fellow beer lovers or developers is highly appreciated!
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## License
+BeerHub is licensed under the MIT License.
