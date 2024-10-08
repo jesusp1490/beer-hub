@@ -28,15 +28,15 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Set up environment
+      - name: Set up environment files
         run: |
           cp src/environments/environment.prod.template.ts src/environments/environment.prod.ts
-          sed -i 's/YOUR_API_KEY/${{ secrets.FIREBASE_API_KEY }}/g' src/environments/environment.prod.ts
-          sed -i 's/YOUR_AUTH_DOMAIN/${{ secrets.FIREBASE_AUTH_DOMAIN }}/g' src/environments/environment.prod.ts
-          sed -i 's/YOUR_PROJECT_ID/${{ secrets.FIREBASE_PROJECT_ID }}/g' src/environments/environment.prod.ts
-          sed -i 's/YOUR_STORAGE_BUCKET/${{ secrets.FIREBASE_STORAGE_BUCKET }}/g' src/environments/environment.prod.ts
-          sed -i 's/YOUR_MESSAGING_SENDER_ID/${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}/g' src/environments/environment.prod.ts
-          sed -i 's/YOUR_APP_ID/${{ secrets.FIREBASE_APP_ID }}/g' src/environments/environment.prod.ts
+          sed -i "s/YOUR_API_KEY/${{ secrets.FIREBASE_API_KEY }}/g" src/environments/environment.prod.ts
+          sed -i "s/YOUR_AUTH_DOMAIN/${{ secrets.FIREBASE_AUTH_DOMAIN }}/g" src/environments/environment.prod.ts
+          sed -i "s/YOUR_PROJECT_ID/${{ secrets.FIREBASE_PROJECT_ID }}/g" src/environments/environment.prod.ts
+          sed -i "s/YOUR_STORAGE_BUCKET/${{ secrets.FIREBASE_STORAGE_BUCKET }}/g" src/environments/environment.prod.ts
+          sed -i "s/YOUR_MESSAGING_SENDER_ID/${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}/g" src/environments/environment.prod.ts
+          sed -i "s/YOUR_APP_ID/${{ secrets.FIREBASE_APP_ID }}/g" src/environments/environment.prod.ts
 
       - name: Debug - List environments directory
         run: ls -la src/environments
