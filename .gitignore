@@ -45,7 +45,5 @@ Thumbs.db
 /src/environments/environment.ts
 /src/environments/environment.prod.ts
 .env
-
-# Do not ignore template files
-!/src/environments/environment.template.ts
-!/src/environments/environment.prod.template.ts
+/src/environments/environment.template.ts
+/src/environments/environment.prod.template.ts

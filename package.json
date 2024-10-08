@@ -7,8 +7,8 @@
     "build": "npm run prebuild && ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "prestart": "node ./set-env.js",
-    "prebuild": "node ./set-env.js"
+    "prestart": "node set-env.js",
+    "prebuild": "node set-env.js"
   },
   "private": true,
   "dependencies": {
