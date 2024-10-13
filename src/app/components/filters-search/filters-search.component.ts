@@ -25,9 +25,9 @@ export class FilterSearchComponent implements OnInit {
         'ALE', 'AMBER ALE', 'AMERICAN INDIA PALE ALE', 'AMERICAN PALE ALE',
         'DOUBLE INDIA PALE ALE', 'INDIA PALE ALE', 'NEIPA', 'PALE ALE',
         'RED ALE', 'RED INDIA PALE ALE', 'BELGIAN BLONDE ALE', 'BELGIAN DARK ALE',
-        'BELGIAN DUBBLE', 'BELGIAN STRONG ALE', 'BELGIAN TRIPEL', 'BROWN ALE',
+        'BELGIAN DUBBLE', 'BELGIAN STRONG ALE', 'BELGIAN TRIPEL', 'BIÈRE DE GARDE', 'BROWN ALE',
         'FRUIT BEER', 'GINGER PALE ALE', 'GOSE', 'HEFEWEIZEN', 'SAISON',
-        'SCOTCH ALE', 'SOUR ALE', 'SPICE ALE', 'SPICED BEER', 'PUMPKIN ALE'
+        'SCOTCH ALE', 'SOUR ALE', 'SPICE ALE', 'SPICED BEER', 'PUMPKIN ALE', 'WHITE INDIA PALE ALE',
       ]
     },
     {
@@ -40,7 +40,7 @@ export class FilterSearchComponent implements OnInit {
     },
     {
       name: 'Pilsner',
-      types: ['PILSNER']
+      types: ['PILSNER', 'PILS BLONDE', 'PILS AMBRÉE', 'STRONG PILSNER', ]
     },
     {
       name: 'Porter and Stout',

@@ -8,6 +8,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
 
 @Component({
   selector: 'app-contact',
@@ -60,7 +62,11 @@ export class ContactComponent {
     }
   ];
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private fns: AngularFireFunctions,
+    private snackBar: MatSnackBar
+  ) {
     this.contactForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -70,8 +76,24 @@ export class ContactComponent {
 
   onSubmit() {
     if (this.contactForm.valid) {
-      console.log('Form submitted:', this.contactForm.value);
+      const formData = this.contactForm.value;
+      const sendEmail = this.fns.httpsCallable('sendEmail');
       
+      sendEmail(formData).subscribe(
+        (result: any) => {
+          console.log('Email sent successfully', result);
+          this.contactForm.reset();
+          this.snackBar.open('Your message has been sent successfully!', 'Close', {
+            duration: 3000,
+          });
+        },
+        (error) => {
+          console.error('Error sending email', error);
+          this.snackBar.open('There was an error sending your message. Please try again later.', 'Close', {
+            duration: 3000,
+          });
+        }
+      );
     }
   }
 }

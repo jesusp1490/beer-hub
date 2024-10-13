@@ -4,7 +4,7 @@
       <mat-card class="contact-card">
         <mat-card-content>
           <div class="contact-content">
-            <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
+            <!-- <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
               <h2>Get in Touch</h2>
               <mat-form-field appearance="fill">
                 <mat-label>Name</mat-label>
@@ -19,9 +19,10 @@
                 <textarea matInput formControlName="message" required rows="4"></textarea>
               </mat-form-field>
               <button mat-raised-button color="primary" type="submit" [disabled]="!contactForm.valid">Send Message</button>
-            </form>
+            </form> -->
             <div class="contact-info">
               <h2>Contact Information</h2>
+              <p><mat-icon>email</mat-icon> info&#64;beerhub.es</p>
               <p><mat-icon>location_on</mat-icon> Madrid, Spain</p>
               <h3>Follow Us</h3>
               <div class="social-links">
