@@ -25,7 +25,7 @@ export class FilterSearchComponent implements OnInit {
         'ALE', 'AMBER ALE', 'AMERICAN INDIA PALE ALE', 'AMERICAN PALE ALE',
         'DOUBLE INDIA PALE ALE', 'INDIA PALE ALE', 'NEIPA', 'PALE ALE',
         'RED ALE', 'RED INDIA PALE ALE', 'BELGIAN BLONDE ALE', 'BELGIAN DARK ALE',
-        'BELGIAN DUBBLE', 'BELGIAN STRONG ALE', 'BELGIAN TRIPEL', 'BIÈRE DE GARDE', 'BROWN ALE',
+        'BELGIAN DUBBLE', 'BELGIAN STRONG ALE', 'BELGIAN TRIPEL', 'BIÈRE DE GARDE', 'BLONDE ALE', 'BROWN ALE',
         'FRUIT BEER', 'GINGER PALE ALE', 'GOSE', 'HEFEWEIZEN', 'SAISON',
         'SCOTCH ALE', 'SOUR ALE', 'SPICE ALE', 'SPICED BEER', 'PUMPKIN ALE', 'WHITE INDIA PALE ALE',
       ]
@@ -35,7 +35,7 @@ export class FilterSearchComponent implements OnInit {
       types: [
         'AMERICAN LAGER', 'DARK LAGER', 'LAGER', 'PALE LAGER', 'BOHEMIAN PILSNER',
         'GERMAN PILSNER', 'MÄRZEN', 'VIENNA LAGER', 'HELLES', 'HELLES BOCK',
-        'SCHWARZBIER', 'STRONG LAGER'
+        'SCHWARZBIER', 'STRONG LAGER', 'TABLE BEER'
       ]
     },
     {
@@ -55,7 +55,7 @@ export class FilterSearchComponent implements OnInit {
     },
     {
       name: 'Wheat and Others',
-      types: ['AMERICAN WHEAT', 'WEISSBIER', 'WITBIER', 'KÖLSH']
+      types: ['AMERICAN WHEAT', 'HOPPY WHEAT BEER', 'LICHTENHAINER', 'WEISSBIER', 'WITBIER', 'KÖLSH']
     },
     {
       name: 'Specialties',
