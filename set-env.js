@@ -16,7 +16,7 @@ environmentFiles.forEach(({ example, target }) => {
 
     if (fs.existsSync(examplePath)) {
         let content = fs.readFileSync(examplePath, 'utf8');
-        
+
         // Replace placeholders with actual values from .env
         content = content.replace(/YOUR_API_KEY/g, process.env.FIREBASE_API_KEY || 'API_KEY_NOT_FOUND');
         content = content.replace(/YOUR_AUTH_DOMAIN/g, process.env.FIREBASE_AUTH_DOMAIN || 'AUTH_DOMAIN_NOT_FOUND');
@@ -24,10 +24,10 @@ environmentFiles.forEach(({ example, target }) => {
         content = content.replace(/YOUR_STORAGE_BUCKET/g, process.env.FIREBASE_STORAGE_BUCKET || 'STORAGE_BUCKET_NOT_FOUND');
         content = content.replace(/YOUR_MESSAGING_SENDER_ID/g, process.env.FIREBASE_MESSAGING_SENDER_ID || 'MESSAGING_SENDER_ID_NOT_FOUND');
         content = content.replace(/YOUR_APP_ID/g, process.env.FIREBASE_APP_ID || 'APP_ID_NOT_FOUND');
-        
+
         // Set production flag based on target file name
         content = content.replace(/"production": false/, `"production": ${target.includes('prod')}`);
-        
+
         fs.writeFileSync(targetPath, content);
         console.log(`Created ${target} from ${example}`);
         console.log('Content:', content);
