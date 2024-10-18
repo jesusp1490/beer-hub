@@ -6,11 +6,11 @@ console.log('Current working directory:', process.cwd());
 console.log('Environment variables:', process.env);
 
 const environmentFiles = [
-    { example: 'environment.example.ts', target: 'environment.ts' },
-    { example: 'environment.example.ts', target: 'environment.prod.ts' }
+    { example: 'environment.example.ts', target: 'environment.ts', isProd: false },
+    { example: 'environment.example.ts', target: 'environment.prod.ts', isProd: true }
 ];
 
-environmentFiles.forEach(({ example, target }) => {
+environmentFiles.forEach(({ example, target, isProd }) => {
     const examplePath = path.join(__dirname, 'src', 'environments', example);
     const targetPath = path.join(__dirname, 'src', 'environments', target);
 
@@ -25,8 +25,8 @@ environmentFiles.forEach(({ example, target }) => {
         content = content.replace(/YOUR_MESSAGING_SENDER_ID/g, process.env.FIREBASE_MESSAGING_SENDER_ID || 'MESSAGING_SENDER_ID_NOT_FOUND');
         content = content.replace(/YOUR_APP_ID/g, process.env.FIREBASE_APP_ID || 'APP_ID_NOT_FOUND');
 
-        // Set production flag based on target file name
-        content = content.replace(/"production": false/, `"production": ${target.includes('prod')}`);
+        // Set production flag based on isProd
+        content = content.replace(/production:\s*(false|true)/, `production: ${isProd}`);
 
         fs.writeFileSync(targetPath, content);
         console.log(`Created ${target} from ${example}`);

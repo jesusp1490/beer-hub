@@ -22,25 +22,27 @@ export class FilterSearchComponent implements OnInit {
     {
       name: 'Ale',
       types: [
-        'ALE', 'AMBER ALE', 'AMERICAN INDIA PALE ALE', 'AMERICAN PALE ALE',
-        'DOUBLE INDIA PALE ALE', 'INDIA PALE ALE', 'NEIPA', 'PALE ALE',
-        'RED ALE', 'RED INDIA PALE ALE', 'BELGIAN BLONDE ALE', 'BELGIAN DARK ALE',
-        'BELGIAN DUBBLE', 'BELGIAN STRONG ALE', 'BELGIAN TRIPEL', 'BIÈRE DE GARDE', 'BLONDE ALE', 'BROWN ALE',
-        'FRUIT BEER', 'GINGER PALE ALE', 'GOSE', 'HEFEWEIZEN', 'SAISON',
-        'SCOTCH ALE', 'SOUR ALE', 'SPICE ALE', 'SPICED BEER', 'PUMPKIN ALE', 'WHITE INDIA PALE ALE',
+        'ALE', 'AMBER ALE', 'BELGIAN BLONDE ALE', 'BELGIAN DARK ALE',
+        'BELGIAN DUBBLE', 'BELGIAN STRONG ALE', 'BELGIAN TRIPEL', 'BIÈRE DE GARDE',
+        'BLONDE ALE', 'BROWN ALE', 'FRUIT BEER', 'GINGER PALE ALE', 
+        'HEFEWEIZEN', 'NEIPA', 'PALE ALE', 'RED ALE', 'SCOTCH ALE', 
+        'SOUR ALE', 'SPICE ALE', 'SPICED BEER', 'PUMPKIN ALE', 
+        'WHITE INDIA PALE ALE', 'AMERICAN INDIA PALE ALE', 
+        'DOUBLE INDIA PALE ALE', 'INDIA PALE ALE'
       ]
     },
     {
       name: 'Lager',
       types: [
-        'AMERICAN LAGER', 'DARK LAGER', 'LAGER', 'PALE LAGER', 'BOHEMIAN PILSNER',
-        'GERMAN PILSNER', 'MÄRZEN', 'VIENNA LAGER', 'HELLES', 'HELLES BOCK',
-        'SCHWARZBIER', 'STRONG LAGER', 'TABLE BEER'
+        'AMERICAN LAGER', 'DARK LAGER', 'LAGER', 'PALE LAGER', 
+        'BOHEMIAN PILSNER', 'GERMAN PILSNER', 'MÄRZEN', 'VIENNA LAGER', 
+        'HELLES', 'HELLES BOCK', 'SCHWARZBIER', 'STRONG LAGER', 
+        'TABLE BEER', 'DUNKEL', 'MÜNCHNER DUNKEL', 'RED LAGER'
       ]
     },
     {
       name: 'Pilsner',
-      types: ['PILSNER', 'PILS BLONDE', 'PILS AMBRÉE', 'STRONG PILSNER', ]
+      types: ['PILSNER', 'PILS BLONDE', 'PILS AMBRÉE', 'STRONG PILSNER']
     },
     {
       name: 'Porter and Stout',
@@ -62,10 +64,13 @@ export class FilterSearchComponent implements OnInit {
       types: [
         'ABBAYE BELGIAN STYLE', 'BARLEYWINE', 'BARREL AGED BEER', 'LAMBIC',
         'LOW ALCOHOL', 'NON-ALCOHOLIC LAGER', 'NON-ALCOHOLIC MALT',
-        'NON-ALCOHOLIC STOUT', 'NON-ALCOHOLIC WEISSBIER', 'RADLER', 'BERLINER WEISSE'
+        'NON-ALCOHOLIC STOUT', 'NON-ALCOHOLIC WEISSBIER', 'RADLER', 
+        'BERLINER WEISSE', 'SOUR BEER', 'SESSION IPA', 
+        'FRUIT LAGER', 'CIDER', 'BROWN LAGER', 'AMBER LAGER'
       ]
     }
-  ];
+];
+
 
   @Output() searchResults = new EventEmitter<Beer[]>();
   @Output() searchPerformed = new EventEmitter<void>();
