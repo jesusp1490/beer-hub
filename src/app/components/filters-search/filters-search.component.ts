@@ -20,56 +20,143 @@ export class FilterSearchComponent implements OnInit {
   filtersForm: FormGroup;
   beerTypeCategories: BeerTypeCategory[] = [
     {
-      name: 'Ale',
-      types: [
-        'ALE', 'AMBER ALE', 'BELGIAN BLONDE ALE', 'BELGIAN DARK ALE',
-        'BELGIAN DUBBLE', 'BELGIAN STRONG ALE', 'BELGIAN TRIPEL', 'BIÈRE DE GARDE',
-        'BLONDE ALE', 'BROWN ALE', 'FRUIT BEER', 'GINGER PALE ALE', 
-        'HEFEWEIZEN', 'NEIPA', 'PALE ALE', 'RED ALE', 'SCOTCH ALE', 
-        'SOUR ALE', 'SPICE ALE', 'SPICED BEER', 'PUMPKIN ALE', 
-        'WHITE INDIA PALE ALE', 'AMERICAN INDIA PALE ALE', 
-        'DOUBLE INDIA PALE ALE', 'INDIA PALE ALE'
-      ]
+        name: 'Ale',
+        types: [
+            'ALE', 
+            'AMBER ALE', 
+            'BELGIAN BLONDE ALE', 
+            'BELGIAN DARK ALE',
+            'BELGIAN DUBBLE', 
+            'BELGIAN GOLDEN ALE',
+            'BELGIAN STRONG ALE', 
+            'BELGIAN TRIPEL', 
+            'BELGIAN WHITE ALE',
+            'BIÈRE DE GARDE',
+            'BLONDE ALE', 
+            'BROWN ALE',
+            'COFFEE ALE',  
+            'FRUIT BEER', 
+            'GINGER PALE ALE', 
+            'HEFEWEIZEN', 
+            'MILD ALE', 
+            'NEIPA', 
+            'PALE ALE', 
+            'RED ALE', 
+            'SAISON', 
+            'SCOTCH ALE', 
+            'SOUR ALE', 
+            'SPICE ALE', 
+            'SPICED BEER', 
+            'PUMPKIN ALE', 
+            'WHITE INDIA PALE ALE', 
+            'AMERICAN INDIA PALE ALE', 
+            'DOUBLE INDIA PALE ALE', 
+            'INDIA PALE ALE', 
+            'IMPERIAL TEQUILA ALE', 
+            'SESSION INDIA PALE ALE', 
+            'TRIPLE INDIA PALE ALE',
+        ]
     },
     {
-      name: 'Lager',
-      types: [
-        'AMERICAN LAGER', 'DARK LAGER', 'LAGER', 'PALE LAGER', 
-        'BOHEMIAN PILSNER', 'GERMAN PILSNER', 'MÄRZEN', 'VIENNA LAGER', 
-        'HELLES', 'HELLES BOCK', 'SCHWARZBIER', 'STRONG LAGER', 
-        'TABLE BEER', 'DUNKEL', 'MÜNCHNER DUNKEL', 'RED LAGER'
-      ]
+        name: 'Lager',
+        types: [
+            'AMERICAN LAGER', 
+            'BOHEMIAN PILSNER', 
+            'DARK LAGER', 
+            'GERMAN PILSNER', 
+            'HELLES', 
+            'HELLES BOCK', 
+            'INDIA PALE LAGER', 
+            'LAGER', 
+            'LIGHT LAGER', 
+            'MÄRZEN', 
+            'MÜNCHNER DUNKEL', 
+            'PALE LAGER', 
+            'RED LAGER', 
+            'SCHWARZBIER', 
+            'STRONG LAGER', 
+            'TABLE BEER', 
+            'DUNKEL', 
+        ]
     },
     {
-      name: 'Pilsner',
-      types: ['PILSNER', 'PILS BLONDE', 'PILS AMBRÉE', 'STRONG PILSNER']
+        name: 'Pilsner',
+        types: [
+            'PILS AMBRÉE', 
+            'PILS BLONDE', 
+            'PILSNER', 
+            'STRONG PILSNER',
+        ]
     },
     {
-      name: 'Porter and Stout',
-      types: [
-        'BALTIC PORTER', 'DRY STOUT', 'IMPERIAL STOUT', 'MILK STOUT',
-        'OATMEAL STOUT', 'PORTER', 'ROBUST PORTER', 'DUNKEL BOCK'
-      ]
+        name: 'Porter and Stout',
+        types: [
+            'BALTIC PORTER', 
+            'DOUBLE STOUT', 
+            'DRY STOUT', 
+            'IMPERIAL STOUT', 
+            'MILK STOUT', 
+            'OATMEAL STOUT',
+            'STOUT',  
+            'PORTER', 
+            'ROBUST PORTER', 
+            'DUNKEL BOCK',
+        ]
     },
     {
-      name: 'Bock',
-      types: ['BOCK', 'DOPPELBOCK', 'DUNKEL']
+        name: 'Bock',
+        types: [
+            'BOCK', 
+            'DOPPELBOCK', 
+            'DUNKEL', 
+            'WEIZENBOCK',
+        ]
     },
     {
-      name: 'Wheat and Others',
-      types: ['AMERICAN WHEAT', 'HOPPY WHEAT BEER', 'LICHTENHAINER', 'WEISSBIER', 'WITBIER', 'KÖLSH']
+        name: 'Wheat and Others',
+        types: [
+            'AMERICAN WHEAT', 
+            'HOPPY WHEAT BEER', 
+            'HEFEWEIZEN',
+            'KÖLSH', 
+            'KRISTALLWEIZEN',
+            'LICHTENHAINER', 
+            'WEISSBIER',  
+            'WITBIER',
+        ]
     },
     {
-      name: 'Specialties',
-      types: [
-        'ABBAYE BELGIAN STYLE', 'BARLEYWINE', 'BARREL AGED BEER', 'LAMBIC',
-        'LOW ALCOHOL', 'NON-ALCOHOLIC LAGER', 'NON-ALCOHOLIC MALT',
-        'NON-ALCOHOLIC STOUT', 'NON-ALCOHOLIC WEISSBIER', 'RADLER', 
-        'BERLINER WEISSE', 'SOUR BEER', 'SESSION IPA', 
-        'FRUIT LAGER', 'CIDER', 'BROWN LAGER', 'AMBER LAGER'
-      ]
-    }
+        name: 'Specialties',
+        types: [
+            'ABBAYE BELGIAN STYLE', 
+            'AMBER LAGER', 
+            'BARLEYWINE', 
+            'BARREL AGED BEER', 
+            'BERLINER WEISSE', 
+            'CIDER', 
+            'FRUIT BEER', 
+            'LOW ALCOHOL', 
+            'NON-ALCOHOLIC LAGER', 
+            'NON-ALCOHOLIC MALT', 
+            'NON-ALCOHOLIC STOUT', 
+            'NON-ALCOHOLIC WEISSBIER', 
+            'RADLER', 
+            'SHANDY',
+            'SMOKED BEER',
+            'SOUR BEER', 
+            'SPECIAL BEER',
+        ]
+    },
+    {
+        name: 'Happoshu',
+        types: [
+            'HAPPOSHU', 
+            
+        ]
+    },
 ];
+
+
 
 
   @Output() searchResults = new EventEmitter<Beer[]>();
