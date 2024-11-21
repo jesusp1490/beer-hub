@@ -27,19 +27,22 @@ export class FilterSearchComponent implements OnInit {
             'BELGIAN BLONDE ALE', 
             'BELGIAN DARK ALE',
             'BELGIAN DUBBLE', 
+            'BELGIAN ENKEL',
             'BELGIAN GOLDEN ALE',
+            'BELGIAN QUADRUPEL',
             'BELGIAN STRONG ALE', 
             'BELGIAN TRIPEL', 
             'BELGIAN WHITE ALE',
             'BIÈRE DE GARDE',
             'BLONDE ALE', 
             'BROWN ALE',
-            'COFFEE ALE',  
+            'COFFEE ALE', 
+            'ENGLISH ALE', 
             'FRUIT BEER', 
             'GINGER PALE ALE', 
-            'HEFEWEIZEN', 
             'MILD ALE', 
             'NEIPA', 
+            'AMERICAN PALE ALE',
             'PALE ALE', 
             'RED ALE', 
             'SAISON', 
@@ -52,9 +55,11 @@ export class FilterSearchComponent implements OnInit {
             'AMERICAN INDIA PALE ALE', 
             'DOUBLE INDIA PALE ALE', 
             'INDIA PALE ALE', 
+            'IMPERIAL INDIA PALE ALE',
             'IMPERIAL TEQUILA ALE', 
             'SESSION INDIA PALE ALE', 
             'TRIPLE INDIA PALE ALE',
+            'WINTER ALE',
         ]
     },
     {
@@ -63,6 +68,8 @@ export class FilterSearchComponent implements OnInit {
             'AMERICAN LAGER', 
             'BOHEMIAN PILSNER', 
             'DARK LAGER', 
+            'DORTMUNDER',
+            'DUNKEL', 
             'GERMAN PILSNER', 
             'HELLES', 
             'HELLES BOCK', 
@@ -76,7 +83,6 @@ export class FilterSearchComponent implements OnInit {
             'SCHWARZBIER', 
             'STRONG LAGER', 
             'TABLE BEER', 
-            'DUNKEL', 
         ]
     },
     {
@@ -133,9 +139,11 @@ export class FilterSearchComponent implements OnInit {
             'BARLEYWINE', 
             'BARREL AGED BEER', 
             'BERLINER WEISSE', 
+            'BIÈRE BRUT',
             'CIDER', 
             'FRUIT BEER', 
             'LOW ALCOHOL', 
+            'NON-ALCOHOLIC ALE',
             'NON-ALCOHOLIC LAGER', 
             'NON-ALCOHOLIC MALT', 
             'NON-ALCOHOLIC STOUT', 
@@ -151,7 +159,6 @@ export class FilterSearchComponent implements OnInit {
         name: 'Happoshu',
         types: [
             'HAPPOSHU', 
-            
         ]
     },
 ];
