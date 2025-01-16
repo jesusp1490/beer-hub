@@ -10,6 +10,7 @@ import { switchMap, map, catchError, take } from 'rxjs/operators';
 })
 export class AuthService {
   user$: Observable<firebase.User | null>;
+
   private lastAttempt: number = 0;
   private attemptLimit: number = 3;
   private readonly COOLDOWN_TIME = 60000; // 1 minute
@@ -23,10 +24,16 @@ export class AuthService {
         if (user) {
           return this.firestore.doc<firebase.User>(`users/${user.uid}`).valueChanges().pipe(
             take(1),
-            map((firebaseUser: firebase.User | undefined) => firebaseUser || null),
+            map((firebaseUser: any) => {
+              if (firebaseUser) {
+                // Use googlePhotoURL if available, otherwise fall back to photoURL
+                user.photoURL = firebaseUser.googlePhotoURL || firebaseUser.photoURL || user.photoURL;
+              }
+              return user;
+            }),
             catchError(error => {
               console.error('Error fetching user data:', error);
-              return of(null);
+              return of(user);
             })
           );
         } else {
@@ -124,11 +131,11 @@ export class AuthService {
   async signInWithGoogle(): Promise<firebase.auth.UserCredential> {
     try {
       const provider = new firebase.auth.GoogleAuthProvider();
-      const result = await this.afAuth.signInWithPopup(provider);
-      await this.updateUserData(result.user);
-      return result;
+      const credential = await this.afAuth.signInWithPopup(provider);
+      await this.updateUserData(credential.user);
+      return credential;
     } catch (error) {
-      console.error('Error in signInWithGoogle:', error);
+      console.error('Error signing in with Google:', error);
       throw error;
     }
   }
@@ -146,9 +153,12 @@ export class AuthService {
       ...additionalData
     };
 
-    const sanitizedData = this.sanitizeUserData(userData);
+    // If the user signed in with Google and has a profile picture, store it separately
+    if (user.providerData[0]?.providerId === 'google.com' && user.photoURL) {
+      userData['googlePhotoURL'] = user.photoURL;
+    }
 
-    return userRef.set(sanitizedData, { merge: true });
+    return userRef.set(userData, { merge: true });
   }
 
   isLoggedIn(): Observable<boolean> {
@@ -232,3 +242,4 @@ export class AuthService {
     }
   }
 }
+

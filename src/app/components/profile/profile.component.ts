@@ -10,10 +10,11 @@ import 'firebase/compat/storage';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Inject } from '@angular/core';
+import { Timestamp } from '@angular/fire/firestore';
 
 interface UserProfile {
   country: string;
-  dob: string;
+  dob: Timestamp | null;
   firstName: string;
   lastName: string;
   photoURL: string;
@@ -37,7 +38,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   user$: Observable<firebase.User | null> = this.afAuth.authState;
   userProfile: UserProfile = {
     country: '',
-    dob: '',
+    dob: null,
     firstName: '',
     lastName: '',
     photoURL: '',
@@ -92,6 +93,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
       });
   }
 
+  formatDate(timestamp: Timestamp | null): string {
+    if (timestamp instanceof Timestamp) {
+      const date = timestamp.toDate();
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    return 'N/A';
+  }
+
   private loadFavoriteBeers(userId: string): void {
     this.firestore.collection(`users/${userId}/favorites`)
       .valueChanges({ idField: 'id' })
@@ -133,7 +142,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
         await userProfilePicRef.put(this.selectedFile);
         const photoURL = await userProfilePicRef.getDownloadURL();
         await this.user.updateProfile({ photoURL });
-        await this.firestore.doc(`users/${this.user.uid}`).update({ photoURL });
+        await this.firestore.doc(`users/${this.user.uid}`).update({ 
+          photoURL: photoURL,
+          googlePhotoURL: null // Remove the Google photo URL to use the custom one
+        });
 
         this.userProfile.photoURL = photoURL;
         this.snackBar.open('Profile picture updated successfully!', 'Close', { duration: 3000 });
@@ -289,3 +301,4 @@ export class NewBeerRequestComponent {
     this.dialogRef.close(this.data.newBeer);
   }
 }
+

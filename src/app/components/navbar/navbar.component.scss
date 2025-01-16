@@ -223,3 +223,31 @@
     max-width: 1800px;
   }
 }
+
+.user-menu {
+  position: relative;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: $color-background-dark;
+  border-radius: $border-radius;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  min-width: 150px;
+}
+
+.dropdown-item {
+  display: block;
+  padding: $spacing-small $spacing-medium;
+  color: $color-text-light;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: $color-primary;
+  }
+}

@@ -46,7 +46,14 @@
             <mat-list-item>
               <div matLine class="list-item-content">
                 <h3 class="info-title"><mat-icon matListIcon class="info-icon">cake</mat-icon>Date of Birth</h3>
-                <p class="info-p">{{ userProfile.dob || 'Not specified' }}</p>
+                <p class="info-p">{{ formatDate(userProfile.dob) }}</p>
+              </div>
+            </mat-list-item>
+
+            <mat-list-item>
+              <div matLine class="list-item-content">
+                <h3 class="info-title"><mat-icon matListIcon class="info-icon">email</mat-icon>Email</h3>
+                <p class="info-p">{{ userProfile.email || 'Not specified' }}</p>
               </div>
             </mat-list-item>
           </mat-list>

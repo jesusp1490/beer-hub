@@ -10,6 +10,7 @@ import { ContactComponent } from './components/contact/contact.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { LogInComponent } from './components/log-in/log-in.component';
+import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -17,7 +18,7 @@ const routes: Routes = [
   { path: 'map', component: MapComponent },
   { path: 'about', component: AboutComponent },
   { path: 'contact', component: ContactComponent },
-  { path: 'profile', component: ProfileComponent },
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'beers', component: BeersComponent },
   { path: 'beers/:id', component: BeerDetailsComponent },
   { path: 'beer/:id', component: BeerDetailsComponent },

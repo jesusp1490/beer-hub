@@ -12,6 +12,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router, RouterModule } from '@angular/router';
+import { Timestamp } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-sign-up',
@@ -62,7 +63,8 @@ export class SignUpComponent {
           lastName: this.lastName,
           username: this.username,
           country: this.country,
-          dob: this.dob,
+          dob: this.dob ? Timestamp.fromDate(this.dob) : null,
+          email: this.email,
         });
 
         this.showSuccessMessage('Sign Up successful!');

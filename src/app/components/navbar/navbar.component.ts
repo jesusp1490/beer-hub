@@ -13,6 +13,7 @@ export class NavbarComponent implements OnInit {
   user$: Observable<firebase.User | null>;
   selectedLanguage: string = 'en'; 
   isMenuOpen: boolean = false;
+  isUserMenuOpen: boolean = false;
 
   constructor(private authService: AuthService, private router: Router) {
     this.user$ = this.authService.user$;
@@ -37,6 +38,15 @@ export class NavbarComponent implements OnInit {
   goToProfile(): void {
     this.router.navigate(['/profile']);
     this.closeMenu();
+    this.closeUserMenu();
+  }
+
+  logout(): void {
+    this.authService.signOut().then(() => {
+      this.router.navigate(['/']);
+      this.closeMenu();
+      this.closeUserMenu();
+    });
   }
 
   changeLanguage(event: Event): void {
@@ -57,10 +67,25 @@ export class NavbarComponent implements OnInit {
     document.body.style.overflow = '';
   }
 
+  toggleUserMenu(): void {
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+  }
+
+  closeUserMenu(): void {
+    this.isUserMenuOpen = false;
+  }
+
   @HostListener('window:resize', ['$event'])
   onResize(event: Event): void {
     if (window.innerWidth > 768 && this.isMenuOpen) {
       this.closeMenu();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.isUserMenuOpen && !(event.target as HTMLElement).closest('.user-menu')) {
+      this.closeUserMenu();
     }
   }
 }

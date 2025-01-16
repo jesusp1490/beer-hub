@@ -21,12 +21,18 @@
 
         <div class="navbar-actions">
           <ng-container *ngIf="user$ | async as user; else loggedOut">
-            <img 
-              [src]="user.photoURL || 'assets/user-baseImg.png'" 
-              class="user-avatar" 
-              (click)="goToProfile()" 
-              alt="User Avatar"
-            />
+            <div class="user-menu">
+              <img 
+                [src]="user.photoURL || 'assets/user-baseImg.png'" 
+                class="user-avatar" 
+                (click)="toggleUserMenu()" 
+                alt="User Avatar"
+              />
+              <div class="user-dropdown" *ngIf="isUserMenuOpen">
+                <a class="dropdown-item" (click)="goToProfile()">Profile</a>
+                <a class="dropdown-item" (click)="logout()">Logout</a>
+              </div>
+            </div>
           </ng-container>
           <ng-template #loggedOut>
             <button class="navbar-button" (click)="goToLogin()">Log In</button>
