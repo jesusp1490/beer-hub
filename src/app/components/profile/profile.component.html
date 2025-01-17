@@ -14,49 +14,85 @@
     <mat-tab-group animationDuration="0ms" class="profile-tabs">
       <mat-tab label="Personal Information">
         <div class="profile-section personal-info">
-          <mat-list>
-            <mat-list-item>
-              <div matLine class="list-item-content">
-                <h3 class="info-title"><mat-icon matListIcon class="info-icon">person</mat-icon>Name</h3>
-                <p class="info-p">{{ userProfile.firstName }}</p>
-              </div>
-            </mat-list-item>
+          <form [formGroup]="editForm" (ngSubmit)="saveProfile()">
+            <mat-list>
+              <mat-list-item>
+                <div matLine class="list-item-content">
+                  <h3 class="info-title"><mat-icon matListIcon class="info-icon">person</mat-icon>Name</h3>
+                  <p *ngIf="!isEditMode" class="info-p">{{ userProfile.firstName }}</p>
+                  <mat-form-field *ngIf="isEditMode">
+                    <input matInput formControlName="firstName" placeholder="First Name">
+                  </mat-form-field>
+                </div>
+              </mat-list-item>
 
-            <mat-list-item>
-              <div matLine class="list-item-content">
-                <h3 class="info-title"><mat-icon matListIcon class="info-icon">group</mat-icon>Last Name</h3>
-                <p class="info-p">{{ userProfile.lastName }}</p>
-              </div>
-            </mat-list-item>
+              <mat-list-item>
+                <div matLine class="list-item-content">
+                  <h3 class="info-title"><mat-icon matListIcon class="info-icon">group</mat-icon>Last Name</h3>
+                  <p *ngIf="!isEditMode" class="info-p">{{ userProfile.lastName }}</p>
+                  <mat-form-field *ngIf="isEditMode">
+                    <input matInput formControlName="lastName" placeholder="Last Name">
+                  </mat-form-field>
+                </div>
+              </mat-list-item>
 
-            <mat-list-item>  
-              <div matLine class="list-item-content">
-                <h3 class="info-title"><mat-icon matListIcon class="info-icon">account_circle</mat-icon>Username</h3>
-                <p class="info-p">{{ userProfile.username || 'Not specified' }}</p>
-              </div>
-            </mat-list-item>
+              <mat-list-item>  
+                <div matLine class="list-item-content">
+                  <h3 class="info-title"><mat-icon matListIcon class="info-icon">account_circle</mat-icon>Username</h3>
+                  <p *ngIf="!isEditMode" class="info-p">{{ userProfile.username || 'Not specified' }}</p>
+                  <mat-form-field *ngIf="isEditMode">
+                    <input matInput formControlName="username" placeholder="Username">
+                  </mat-form-field>
+                </div>
+              </mat-list-item>
 
-            <mat-list-item>
-              <div matLine class="list-item-content">
-                <h3 class="info-title"><mat-icon matListIcon class="info-icon">public</mat-icon>Country</h3>
-                <p class="info-p">{{ userProfile.country || 'Not specified' }}</p>
-              </div>
-            </mat-list-item>
+              <mat-list-item>
+                <div matLine class="list-item-content">
+                  <h3 class="info-title"><mat-icon matListIcon class="info-icon">public</mat-icon>Country</h3>
+                  <p *ngIf="!isEditMode" class="info-p">{{ userProfile.country || 'Not specified' }}</p>
+                  <mat-form-field *ngIf="isEditMode">
+                    <input matInput formControlName="country" placeholder="Country">
+                  </mat-form-field>
+                </div>
+              </mat-list-item>
 
-            <mat-list-item>
-              <div matLine class="list-item-content">
-                <h3 class="info-title"><mat-icon matListIcon class="info-icon">cake</mat-icon>Date of Birth</h3>
-                <p class="info-p">{{ formatDate(userProfile.dob) }}</p>
-              </div>
-            </mat-list-item>
+              <mat-list-item>
+                <div matLine class="list-item-content">
+                  <h3 class="info-title"><mat-icon matListIcon class="info-icon">cake</mat-icon>Date of Birth</h3>
+                  <p *ngIf="!isEditMode" class="info-p">{{ formatDate(userProfile.dob) }}</p>
+                  <mat-form-field *ngIf="isEditMode">
+                    <input matInput [matDatepicker]="picker" formControlName="dob" placeholder="Date of Birth">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                  </mat-form-field>
+                </div>
+              </mat-list-item>
 
-            <mat-list-item>
-              <div matLine class="list-item-content">
-                <h3 class="info-title"><mat-icon matListIcon class="info-icon">email</mat-icon>Email</h3>
-                <p class="info-p">{{ userProfile.email || 'Not specified' }}</p>
-              </div>
-            </mat-list-item>
-          </mat-list>
+              <mat-list-item>
+                <div matLine class="list-item-content">
+                  <h3 class="info-title"><mat-icon matListIcon class="info-icon">email</mat-icon>Email</h3>
+                  <p class="info-p">{{ userProfile.email || 'Not specified' }}</p>
+                </div>
+              </mat-list-item>
+            </mat-list>
+
+            <div class="edit-actions">
+              <button *ngIf="!isEditMode" mat-raised-button color="primary" (click)="toggleEditMode()">
+                <mat-icon>edit</mat-icon>
+                Edit Profile
+              </button>
+              <ng-container *ngIf="isEditMode">
+                <button mat-raised-button color="primary" type="submit" [disabled]="editForm.invalid || isLoading">
+                  <mat-icon>save</mat-icon>
+                  Save Changes
+                </button>
+                <button mat-raised-button (click)="toggleEditMode()">
+                  <mat-icon>cancel</mat-icon>
+                  Cancel
+                </button>
+              </ng-container>
+            </div>
+          </form>
         </div>
       </mat-tab>
 
@@ -116,3 +152,4 @@
 </div>
 
 <mat-progress-spinner *ngIf="isLoading" mode="indeterminate"></mat-progress-spinner>
+

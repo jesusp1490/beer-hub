@@ -8,9 +8,10 @@ import { Router } from '@angular/router';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/storage';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Inject } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Timestamp } from '@angular/fire/firestore';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NewBeerRequestComponent } from './new-beer-request.component';
 
 interface UserProfile {
   country: string;
@@ -53,6 +54,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
   favoriteBeers: FavoriteBeer[] = [];
   private unsubscribe$ = new Subject<void>();
   isLoading: boolean = false;
+  isEditMode: boolean = false;
+  editForm: FormGroup;
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -60,8 +63,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private router: Router,
     private authService: AuthService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
-  ) { }
+    private dialog: MatDialog,
+    private fb: FormBuilder
+  ) {
+    this.editForm = this.fb.group({
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      username: ['', Validators.required],
+      country: [''],
+      dob: [null]
+    });
+  }
 
   ngOnInit(): void {
     this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe(user => {
@@ -84,6 +96,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
       .subscribe(profile => {
         if (profile) {
           this.userProfile = { ...profile };
+          this.editForm.patchValue({
+            firstName: profile.firstName,
+            lastName: profile.lastName,
+            username: profile.username,
+            country: profile.country,
+            dob: profile.dob ? profile.dob.toDate() : null
+          });
           console.log('Loaded user profile:', this.userProfile);
         } else {
           console.log('No user profile found');
@@ -99,6 +118,43 @@ export class ProfileComponent implements OnInit, OnDestroy {
       return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     }
     return 'N/A';
+  }
+
+  toggleEditMode(): void {
+    this.isEditMode = !this.isEditMode;
+    if (!this.isEditMode) {
+      this.editForm.patchValue({
+        firstName: this.userProfile.firstName,
+        lastName: this.userProfile.lastName,
+        username: this.userProfile.username,
+        country: this.userProfile.country,
+        dob: this.userProfile.dob ? this.userProfile.dob.toDate() : null
+      });
+    }
+  }
+
+  saveProfile(): void {
+    if (this.editForm.valid && this.user) {
+      this.isLoading = true;
+      const updatedProfile = {
+        ...this.editForm.value,
+        dob: this.editForm.value.dob ? Timestamp.fromDate(this.editForm.value.dob) : null
+      };
+
+      this.firestore.doc(`users/${this.user.uid}`).update(updatedProfile)
+        .then(() => {
+          this.userProfile = { ...this.userProfile, ...updatedProfile };
+          this.isEditMode = false;
+          this.snackBar.open('Profile updated successfully!', 'Close', { duration: 3000 });
+        })
+        .catch(error => {
+          console.error('Error updating profile:', error);
+          this.snackBar.open('Error updating profile. Please try again.', 'Close', { duration: 3000 });
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    }
   }
 
   private loadFavoriteBeers(userId: string): void {
@@ -234,71 +290,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   navigateToBeerDetails(beerId: string): void {
     this.router.navigate(['/beer-details', beerId]);
-  }
-}
-
-@Component({
-  selector: 'app-new-beer-request',
-  template: `
-    <h2 mat-dialog-title>Request New Beer</h2>
-    <mat-dialog-content>
-      <form #beerForm="ngForm">
-        <mat-form-field appearance="fill">
-          <mat-label>Beer Name</mat-label>
-          <input matInput type="text" [(ngModel)]="data.newBeer.name" name="beerName" required>
-          <mat-icon matSuffix>local_drink</mat-icon>
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Description</mat-label>
-          <textarea matInput [(ngModel)]="data.newBeer.description" name="beerDescription" required></textarea>
-          <mat-icon matSuffix>description</mat-icon>
-        </mat-form-field>
-      </form>
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button mat-button (click)="onNoClick()">Cancel</button>
-      <button mat-raised-button color="primary" [disabled]="!beerForm.form.valid" (click)="onSubmit()">Submit Request</button>
-    </mat-dialog-actions>
-  `,
-  styles: [`
-    :host {
-      display: block;
-      background-color: #424242;
-      color: #e0e0e0;
-      padding: 20px;
-      border-radius: 8px;
-    }
-    mat-form-field {
-      width: 100%;
-      margin-bottom: 15px;
-    }
-    .mat-mdc-form-field {
-      --mdc-filled-text-field-container-color: transparent;
-      --mdc-filled-text-field-focus-active-indicator-color: #ff9100;
-      --mdc-filled-text-field-focus-label-text-color: #ff9100;
-      --mdc-filled-text-field-label-text-color: #e0e0e0;
-      --mdc-filled-text-field-input-text-color: #e0e0e0;
-    }
-    .mat-mdc-dialog-actions {
-      justify-content: flex-end;
-    }
-    .mat-mdc-raised-button.mat-primary {
-      background-color: #ff9100;
-    }
-  `]
-})
-export class NewBeerRequestComponent {
-  constructor(
-    public dialogRef: MatDialogRef<NewBeerRequestComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { newBeer: any }
-  ) { }
-
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
-  onSubmit(): void {
-    this.dialogRef.close(this.data.newBeer);
   }
 }
 

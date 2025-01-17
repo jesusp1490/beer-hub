@@ -39,7 +39,6 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSliderModule } from '@angular/material/slider';
 
-
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
 }
@@ -81,7 +80,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AngularFireAuthModule,
     AngularFirestoreModule,
     AppRoutingModule,
-    RouterModule.forRoot([]),
+    RouterModule,
     FormsModule,
     ReactiveFormsModule,
     ProfileModule,
@@ -89,7 +88,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatExpansionModule,
     MatCheckboxModule,
     MatSliderModule,
-    MatButtonModule,
   ],
   exports: [
     BackButtonComponent
@@ -103,3 +101,4 @@ export function HttpLoaderFactory(http: HttpClient) {
   schemas: [CUSTOM_ELEMENTS_SCHEMA] 
 })
 export class AppModule { }
+
