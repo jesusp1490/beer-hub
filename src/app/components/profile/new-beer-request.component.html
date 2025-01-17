@@ -1,0 +1,22 @@
+<div class="new-beer-request-dialog">
+  <h2 mat-dialog-title>Request New Beer</h2>
+  <mat-dialog-content>
+    <form #beerForm="ngForm">
+      <mat-form-field appearance="fill">
+        <mat-label>Beer Name</mat-label>
+        <input matInput type="text" [(ngModel)]="data.newBeer.name" name="beerName" required>
+        <mat-icon matSuffix>local_drink</mat-icon>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Description</mat-label>
+        <textarea matInput [(ngModel)]="data.newBeer.description" name="beerDescription" required></textarea>
+        <mat-icon matSuffix>description</mat-icon>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onNoClick()">Cancel</button>
+    <button mat-raised-button color="primary" [disabled]="!beerForm.form.valid" (click)="onSubmit()">Submit Request</button>
+  </mat-dialog-actions>
+</div>
+

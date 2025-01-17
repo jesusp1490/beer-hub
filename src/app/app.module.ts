@@ -38,6 +38,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSliderModule } from '@angular/material/slider';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -56,7 +57,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     // AboutComponent,
     // ContactComponent,
     // SignUpComponent,
-    // LogInComponent
+    // LogInComponent,
+    ForgotPasswordComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,62 @@
+@import '../../../styles/variables';
+
+.new-beer-request-dialog {
+    background-color: $color-card-background;
+    color: $color-text-light;
+    font-family: $font-family-primary;
+    border-radius: $border-radius;
+    padding: $spacing-large;
+
+    h2 {
+        font-size: $font-size-large;
+        margin-bottom: $spacing-medium;
+        color: $color-primary;
+    }
+
+    mat-form-field {
+        width: 100%;
+        margin-bottom: $spacing-medium;
+    }
+
+    .mat-mdc-form-field {
+        --mdc-filled-text-field-container-color: #{$color-card-background};
+        --mdc-filled-text-field-focus-active-indicator-color: #{$color-primary};
+        --mdc-filled-text-field-focus-label-text-color: #{$color-primary};
+        --mdc-filled-text-field-label-text-color: #{$color-text-secondary};
+        --mdc-filled-text-field-input-text-color: #{$color-text-light};
+    }
+
+    textarea {
+        min-height: 100px;
+    }
+
+    .mat-mdc-dialog-actions {
+        justify-content: flex-end;
+        padding-top: $spacing-medium;
+    }
+
+    button {
+        font-size: $font-size-base;
+        padding: $spacing-small $spacing-medium;
+
+        &.mat-mdc-raised-button.mat-primary {
+            background-color: $color-primary;
+            color: $color-background-dark;
+
+            &:hover:not(:disabled) {
+                background-color: $color-secondary;
+            }
+        }
+
+        &:disabled {
+            background-color: $color-tag-background;
+            color: $color-text-secondary;
+        }
+    }
+}
+
+@include phone {
+    .new-beer-request-dialog {
+        padding: $spacing-medium;
+    }
+}
