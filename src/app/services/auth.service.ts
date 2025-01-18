@@ -144,14 +144,14 @@ export class AuthService {
     if (!user) return;
 
     const userRef: AngularFirestoreDocument<firebase.User> = this.firestore.doc(`users/${user.uid}`);
-    const userData = {
+    const userData = this.sanitizeUserData({
       uid: user.uid,
       email: user.email,
       displayName: user.displayName,
       photoURL: user.photoURL,
       emailVerified: user.emailVerified,
       ...additionalData
-    };
+    });
 
     // If the user signed in with Google and has a profile picture, store it separately
     if (user.providerData[0]?.providerId === 'google.com' && user.photoURL) {

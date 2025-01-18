@@ -1,3 +1,5 @@
+import { Timestamp } from '@angular/fire/firestore';
+
 export interface Ingredient {
   name: string;
   ingImageUrl: string;
@@ -21,5 +23,10 @@ export interface Beer {
   rating?: { [userId: string]: number };
   addedDate?: string;
   web: string;
+}
+
+export interface RatedBeer extends Omit<Beer, 'rating'> {
+  rating: number;
+  ratedAt: Timestamp;
 }
 

@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Observable, Subject, of } from 'rxjs';
+import { takeUntil, switchMap, map, catchError } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import firebase from 'firebase/compat/app';
@@ -12,6 +12,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { Timestamp } from '@angular/fire/firestore';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NewBeerRequestComponent } from './new-beer-request.component';
+import { BeerService } from '../../services/beer.service';
+import { Beer, RatedBeer } from '../beers/beers.interface';
 
 interface UserProfile {
   country: string;
@@ -29,6 +31,7 @@ interface FavoriteBeer {
   id: string;
   name: string;
 }
+
 
 @Component({
   selector: 'app-profile',
@@ -52,6 +55,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   user: firebase.User | null = null;
   newBeer: any = { name: '', description: '' };
   favoriteBeers: FavoriteBeer[] = [];
+  ratedBeers: RatedBeer[] = [];
   private unsubscribe$ = new Subject<void>();
   isLoading: boolean = false;
   isEditMode: boolean = false;
@@ -64,7 +68,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private beerService: BeerService
   ) {
     this.editForm = this.fb.group({
       firstName: ['', Validators.required],
@@ -79,8 +84,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe(user => {
       this.user = user;
       if (user) {
+        console.log('User authenticated:', user.uid);
         this.loadUserProfile(user.uid);
         this.loadFavoriteBeers(user.uid);
+        this.loadRatedBeers(user.uid);
+      } else {
+        console.log('No authenticated user');
       }
     });
   }
@@ -103,14 +112,107 @@ export class ProfileComponent implements OnInit, OnDestroy {
             country: profile.country,
             dob: profile.dob ? profile.dob.toDate() : null
           });
-          console.log('Loaded user profile:', this.userProfile);
-        } else {
-          console.log('No user profile found');
         }
       }, error => {
         console.error('Error loading user profile:', error);
       });
   }
+
+  private loadFavoriteBeers(userId: string): void {
+    this.firestore.collection(`users/${userId}/favorites`)
+      .valueChanges({ idField: 'id' })
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(favorites => {
+        const beerPromises = favorites.map((favorite: any) =>
+          this.firestore.doc(`beers/${favorite.id}`).get().toPromise()
+        );
+
+        Promise.all(beerPromises).then(beers => {
+          this.favoriteBeers = beers.map(beer => {
+            const beerData = beer?.data() as any;
+            return {
+              id: beer?.id || '',
+              name: beerData?.name || '',
+              beerLabelUrl: beerData?.beerLabelUrl || '',
+              beerImageUrl: beerData?.beerImageUrl || ''
+            };
+          });
+        });
+      });
+  }
+
+  private loadRatedBeers(userId: string): void {
+    console.log('Loading rated beers for user:', userId);
+    this.firestore.collection(`users/${userId}/ratings`).get().subscribe(
+      snapshot => {
+        console.log('Raw ratings snapshot:', snapshot);
+        if (snapshot.empty) {
+          console.log('No ratings found in the snapshot');
+        } else {
+          snapshot.docs.forEach(doc => {
+            console.log('Rating document:', doc.id, doc.data());
+          });
+        }
+      },
+      error => {
+        console.error('Error fetching ratings:', error);
+      }
+    );
+
+    this.firestore.collection(`users/${userId}/ratings`, ref => ref.orderBy('ratedAt', 'desc'))
+    .snapshotChanges()
+    .pipe(
+      takeUntil(this.unsubscribe$),
+      switchMap(actions => {
+        console.log('Ratings snapshot:', actions);
+        const ratingData = actions.map(a => {
+          const data = a.payload.doc.data() as { beerId: string; rating: number; ratedAt: Timestamp };
+          const id = a.payload.doc.id;
+          return { id, ...data };
+        });
+        console.log('Mapped rating data:', ratingData);
+
+        if (ratingData.length === 0) {
+          console.log('No ratings found for user');
+          return of([]);
+        }
+
+        const beerIds = ratingData.map(rating => rating.beerId);
+        console.log('Beer IDs to fetch:', beerIds);
+        return this.beerService.getBeers().pipe(
+          map(beers => {
+            console.log('All beers:', beers);
+            return ratingData.map(rating => {
+              const beer = beers.find(b => b.id === rating.beerId);
+              console.log(`Beer found for ID ${rating.beerId}:`, beer);
+              if (beer) {
+                return {
+                  ...beer,
+                  rating: rating.rating,
+                  ratedAt: rating.ratedAt
+                } as RatedBeer;
+              }
+              return null;
+            }).filter((beer): beer is RatedBeer => beer !== null);
+          })
+        );
+      }),
+      catchError(error => {
+        console.error('Error loading rated beers:', error);
+        this.snackBar.open('Error loading rated beers. Please try again.', 'Close', { duration: 5000 });
+        return of([]);
+      })
+    )
+    .subscribe(
+      ratedBeers => {
+        this.ratedBeers = ratedBeers;
+        console.log('Rated beers loaded:', this.ratedBeers);
+      },
+      error => {
+        console.error('Error in rated beers subscription:', error);
+      }
+    );
+}
 
   formatDate(timestamp: Timestamp | null): string {
     if (timestamp instanceof Timestamp) {
@@ -157,29 +259,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
   }
 
-  private loadFavoriteBeers(userId: string): void {
-    this.firestore.collection(`users/${userId}/favorites`)
-      .valueChanges({ idField: 'id' })
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(favorites => {
-        const beerPromises = favorites.map((favorite: any) =>
-          this.firestore.doc(`beers/${favorite.id}`).get().toPromise()
-        );
-
-        Promise.all(beerPromises).then(beers => {
-          this.favoriteBeers = beers.map(beer => {
-            const beerData = beer?.data() as any;
-            return {
-              id: beer?.id || '',
-              name: beerData.name,
-              beerLabelUrl: beerData.beerLabelUrl,
-              beerImageUrl: beerData.beerImageUrl || ''
-            };
-          });
-        });
-      });
-  }
-
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
@@ -198,7 +277,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
         await userProfilePicRef.put(this.selectedFile);
         const photoURL = await userProfilePicRef.getDownloadURL();
         await this.user.updateProfile({ photoURL });
-        await this.firestore.doc(`users/${this.user.uid}`).update({ 
+        await this.firestore.doc(`users/${this.user.uid}`).update({
           photoURL: photoURL,
           googlePhotoURL: null // Remove the Google photo URL to use the custom one
         });
@@ -263,7 +342,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       ...newBeer,
       userId: this.user?.uid,
       userEmail: this.user?.email,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      createdAt: Timestamp.now(),
     }).then(() => {
       this.snackBar.open('New beer request submitted!', 'Close', { duration: 3000 });
     }).catch(error => {
@@ -290,6 +369,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   navigateToBeerDetails(beerId: string): void {
     this.router.navigate(['/beer-details', beerId]);
+  }
+
+  ratedBeersExist(): boolean {
+    return this.ratedBeers && this.ratedBeers.length > 0;
   }
 }
 

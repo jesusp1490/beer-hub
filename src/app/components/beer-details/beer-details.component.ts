@@ -9,6 +9,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Subject, forkJoin, EMPTY, of } from 'rxjs';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
+import { BeerService } from '../../services/beer.service';
 
 @Component({
   selector: 'app-beer-details',

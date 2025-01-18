@@ -82,7 +82,7 @@
 
     ::ng-deep {
         .mat-tab-body-wrapper {
-            background-color: blue;
+            background-color: $color-card-background;
             border-radius: 0 0 8px 8px;
         }
 
@@ -112,7 +112,7 @@
             display: inline-flex;
             align-items: center;
             font-family: $font-family-primary;
-            --mat-tab-header-active-focus-indicator-color: #ff4400;
+            --mat-tab-header-active-focus-indicator-color: $color-primary;
         }
     }
 }
@@ -168,10 +168,10 @@
 
     .mat-mdc-form-field {
         --mdc-filled-text-field-container-color: transparent;
-        --mdc-filled-text-field-focus-active-indicator-color: #ff9100;
-        --mdc-filled-text-field-focus-label-text-color: #ff9100;
-        --mdc-filled-text-field-label-text-color: #e0e0e0;
-        --mdc-filled-text-field-input-text-color: #e0e0e0;
+        --mdc-filled-text-field-focus-active-indicator-color: $color-primary;
+        --mdc-filled-text-field-focus-label-text-color: $color-primary;
+        --mdc-filled-text-field-label-text-color: $color-text-light;
+        --mdc-filled-text-field-input-text-color: $color-text-light;
     }
 
     .mat-mdc-form-field-subscript-wrapper {
@@ -179,7 +179,7 @@
     }
 
     .mat-mdc-icon-button {
-        color: #ff9100;
+        color: $color-primary;
     }
 }
 
@@ -213,6 +213,7 @@
             top: 5px;
             right: 5px;
             background-color: rgba(0, 0, 0, 0.5);
+
             color: white;
 
             &:hover {
@@ -229,6 +230,72 @@
             margin: 0;
             color: $color-text-light;
             font-weight: bold;
+        }
+    }
+}
+
+.rated-beers {
+    .mat-grid-tile {
+        overflow: visible;
+    }
+}
+
+.rated-beer-card {
+    width: 100%;
+    max-width: 200px;
+    background-color: transparent;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+
+    &:hover {
+        transform: scale(1.05);
+    }
+
+    .rated-beer-image-container {
+        position: relative;
+
+        img {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .rating-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: $color-primary;
+            color: $color-text-light;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+
+            .mat-icon {
+                font-size: 16px;
+                width: 16px;
+                height: 16px;
+                margin-right: 4px;
+                color: $color-text-light;
+            }
+        }
+    }
+
+    .mat-card-content {
+        padding: 8px;
+        text-align: center;
+
+        p {
+            margin: 0;
+            color: $color-text-light;
+            font-weight: bold;
+
+            &.rated-date {
+                font-size: 0.8rem;
+                color: $color-text-secondary;
+                font-weight: normal;
+                margin-top: 4px;
+            }
         }
     }
 }
@@ -256,8 +323,8 @@
 
 ::ng-deep .custom-dialog-container {
     .mat-mdc-dialog-container {
-        background-color: #424242;
-        color: #e0e0e0;
+        background-color: $color-card-background;
+        color: $color-text-light;
     }
 
     .mat-mdc-dialog-content {
@@ -270,7 +337,7 @@
     }
 
     .mat-mdc-raised-button.mat-primary {
-        background-color: #ff9100;
+        background-color: $color-primary;
     }
 }
 
@@ -308,7 +375,8 @@ mat-progress-spinner {
         }
     }
 
-    .favorite-beers {
+    .favorite-beers,
+    .rated-beers {
         .mat-grid-list {
             ::ng-deep {
                 .mat-grid-tile {

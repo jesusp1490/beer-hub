@@ -136,6 +136,37 @@
           </mat-grid-list>
         </div>
       </mat-tab>
+
+      <mat-tab label="Rated Beers">
+        <div class="profile-section rated-beers">
+          <ng-container *ngIf="ratedBeersExist(); else noRatedBeers">
+            <p>Debug: {{ ratedBeers.length }} rated beers found</p>
+            <mat-grid-list cols="3" rowHeight="1:1" gutterSize="16px">
+              <mat-grid-tile *ngFor="let beer of ratedBeers">
+                <mat-card class="rated-beer-card" (click)="navigateToBeerDetails(beer.id)">
+                  <div class="rated-beer-image-container">
+                    <img mat-card-image [src]="beer.beerLabelUrl || 'assets/default-beer.png'" alt="{{ beer.name }}">
+                    <div class="rating-badge">
+                      <mat-icon>star</mat-icon>
+                      <span>{{ beer.rating }}</span>
+                    </div>
+                  </div>
+                  <mat-card-content>
+                    <p>{{ beer.name }}</p>
+                    <p class="rated-date">Rated on: {{ formatDate(beer.ratedAt) }}</p>
+                  </mat-card-content>
+                </mat-card>
+              </mat-grid-tile>
+            </mat-grid-list>
+          </ng-container>
+          <ng-template #noRatedBeers>
+            <div class="empty-state">
+              <mat-icon>sentiment_dissatisfied</mat-icon>
+              <p>You haven't rated any beers yet. Start exploring and rating beers!</p>
+            </div>
+          </ng-template>
+        </div>
+      </mat-tab>
     </mat-tab-group>
 
     <div class="profile-actions">
