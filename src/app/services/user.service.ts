@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { Observable, of, from } from 'rxjs';
-import { map, switchMap, catchError } from 'rxjs/operators';
+import { Observable, of, from, combineLatest } from 'rxjs';
+import { map, switchMap, catchError, take } from 'rxjs/operators';
 import { UserProfile, FavoriteBeer, RatedBeer } from '../models/user.model';
 import { AuthService } from './auth.service';
+import { Beer } from '../components/beers/beers.interface';
+import firebase from 'firebase/compat/app';
+import { Timestamp } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
@@ -70,22 +73,49 @@ export class UserService {
   }
 
   getUserFavoriteBeers(): Observable<FavoriteBeer[]> {
-    return this.authService.user$.pipe(
-      switchMap(user => {
-        if (user) {
-          return this.firestore.collection<FavoriteBeer>(`users/${user.uid}/favorites`).valueChanges({ idField: 'id' });
-        } else {
-          return of([]);
-        }
-      })
-    );
-  }
+  return this.authService.user$.pipe(
+    switchMap(user => {
+      if (user) {
+        return this.firestore.collection(`users/${user.uid}/favorites`).valueChanges({ idField: 'id' }).pipe(
+          switchMap((favorites: any[]) => {
+            if (favorites.length === 0) {
+              return of([]);
+            }
+            return combineLatest(
+              favorites.map(favorite => 
+                this.firestore.doc<Beer>(`beers/${favorite.id}`).valueChanges().pipe(
+                  map(beer => ({
+                    id: favorite.id,
+                    name: beer?.name || 'Unknown Beer',
+                    beerLabelUrl: beer?.beerLabelUrl || '',
+                    beerImageUrl: beer?.beerImageUrl || ''
+                  }))
+                )
+              )
+            );
+          })
+        );
+      } else {
+        return of([]);
+      }
+    })
+  );
+}
 
   getUserRatedBeers(): Observable<RatedBeer[]> {
     return this.authService.user$.pipe(
       switchMap(user => {
         if (user) {
-          return this.firestore.collection<RatedBeer>(`users/${user.uid}/ratings`, ref => ref.orderBy('ratedAt', 'desc')).valueChanges({ idField: 'id' });
+          return this.firestore.collection<Beer>('beers', ref => ref.where(`rating.${user.uid}`, '>', 0)).valueChanges({ idField: 'id' }).pipe(
+            map(beers => beers.map(beer => ({
+              id: beer.id,
+              name: beer.name,
+              beerLabelUrl: beer.beerLabelUrl,
+              beerImageUrl: beer.beerImageUrl,
+              rating: beer.rating && beer.rating[user.uid] ? beer.rating[user.uid] : 0,
+              ratedAt: Timestamp.now() // Using Firestore Timestamp as we don't have the exact rated date
+            })))
+          );
         } else {
           return of([]);
         }
@@ -97,7 +127,9 @@ export class UserService {
     return this.authService.user$.pipe(
       switchMap(user => {
         if (user) {
-          return from(this.firestore.doc(`users/${user.uid}/favorites/${beerId}`).delete());
+          return from(this.firestore.doc(`users/${user.uid}`).update({
+            [`favorites.${beerId}`]: firebase.firestore.FieldValue.delete()
+          }));
         } else {
           throw new Error('No authenticated user');
         }

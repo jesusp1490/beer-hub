@@ -5,90 +5,95 @@
     justify-content: center;
     align-items: flex-start;
     min-height: 100vh;
-    padding: 2rem;
+    padding: $spacing-large;
     background-color: $color-background-dark;
     font-family: $font-family-primary;
+    color: $color-text-light;
 }
 
 .profile-content {
-    background-color: $color-card-background;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 2rem;
     width: 100%;
     max-width: 800px;
+    background-color: $color-card-background;
+    border-radius: $border-radius;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
 .profile-header {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    margin-bottom: 2rem;
+    padding: $spacing-large;
+    background-color: $color-primary;
+    color: $color-background-dark;
+    border-top-left-radius: $border-radius;
+    border-top-right-radius: $border-radius;
+    opacity: 0.8;
 
-    h1 {
-        margin-left: 1rem;
-        color: $color-text-secondary;
-        font-size: 2rem;
-    }
-}
+    .profile-avatar-container {
+        position: relative;
+        width: 140px;
+        height: 140px;
+        margin-bottom: $spacing-medium;
 
-.profile-avatar-container {
-    position: relative;
-    width: 100px;
-    height: 100px;
+        .profile-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid $color-text-light;
+        }
 
-    .profile-avatar {
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
-    }
+        .custom-file-upload {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background-color: $color-secondary;
+            color: $color-text-light;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
 
-    .custom-file-upload {
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        background-color: $color-primary;
-        color: $color-text-light;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
+            &:hover {
+                background-color: darken($color-secondary, 10%);
+            }
 
-        &:hover {
-            background-color: darken($color-primary, 10%);
+            &:focus {
+                outline: 2px solid $color-primary;
+                outline-offset: 2px;
+            }
+        }
+
+        input[type="file"] {
+            display: none;
         }
     }
 
-    input[type="file"] {
-        display: none;
+    .profile-name {
+        font-size: $font-size-large;
+        font-weight: 600;
+        margin-bottom: $spacing-small;
+        color: $color-text-light;
     }
-}
 
-.mat-mdc-tab-group,
-.mat-mdc-tab-nav-bar {
-    --mat-tab-header-active-focus-indicator-color: $color-hover;
-}
-
-.mat-icon {
-    color: $color-secondary;
+    .profile-username {
+        font-size: $font-size-base;
+        color: $color-text-light;
+    }
 }
 
 .profile-tabs {
-    margin-bottom: 3rem;
+    margin-top: 1rem;
 
     ::ng-deep {
-        .mat-tab-body-wrapper {
-            background-color: $color-card-background;
-            border-radius: 0 0 8px 8px;
-        }
-
-        .mdc-tab__text-label {
-            height: 100px;
-            font-size: 1.2rem;
+        .mat-tab-label {
+            color: $color-primary;
         }
 
         .mat-tab-label-active {
@@ -98,247 +103,168 @@
         .mat-ink-bar {
             background-color: $color-primary;
         }
-
-        .mat-mdc-tab .mdc-tab-indicator__content--underline {
-            border-color: $color-primary;
+        
+        .mdc-tab__text-label{
+            color: $color-text-secondary;
         }
 
         .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
             color: $color-primary;
         }
-
-        .mat-mdc-tab .mdc-tab__text-label {
-            color: $color-text-light;
-            display: inline-flex;
-            align-items: center;
-            font-family: $font-family-primary;
-            --mat-tab-header-active-focus-indicator-color: $color-primary;
-        }
     }
 }
 
-.profile-section {
-    padding: 3rem;
-    margin-top: 20px;
+.profile-info {
+    padding: $spacing-large;
 
-    .list-item-content {
+    .info-item {
         display: flex;
-        flex-direction: column;
-        height: 50%;
-    }
+        align-items: center;
+        margin-bottom: $spacing-medium;
 
-    .info-title {
-        font-family: $font-family-primary;
-        font-weight: bold;
-        font-size: 1.2rem;
-        color: $color-text-light;
-        height: 20px;
-        margin-top: 30px;
-        margin-bottom: 5px;
-
-        .info-icon {
-            margin-bottom: -3px;
-            margin-right: 10px;
-            color: $color-secondary;
-        }
-    }
-
-    .info-p {
-        font-family: $font-family-primary;
-        font-size: 1.2rem;
-        color: $color-text-secondary;
-        height: 45px;
-        margin-left: 45px;
-    }
-}
-
-.password-form {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-
-    .mat-form-field {
-        width: 100%;
-        margin-bottom: 1rem;
-    }
-
-    button {
-        margin-top: 1rem;
-    }
-
-    .mat-mdc-form-field {
-        --mdc-filled-text-field-container-color: transparent;
-        --mdc-filled-text-field-focus-active-indicator-color: $color-primary;
-        --mdc-filled-text-field-focus-label-text-color: $color-primary;
-        --mdc-filled-text-field-label-text-color: $color-text-light;
-        --mdc-filled-text-field-input-text-color: $color-text-light;
-    }
-
-    .mat-mdc-form-field-subscript-wrapper {
-        display: none;
-    }
-
-    .mat-mdc-icon-button {
-        color: $color-primary;
-    }
-}
-
-.favorite-beers {
-    .mat-grid-tile {
-        overflow: visible;
-    }
-}
-
-.favorite-beer-card {
-    width: 100%;
-    max-width: 200px;
-    background-color: transparent;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-
-    &:hover {
-        transform: scale(1.05);
-    }
-
-    .favorite-beer-image-container {
-        position: relative;
-
-        img {
-            height: 200px;
-            object-fit: cover;
-        }
-
-        .delete-button {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background-color: rgba(0, 0, 0, 0.5);
-
-            color: white;
-
-            &:hover {
-                background-color: rgba(255, 0, 0, 0.7);
-            }
-        }
-    }
-
-    .mat-card-content {
-        padding: 8px;
-        text-align: center;
-
-        p {
-            margin: 0;
-            color: $color-text-light;
-            font-weight: bold;
-        }
-    }
-}
-
-.rated-beers {
-    .mat-grid-tile {
-        overflow: visible;
-    }
-}
-
-.rated-beer-card {
-    width: 100%;
-    max-width: 200px;
-    background-color: transparent;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-
-    &:hover {
-        transform: scale(1.05);
-    }
-
-    .rated-beer-image-container {
-        position: relative;
-
-        img {
-            height: 200px;
-            object-fit: cover;
-        }
-
-        .rating-badge {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background-color: $color-primary;
-            color: $color-text-light;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-
-            .mat-icon {
-                font-size: 16px;
-                width: 16px;
-                height: 16px;
-                margin-right: 4px;
-                color: $color-text-light;
-            }
-        }
-    }
-
-    .mat-card-content {
-        padding: 8px;
-        text-align: center;
-
-        p {
-            margin: 0;
-            color: $color-text-light;
-            font-weight: bold;
-
-            &.rated-date {
-                font-size: 0.8rem;
-                color: $color-text-secondary;
-                font-weight: normal;
-                margin-top: 4px;
-            }
+        mat-icon {
+            margin-right: $spacing-small;
+            color: $color-primary;
         }
     }
 }
 
 .profile-actions {
     display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
+    justify-content: center;
+    gap: $spacing-medium;
+    margin-top: $spacing-large;
+    color: red;
+}
 
-    .request-beer-btn,
-    .logout-btn {
-        background-color: darken($color-primary, 10%);
-        color: $color-text-light;
-        font-weight: 600;
+.edit-form,
+.change-password-form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-medium;
+    padding: $spacing-large;
+    font-family: $font-family-primary;
+    color: $color-secondary;
 
-        &:hover {
-            background-color: $color-primary;
+    .form-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    mat-form-field {
+        flex: 1;
+        color: $color-secondary;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: $spacing-medium;
+        margin-top: 1rem;
+    }
+
+    button[type="submit"] {
+        height: 48px;
+        font-size: 1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background-color: #ff9100;
+        color: $color-background-dark;
+        transition: background-color 0.3s ease;
+        position: relative;
+
+        &:hover:not(:disabled) {
+            background-color: darken(#ff9100, 10%);
         }
 
-        .mat-icon {
-            color: $color-text-light;
+        &:disabled {
+            opacity: 0.7;
+        }
+
+        .spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
     }
 }
 
-::ng-deep .custom-dialog-container {
-    .mat-mdc-dialog-container {
-        background-color: $color-card-background;
-        color: $color-text-light;
+.beer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: $spacing-medium;
+    padding: $spacing-large;
+}
+
+.beer-card {
+    background-color: $color-card-background;
+    border-radius: $border-radius;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
 
-    .mat-mdc-dialog-content {
-        max-height: 65vh;
-    }
-
-    .mat-mdc-form-field {
+    img {
         width: 100%;
-        margin-bottom: 15px;
+        height: 200px;
+        object-fit: cover;
     }
 
-    .mat-mdc-raised-button.mat-primary {
-        background-color: $color-primary;
+    .beer-info {
+        padding: $spacing-medium;
+
+        h3 {
+            margin: 0;
+            font-size: $font-size-base;
+            color: $color-text-light;
+        }
+
+        .rating-badge {
+            display: flex;
+            align-items: center;
+            gap: $spacing-small;
+            margin-top: $spacing-small;
+            color: $color-primary;
+
+            mat-icon {
+                font-size: $font-size-base;
+            }
+        }
+
+        .rated-date {
+            font-size: $font-size-small;
+            color: $color-text-secondary;
+            margin-top: $spacing-small;
+        }
     }
+
+    .remove-button {
+        position: absolute;
+        top: $spacing-small;
+        right: $spacing-small;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: $color-text-light;
+
+        &:hover {
+            background-color: rgba(255, 0, 0, 0.7);
+        }
+    }
+}
+
+.profile-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: $spacing-large;
+    background-color: $color-card-background;
+    border-top: 1px solid $color-hover;
+    margin-top: 10px;
 }
 
 mat-progress-spinner {
@@ -348,41 +274,99 @@ mat-progress-spinner {
     transform: translate(-50%, -50%);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .profile-container {
-        padding: 1rem;
+        padding: $spacing-medium;
     }
 
     .profile-content {
-        padding: 1rem;
+        padding: $spacing-medium;
     }
 
-    .profile-header {
+    .beer-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+
+    .profile-actions,
+    .profile-footer {
         flex-direction: column;
-        text-align: center;
-
-        h1 {
-            margin-left: 0;
-            margin-top: 1rem;
-        }
+        gap: $spacing-medium;
     }
 
-    .profile-actions {
-        flex-direction: column;
-
-        button {
-            margin-bottom: 1rem;
+    .edit-form,
+    .change-password-form {
+        .form-row {
+            flex-direction: column;
+            gap: 0;
         }
     }
+}
 
-    .favorite-beers,
-    .rated-beers {
-        .mat-grid-list {
-            ::ng-deep {
-                .mat-grid-tile {
-                    width: 100% !important;
-                }
-            }
-        }
+@media (max-width: 480px) {
+    .profile-content {
+        padding: 1.5rem;
     }
+
+    .profile-name {
+        font-size: 1.75rem;
+    }
+
+    .profile-username {
+        font-size: 0.9rem;
+    }
+}
+
+::ng-deep {
+    .mat-mdc-form-field {
+        --mdc-filled-text-field-container-color: transparent;
+        --mdc-filled-text-field-focus-active-indicator-color: #ff9100;
+        --mdc-filled-text-field-focus-label-text-color: #ff9100;
+        --mdc-filled-text-field-label-text-color: #e0e0e0;
+        --mdc-filled-text-field-input-text-color: #e0e0e0;
+    }
+
+    .mat-mdc-form-field-subscript-wrapper {
+        display: none;
+    }
+
+    .mat-mdc-icon-button {
+        color: #ff9100;
+    }
+
+    .mat-mdc-form-field-focus-overlay {
+        background-color: rgba(255, 145, 0, 0.05);
+    }
+
+    .mdc-text-field--focused:not(.mdc-text-field--disabled) .mdc-floating-label {
+        color: #ff9100;
+    }
+
+    .mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--focused .mdc-notched-outline__leading,
+    .mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--focused .mdc-notched-outline__notch,
+    .mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--focused .mdc-notched-outline__trailing {
+        border-color: #ff9100;
+    }
+}
+
+// Animations
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.profile-header,
+.profile-info,
+.beer-card {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+// Accessibility improvements
+button:focus {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
 }

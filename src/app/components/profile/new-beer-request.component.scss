@@ -18,19 +18,33 @@
         margin-bottom: $spacing-medium;
     }
 
-    .mat-mdc-form-field {
-        --mdc-filled-text-field-container-color: #{$color-card-background};
-        --mdc-filled-text-field-focus-active-indicator-color: #{$color-primary};
-        --mdc-filled-text-field-focus-label-text-color: #{$color-primary};
-        --mdc-filled-text-field-label-text-color: #{$color-text-secondary};
-        --mdc-filled-text-field-input-text-color: #{$color-text-light};
+    ::ng-deep {
+        .mat-form-field-appearance-outline .mat-form-field-outline {
+            color: $color-secondary;
+        }
+
+        .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+            color: $color-secondary;
+        }
+
+        .mat-form-field-appearance-outline .mat-form-field-label {
+            color: $color-text-secondary;
+        }
+
+        .mat-form-field.mat-focused .mat-form-field-label {
+            color: $color-secondary;
+        }
+
+        .mat-input-element {
+            color: $color-text-light;
+        }
     }
 
     textarea {
         min-height: 100px;
     }
 
-    .mat-mdc-dialog-actions {
+    .mat-dialog-actions {
         justify-content: flex-end;
         padding-top: $spacing-medium;
     }
@@ -39,12 +53,12 @@
         font-size: $font-size-base;
         padding: $spacing-small $spacing-medium;
 
-        &.mat-mdc-raised-button.mat-primary {
-            background-color: $color-primary;
-            color: $color-background-dark;
+        &.mat-raised-button.mat-accent {
+            background-color: $color-secondary;
+            color: $color-text-light;
 
             &:hover:not(:disabled) {
-                background-color: $color-secondary;
+                background-color: darken($color-secondary, 10%);
             }
         }
 
@@ -55,7 +69,7 @@
     }
 }
 
-@include phone {
+@media (max-width: $breakpoint-phone) {
     .new-beer-request-dialog {
         padding: $spacing-medium;
     }
