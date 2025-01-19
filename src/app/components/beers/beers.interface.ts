@@ -15,10 +15,11 @@ export interface Beer {
   description: string;
   beerImageUrl: string;
   beerLabelUrl: string;
-  ingredients: { name: string; ingImageUrl: string }[];
+  ingredients: Ingredient[];
   brandId: string;
   countryId: string;
   averageRating?: number;
+  numberOfRatings?: number;
   favoriteUsers?: { [userId: string]: boolean };
   rating?: { [userId: string]: number };
   addedDate?: string;

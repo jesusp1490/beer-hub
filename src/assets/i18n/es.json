@@ -1,0 +1,17 @@
+{
+    "HELLO": "Hola",
+    "WELCOME": "Bienvenido a Beer Hub",
+    "BEER_TYPE": "Tipo de Cerveza",
+    "ABV": "Graduación Alcohólica",
+    "IBU": "Amargor (IBU)",
+    "DESCRIPTION": "Descripción",
+    "INGREDIENTS": "Ingredientes",
+    "VIEW_DETAILS": "Ver Detalles",
+    "FAVORITE": "Favorito",
+    "RATE": "Calificar",
+    "HOME": "Inicio",
+    "PROFILE": "Perfil",
+    "LOGOUT": "Cerrar Sesión",
+    "LOGIN": "Iniciar Sesión",
+    "SIGNUP": "Registrarse"
+}

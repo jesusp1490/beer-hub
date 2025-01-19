@@ -39,6 +39,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSliderModule } from '@angular/material/slider';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { LanguageSwitcherComponent } from './components/language-switcher/language-switcher.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -58,7 +59,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     // ContactComponent,
     // SignUpComponent,
     // LogInComponent,
-    ForgotPasswordComponent
+    ForgotPasswordComponent,
+    LanguageSwitcherComponent,
   ],
   imports: [
     BrowserModule,
@@ -66,6 +68,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     BrowserAnimationsModule,
     HttpClientModule,
     TranslateModule.forRoot({
+      defaultLanguage: 'en',
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,

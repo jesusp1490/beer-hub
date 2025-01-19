@@ -1,0 +1,17 @@
+{
+    "HELLO": "Hello",
+    "WELCOME": "Welcome to Beer Hub",
+    "BEER_TYPE": "Beer Type",
+    "ABV": "ABV",
+    "IBU": "IBU",
+    "DESCRIPTION": "Description",
+    "INGREDIENTS": "Ingredients",
+    "VIEW_DETAILS": "View Details",
+    "FAVORITE": "Favorite",
+    "RATE": "Rate",
+    "HOME": "Home",
+    "PROFILE": "Profile",
+    "LOGOUT": "Logout",
+    "LOGIN": "Login",
+    "SIGNUP": "Sign Up"
+}

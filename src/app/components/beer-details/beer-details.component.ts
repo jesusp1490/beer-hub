@@ -299,3 +299,4 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
     setTimeout(() => this.animationState.stats = true, delay * 10);
   }
 }
+
