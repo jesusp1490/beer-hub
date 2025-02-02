@@ -33,20 +33,24 @@
       <p>No beers found for this brand.</p>
     </div>
 
-    <div *ngIf="!isLoading && beers.length > 0" class="carousel-container">
-      <button *ngIf="beers.length > 1" class="carousel-button left"></button>
-
-      <div class="carousel-track">
-        <div *ngFor="let beer of beers" class="carousel-item">
-          <img [src]="beer.beerImageUrl" alt="{{ beer.name }} image" class="beer-image" (click)="selectBeer(beer.id)" />
+    <div *ngIf="!isLoading && beers.length > 0" class="swiper-container" #swiperContainer>
+      <div class="swiper-wrapper">
+        <div *ngFor="let beer of beers" class="swiper-slide">
+          <div class="beer-card" (click)="selectBeer(beer.id)">
+            <img [src]="beer.beerImageUrl" [alt]="beer.name + ' image'" class="beer-image">
+            <!-- <div class="beer-info">
+              <h3>{{ beer.name }}</h3>
+            </div> -->
+          </div>
         </div>
       </div>
-
-      <button *ngIf="beers.length > 1" class="carousel-button right"></button>
+      <div class="swiper-pagination"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next"></div>
     </div>
 
     <button class="back-button" (click)="goBack()">
-      <i class="fa-solid fa-arrow-left"></i>
+      <i class="fa-solid fa-arrow-left"></i> Back
     </button>
   </div>
 </app-page-layout>

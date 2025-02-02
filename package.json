@@ -34,6 +34,7 @@
     "ngx-slick-carousel": "^17.0.0",
     "rxjs": "~7.8.0",
     "slick-carousel": "^1.8.1",
+    "swiper": "^11.2.2",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"
   },
@@ -47,6 +48,7 @@
     "@types/jquery": "^3.5.30",
     "@types/node": "^22.7.5",
     "@types/slick-carousel": "^1.6.40",
+    "@types/swiper": "^6.0.0",
     "circular-dependency-plugin": "^5.2.2",
     "dotenv": "^16.4.5",
     "jasmine-core": "~5.1.0",

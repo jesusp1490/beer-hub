@@ -1,15 +1,16 @@
-import { Component, Input } from '@angular/core';
-import { Location } from '@angular/common';
+import { Component, Input } from "@angular/core"
+import { Location } from "@angular/common"
 
 @Component({
-  selector: 'app-back-button',
+  selector: "app-back-button",
   template: `
     <button class="back-button" (click)="goBack()">
-      <mat-icon>arrow_back</mat-icon>
+      <span class="material-icons">arrow_back</span>
       {{ text }}
     </button>
   `,
-  styles: [`
+  styles: [
+    `
     .back-button {
       display: flex;
       align-items: center;
@@ -24,17 +25,20 @@ import { Location } from '@angular/common';
     .back-button:hover {
       color: #ff9100;
     }
-    mat-icon {
-      // margin-right: 8px;
+    .material-icons {
+      font-size: 24px;
+      margin-right: 8px;
     }
-  `]
+  `,
+  ],
 })
 export class BackButtonComponent {
-  @Input() text: string = 'Back';
+  @Input() text = "Back"
 
   constructor(private location: Location) {}
 
   goBack(): void {
-    this.location.back();
+    this.location.back()
   }
 }
+

@@ -1,29 +1,27 @@
-import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { BeersComponent } from './beers.component';
-import { RouterModule } from '@angular/router';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BeerDetailsComponent } from '../beer-details/beer-details.component';
-import { SlickCarouselModule } from 'ngx-slick-carousel';
-import { PageLayoutComponent } from '../page-layout/page-layout.component';
-import { BackButtonComponent } from '../back-button/back-button.component';
+import { NgModule } from "@angular/core"
+import { CommonModule } from "@angular/common"
+import { RouterModule } from "@angular/router"
+import { FormsModule, ReactiveFormsModule } from "@angular/forms"
+import { SlickCarouselModule } from "ngx-slick-carousel"
+import { SharedModule } from "../../shared/shared.module"
+
+import { BeersComponent } from "./beers.component"
+import { BeerDetailsComponent } from "../beer-details/beer-details.component"
 
 @NgModule({
-  declarations: [
-    BeersComponent,
-    BeerDetailsComponent,
-  ],
+  declarations: [BeersComponent, BeerDetailsComponent],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     SlickCarouselModule,
+    SharedModule,
     RouterModule.forChild([
-      { path: '', component: BeersComponent },
-      { path: 'country/:country/brands/:brandId/beers/:beerId', component: BeerDetailsComponent }
+      { path: "", component: BeersComponent },
+      { path: "country/:country/brands/:brandId/beers/:beerId", component: BeerDetailsComponent },
     ]),
   ],
-  exports: [BeersComponent],
-  schemas: [NO_ERRORS_SCHEMA]
+  exports: [BeersComponent, BeerDetailsComponent],
 })
-export class BeersModule { }
+export class BeersModule {}
+
