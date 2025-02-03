@@ -134,11 +134,15 @@ export class BeerService {
         switchMap((beer) => {
           if (beer) {
             return this.calculateTotalRatings(beer).pipe(
-              map((totalRatings) => ({
-                ...beer,
-                ratingsCount: totalRatings,
-                averageRating: this.calculateAverageRating(beer, totalRatings),
-              })),
+              switchMap((totalRatings) =>
+                this.calculateAverageRating(beer).pipe(
+                  map((averageRating) => ({
+                    ...beer,
+                    ratingsCount: totalRatings,
+                    averageRating: averageRating,
+                  })),
+                ),
+              ),
             )
           }
           return of(undefined)
@@ -150,8 +154,45 @@ export class BeerService {
       )
   }
 
+  private calculateAverageRating(beer: Beer): Observable<number> {
+    return this.firestore
+      .collection(`beers/${beer.id}/ratings`)
+      .get()
+      .pipe(
+        map((snapshot) => {
+          let totalScore = 0
+          let totalRatings = 0
+
+          // Get ratings from the old format
+          if (beer.rating) {
+            Object.values(beer.rating).forEach((rating) => {
+              if (typeof rating === "number") {
+                totalScore += rating
+                totalRatings++
+              }
+            })
+          }
+
+          // Get ratings from the new format (subcollection)
+          snapshot.docs.forEach((doc) => {
+            const rating = (doc.data() as { rating: number }).rating
+            if (typeof rating === "number") {
+              totalScore += rating
+              totalRatings++
+            }
+          })
+
+          // Calculate final average
+          return totalRatings > 0 ? totalScore / totalRatings : 0
+        }),
+        catchError((error) => {
+          console.error("Error calculating average rating:", error)
+          return of(0)
+        }),
+      )
+  }
+
   private calculateTotalRatings(beer: Beer): Observable<number> {
-    console.log("BeerService: calculateTotalRatings started for beer:", beer.id)
     return this.firestore
       .collection(`beers/${beer.id}/ratings`)
       .get()
@@ -161,61 +202,20 @@ export class BeerService {
           const newRatingUserIds = new Set(snapshot.docs.map((doc) => doc.id))
 
           // Get all user IDs who rated in the old system
-          const oldRatingUserIds = new Set(Object.keys(beer.rating || {}))
+          const oldRatingUserIds = new Set(
+            Object.entries(beer.rating || {})
+              .filter(([_, rating]) => typeof rating === "number")
+              .map(([userId]) => userId),
+          )
 
           // Combine unique user IDs to get total unique ratings
           const uniqueUserIds = new Set([...newRatingUserIds, ...oldRatingUserIds])
-          const totalCount = uniqueUserIds.size
 
-          console.log("BeerService: Total ratings calculated", {
-            newRatingsCount: newRatingUserIds.size,
-            oldRatingsCount: oldRatingUserIds.size,
-            uniqueTotal: totalCount,
-          })
-
-          return totalCount
+          return uniqueUserIds.size
         }),
         catchError((error) => {
-          console.error("BeerService: Error calculating total ratings:", error)
+          console.error("Error calculating total ratings:", error)
           return of(0)
-        }),
-      )
-  }
-
-  private calculateAverageRating(beer: Beer, totalRatings: number): number {
-    let totalScore = 0
-    if (beer.rating) {
-      Object.values(beer.rating).forEach((rating) => {
-        if (typeof rating === "number") {
-          totalScore += rating
-        }
-      })
-    }
-    return totalRatings > 0 ? totalScore / totalRatings : 0
-  }
-
-  getBrandDetails(brandId: string): Observable<Brand | undefined> {
-    return this.firestore
-      .doc<Brand>(`brands/${brandId}`)
-      .valueChanges({ idField: "id" })
-      .pipe(
-        take(1),
-        catchError((error) => {
-          console.error("Error fetching brand details:", error)
-          return of(undefined)
-        }),
-      )
-  }
-
-  getCountryDetails(countryId: string): Observable<Country | undefined> {
-    return this.firestore
-      .doc<Country>(`countries/${countryId}`)
-      .valueChanges({ idField: "id" })
-      .pipe(
-        take(1),
-        catchError((error) => {
-          console.error("Error fetching country details:", error)
-          return of(undefined)
         }),
       )
   }
@@ -252,12 +252,38 @@ export class BeerService {
               ratedAt: firebase.firestore.FieldValue.serverTimestamp(),
             })
 
-            // Recalculate ratings count and average
+            // Recalculate total ratings and average
             const ratingsSnapshot = await this.firestore.collection(`beers/${beerId}/ratings`).get().toPromise()
 
-            const ratings = ratingsSnapshot?.docs.map((doc) => (doc.data() as any).rating) || []
-            const ratingsCount = ratings.length
-            const averageRating = ratingsCount > 0 ? ratings.reduce((sum, r) => sum + r, 0) / ratingsCount : 0
+            const newRatingUserIds = new Set(ratingsSnapshot?.docs.map((doc) => doc.id) ?? [])
+            const oldRatingUserIds = new Set(
+              Object.entries(oldRatings)
+                .filter(([_, r]) => typeof r === "number")
+                .map(([uid]) => uid),
+            )
+
+            const uniqueUserIds = new Set([...newRatingUserIds, ...oldRatingUserIds])
+            const ratingsCount = uniqueUserIds.size
+
+            // Calculate total score from both old and new ratings
+            let totalScore = 0
+
+            // Add scores from old ratings
+            Object.entries(oldRatings).forEach(([uid, r]) => {
+              if (typeof r === "number" && !newRatingUserIds.has(uid)) {
+                totalScore += r
+              }
+            })
+
+            // Add scores from new ratings
+            ratingsSnapshot?.docs.forEach((doc) => {
+              const r = (doc.data() as { rating: number }).rating
+              if (typeof r === "number") {
+                totalScore += r
+              }
+            })
+
+            const averageRating = ratingsCount > 0 ? totalScore / ratingsCount : 0
 
             transaction.update(beerRef, {
               averageRating,
@@ -420,20 +446,49 @@ export class BeerService {
     )
   }
 
+  getBrandDetails(brandId: string): Observable<Brand | undefined> {
+    return this.firestore
+      .doc<Brand>(`brands/${brandId}`)
+      .valueChanges({ idField: "id" })
+      .pipe(
+        take(1),
+        catchError((error) => {
+          console.error("Error fetching brand details:", error)
+          return of(undefined)
+        }),
+      )
+  }
+
+  getCountryDetails(countryId: string): Observable<Country | undefined> {
+    return this.firestore
+      .doc<Country>(`countries/${countryId}`)
+      .valueChanges({ idField: "id" })
+      .pipe(
+        take(1),
+        catchError((error) => {
+          console.error("Error fetching country details:", error)
+          return of(undefined)
+        }),
+      )
+  }
+
   initializeRatingsCount(): Observable<void> {
     return this.getBeers().pipe(
       switchMap((beers) => {
         const updates = beers.map((beer) => {
           return this.calculateTotalRatings(beer).pipe(
-            switchMap((totalRatings) => {
-              const averageRating = this.calculateAverageRating(beer, totalRatings)
-              return from(
-                this.firestore.doc(`beers/${beer.id}`).update({
-                  ratingsCount: totalRatings,
-                  averageRating: averageRating,
-                }),
-              )
-            }),
+            switchMap((totalRatings) =>
+              this.calculateAverageRating(beer).pipe(
+                switchMap((averageRating) =>
+                  from(
+                    this.firestore.doc(`beers/${beer.id}`).update({
+                      ratingsCount: totalRatings,
+                      averageRating: averageRating,
+                    }),
+                  ),
+                ),
+              ),
+            ),
           )
         })
         return forkJoin(updates)
@@ -444,12 +499,11 @@ export class BeerService {
 
   getRatingsCount(beerId: string): Observable<number> {
     return this.firestore
-      .doc(`ratings/${beerId}`)
+      .doc(`beers/${beerId}`)
       .valueChanges()
       .pipe(
         map((data: any) => {
-          if (!data || !data.ratings) return 0
-          return Object.keys(data.ratings).length
+          return data?.ratingsCount || 0
         }),
         catchError((error) => {
           console.error("Error fetching ratings count:", error)
@@ -553,11 +607,15 @@ export class BeerService {
       switchMap((beers) => {
         const beerObservables = beers.map((beer) =>
           this.calculateTotalRatings(beer).pipe(
-            map((totalRatings) => ({
-              ...beer,
-              ratingsCount: totalRatings,
-              averageRating: this.calculateAverageRating(beer, totalRatings),
-            })),
+            switchMap((totalRatings) =>
+              this.calculateAverageRating(beer).pipe(
+                map((averageRating) => ({
+                  ...beer,
+                  ratingsCount: totalRatings,
+                  averageRating: averageRating,
+                })),
+              ),
+            ),
           ),
         )
         return forkJoin(beerObservables)
@@ -638,3 +696,4 @@ export class BeerService {
     )
   }
 }
+
