@@ -38,6 +38,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private fb: FormBuilder,
   ) {
+    this.userProfile$ = new Observable<UserProfile | null>()
+    this.favoriteBeers$ = new Observable<FavoriteBeer[]>()
+    this.ratedBeers$ = new Observable<RatedBeer[]>()
     this.editForm = this.fb.group({
       firstName: ["", Validators.required],
       lastName: ["", Validators.required],
@@ -45,7 +48,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
       country: [""],
       dob: [null],
     })
-
     this.changePasswordForm = this.fb.group(
       {
         currentPassword: ["", Validators.required],
@@ -54,20 +56,28 @@ export class ProfileComponent implements OnInit, OnDestroy {
       },
       { validator: this.passwordMatchValidator },
     )
-
-    this.userProfile$ = this.userService.getCurrentUserProfile()
-    this.favoriteBeers$ = this.userService.getUserFavoriteBeers()
-    this.ratedBeers$ = this.userService.getUserRatedBeers()
   }
 
   ngOnInit(): void {
     this.authService.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user) => {
       if (user) {
         console.log("User authenticated:", user.uid)
+        this.loadUserData()
       } else {
         console.log("No authenticated user")
       }
     })
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next()
+    this.unsubscribe$.complete()
+  }
+
+  private loadUserData(): void {
+    this.userProfile$ = this.userService.getCurrentUserProfile()
+    this.favoriteBeers$ = this.userService.getUserFavoriteBeers()
+    this.ratedBeers$ = this.userService.getUserRatedBeers()
 
     // Log rated beers for debugging
     this.ratedBeers$.pipe(takeUntil(this.unsubscribe$)).subscribe(
@@ -78,11 +88,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
         console.error("Error fetching rated beers:", error)
       },
     )
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribe$.next()
-    this.unsubscribe$.complete()
   }
 
   toggleEditMode(): void {
@@ -227,10 +232,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
       .subscribe(
         () => {
           this.snackBar.open("Rating removed successfully", "Close", { duration: 3000 })
+          this.loadUserData() // Reload user data after removing rating
         },
         (error: any) => {
           console.error("Error removing rating:", error)
-          this.snackBar.open("Error removing rating. Please try again.", "Close", { duration: 3000 })
+          this.snackBar.open("Error removing rating. Please try again.", "Close", { duration: 5000 })
         },
       )
   }

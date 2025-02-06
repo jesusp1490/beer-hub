@@ -228,6 +228,7 @@ export class BeerService {
         const userId = user.uid
         const beerRef = this.firestore.doc(`beers/${beerId}`).ref
         const userRatingRef = this.firestore.doc(`beers/${beerId}/ratings/${userId}`).ref
+        const userRatingDocRef = this.firestore.doc(`users/${userId}/ratings/${beerId}`).ref
 
         return from(
           this.firestore.firestore.runTransaction(async (transaction) => {
@@ -246,8 +247,15 @@ export class BeerService {
               transaction.update(beerRef, { rating: updatedRating })
             }
 
-            // Add the new rating in the subcollection
+            // Add the new rating in the beer's subcollection
             transaction.set(userRatingRef, {
+              rating,
+              ratedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            })
+
+            // Add the new rating in the user's ratings subcollection
+            transaction.set(userRatingDocRef, {
+              beerId,
               rating,
               ratedAt: firebase.firestore.FieldValue.serverTimestamp(),
             })
@@ -323,7 +331,7 @@ export class BeerService {
           return of(null)
         }
         return this.firestore
-          .doc(`beers/${beerId}/ratings/${user.uid}`)
+          .doc(`users/${user.uid}/ratings/${beerId}`)
           .valueChanges()
           .pipe(
             map((data: any) => data?.rating || null),
@@ -344,6 +352,7 @@ export class BeerService {
         const userId = user.uid
         const beerRef = this.firestore.doc(`beers/${beerId}`).ref
         const userRatingRef = this.firestore.doc(`beers/${beerId}/ratings/${userId}`).ref
+        const userRatingDocRef = this.firestore.doc(`users/${userId}/ratings/${beerId}`).ref
 
         return from(
           this.firestore.firestore.runTransaction(async (transaction) => {
@@ -369,6 +378,7 @@ export class BeerService {
             const newAverageRating = newRatingsCount > 0 ? newTotalScore / newRatingsCount : 0
 
             transaction.delete(userRatingRef)
+            transaction.delete(userRatingDocRef)
             transaction.update(beerRef, {
               averageRating: newAverageRating,
               ratingsCount: newRatingsCount,
