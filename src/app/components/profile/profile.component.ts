@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from "@angular/core"
-import { Observable, Subject } from "rxjs"
-import { takeUntil } from "rxjs/operators"
+import { Observable, Subject, of } from "rxjs"
+import { takeUntil, map, catchError } from "rxjs/operators"
 import { AuthService } from "../../services/auth.service"
 import { UserService } from "../../services/user.service"
 import { BeerService } from "../../services/beer.service"
@@ -10,7 +10,7 @@ import { MatDialog } from "@angular/material/dialog"
 import { Timestamp } from "@angular/fire/firestore"
 import { FormBuilder, FormGroup, Validators } from "@angular/forms"
 import { NewBeerRequestComponent } from "./new-beer-request.component"
-import { UserProfile, FavoriteBeer, RatedBeer } from "../../models/user.model"
+import { UserProfile, FavoriteBeer, RatedBeer, Achievement, UserRank } from "../../models/user.model"
 
 @Component({
   selector: "app-profile",
@@ -21,6 +21,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
   userProfile$: Observable<UserProfile | null>
   favoriteBeers$: Observable<FavoriteBeer[]>
   ratedBeers$: Observable<RatedBeer[]>
+  achievements$: Observable<Achievement[]>
+  userRank$: Observable<UserRank | null>
   editForm: FormGroup
   changePasswordForm: FormGroup
   isLoading = false
@@ -41,6 +43,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.userProfile$ = new Observable<UserProfile | null>()
     this.favoriteBeers$ = new Observable<FavoriteBeer[]>()
     this.ratedBeers$ = new Observable<RatedBeer[]>()
+    this.achievements$ = new Observable<Achievement[]>()
+    this.userRank$ = new Observable<UserRank | null>()
     this.editForm = this.fb.group({
       firstName: ["", Validators.required],
       lastName: ["", Validators.required],
@@ -62,9 +66,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.authService.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user) => {
       if (user) {
         console.log("User authenticated:", user.uid)
-        this.loadUserData()
+        this.loadUserData(user.uid)
       } else {
         console.log("No authenticated user")
+        this.router.navigate(["/login"])
       }
     })
   }
@@ -74,20 +79,18 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete()
   }
 
-  private loadUserData(): void {
-    this.userProfile$ = this.userService.getCurrentUserProfile()
+  private loadUserData(userId: string): void {
+    this.userProfile$ = this.userService.getCurrentUserProfile().pipe(
+      map((profile) => this.initializeUserProfile(profile)),
+      catchError((error) => {
+        console.error("Error loading user data:", error)
+        return of(null)
+      }),
+    )
     this.favoriteBeers$ = this.userService.getUserFavoriteBeers()
     this.ratedBeers$ = this.userService.getUserRatedBeers()
-
-    // Log rated beers for debugging
-    this.ratedBeers$.pipe(takeUntil(this.unsubscribe$)).subscribe(
-      (ratedBeers) => {
-        console.log("Rated beers:", ratedBeers)
-      },
-      (error) => {
-        console.error("Error fetching rated beers:", error)
-      },
-    )
+    this.achievements$ = this.userService.checkAndUpdateAchievements(userId)
+    this.userRank$ = this.userService.updateUserRank(userId)
   }
 
   toggleEditMode(): void {
@@ -232,7 +235,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
       .subscribe(
         () => {
           this.snackBar.open("Rating removed successfully", "Close", { duration: 3000 })
-          this.loadUserData() // Reload user data after removing rating
+          this.authService.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user) => {
+            if (user) {
+              this.loadUserData(user.uid)
+            }
+          })
         },
         (error: any) => {
           console.error("Error removing rating:", error)
@@ -249,12 +256,26 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.navigateToBeerDetails(beerId)
   }
 
-  formatDate(timestamp: Timestamp | null): string {
+  formatDate(timestamp: Timestamp | null | undefined): string {
     if (timestamp instanceof Timestamp) {
       const date = timestamp.toDate()
       return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
     }
     return "Date not available"
+  }
+
+  calculateDaysSinceRegistration(registrationDate: Timestamp | null | undefined): number {
+    if (!registrationDate) return 0
+    const now = new Date()
+    const regDate = registrationDate.toDate()
+    const diffTime = Math.abs(now.getTime() - regDate.getTime())
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  }
+
+  calculateRankProgress(points: number | undefined, rank: UserRank | null): number {
+    if (!points || !rank) return 0
+    const progress = ((points - rank.minPoints) / (rank.maxPoints - rank.minPoints)) * 100
+    return Math.min(Math.max(progress, 0), 100) // Ensure the value is between 0 and 100
   }
 
   private resetForm(): void {
@@ -277,6 +298,52 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return newPassword && confirmPassword && newPassword.value === confirmPassword.value
       ? null
       : { passwordMismatch: true }
+  }
+
+  private initializeUserProfile(profile: UserProfile | null): UserProfile {
+    const defaultProfile: UserProfile = {
+      uid: "",
+      email: "",
+      displayName: "",
+      photoURL: "",
+      firstName: "",
+      lastName: "",
+      username: "",
+      country: "",
+      dob: null,
+      statistics: {
+        totalBeersRated: 0,
+        countriesExplored: [],
+        beerTypeStats: {},
+        mostActiveDay: { date: "", count: 0 },
+        registrationDate: Timestamp.now(),
+        points: 0,
+      },
+      rank: {
+        id: "",
+        name: "Novice",
+        icon: "🍺",
+        minPoints: 0,
+        maxPoints: 100,
+        level: 1,
+      },
+      achievements: [],
+    }
+
+    if (!profile) {
+      return defaultProfile
+    }
+
+    return {
+      ...defaultProfile,
+      ...profile,
+      statistics: {
+        ...defaultProfile.statistics,
+        ...(profile.statistics || {}),
+      },
+      rank: profile.rank || defaultProfile.rank,
+      achievements: profile.achievements || [],
+    }
   }
 }
 

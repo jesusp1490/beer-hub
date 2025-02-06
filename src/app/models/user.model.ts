@@ -10,6 +10,39 @@ export interface UserProfile {
   username: string
   country: string
   dob: Timestamp | null
+  statistics: UserStatistics
+  achievements: Achievement[]
+  rank: UserRank
+}
+
+export interface UserStatistics {
+  totalBeersRated: number
+  countriesExplored: string[]
+  beerTypeStats: { [key: string]: number }
+  mostActiveDay: {
+    date: string
+    count: number
+  }
+  registrationDate: Timestamp
+  points: number
+}
+
+export interface Achievement {
+  id: string
+  name: string
+  description: string
+  icon: string
+  unlockedAt?: Timestamp
+  category: "beginner" | "intermediate" | "advanced"
+}
+
+export interface UserRank {
+  id: string
+  name: string
+  icon: string
+  minPoints: number
+  maxPoints: number
+  level: number
 }
 
 export interface FavoriteBeer {
@@ -26,5 +59,7 @@ export interface RatedBeer {
   beerImageUrl: string
   rating: number
   ratedAt: Timestamp
+  country: string
+  beerType: string
 }
 
