@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from "@angular/core"
-import { Observable, Subject, of } from "rxjs"
-import { takeUntil, switchMap, map } from "rxjs/operators"
+import { Observable, Subject, combineLatest } from "rxjs"
+import { takeUntil, map } from "rxjs/operators"
 import { AuthService } from "../../services/auth.service"
 import { UserService } from "../../services/user.service"
 import { BeerService } from "../../services/beer.service"
@@ -71,48 +71,34 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete()
   }
 
-  private initializeForms(): void {
-    this.editForm = this.fb.group({
-      firstName: ["", Validators.required],
-      lastName: ["", Validators.required],
-      username: ["", Validators.required],
-      country: [""],
-      dob: [null],
-    })
-
-    this.changePasswordForm = this.fb.group(
-      {
-        currentPassword: ["", Validators.required],
-        newPassword: ["", [Validators.required, Validators.minLength(8)]],
-        confirmPassword: ["", Validators.required],
-      },
-      { validator: this.passwordMatchValidator },
-    )
-  }
-
   private loadUserData(): void {
     this.authService.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user) => {
       if (user) {
-        this.userProfile$ = this.userService.getCurrentUserProfile().pipe(
-          switchMap((profile) => {
+        this.userProfile$ = combineLatest([
+          this.userService.getCurrentUserProfile(),
+          this.userService.getUserRatedBeers(),
+          this.userService.checkAndUpdateAchievements(user.uid),
+          this.userService.updateUserRank(user.uid),
+        ]).pipe(
+          map(([profile, ratedBeers, achievements, rank]) => {
             if (profile) {
-              return this.userService.getUserRatedBeers().pipe(
-                map((ratedBeers) => ({
-                  ...profile,
-                  statistics: {
-                    ...profile.statistics,
-                    totalBeersRated: ratedBeers.length,
-                  },
-                })),
-              )
+              return {
+                ...profile,
+                statistics: {
+                  ...profile.statistics,
+                  totalBeersRated: ratedBeers.length,
+                },
+                achievements: achievements,
+                rank: rank,
+              }
             }
-            return of(null)
+            return null
           }),
         )
+
         this.favoriteBeers$ = this.userService.getUserFavoriteBeers()
         this.ratedBeers$ = this.userService.getUserRatedBeers()
         this.achievements$ = this.userService.checkAndUpdateAchievements(user.uid)
-        this.userRank$ = this.userService.updateUserRank(user.uid)
       } else {
         this.router.navigate(["/login"])
       }
@@ -163,20 +149,18 @@ export class ProfileComponent implements OnInit, OnDestroy {
   changePassword(): void {
     if (this.changePasswordForm.valid) {
       this.isLoading = true
-      const { newPassword } = this.changePasswordForm.value
+      const { currentPassword, newPassword } = this.changePasswordForm.value
       this.authService
-        .updatePassword(newPassword)
-        .then(
-          () => {
-            this.isChangePasswordMode = false
-            this.snackBar.open("Password updated successfully!", "Close", { duration: 3000 })
-            this.changePasswordForm.reset()
-          },
-          (error: any) => {
-            console.error("Error updating password:", error)
-            this.snackBar.open(`Error updating password: ${error.message}`, "Close", { duration: 3000 })
-          },
-        )
+        .changePassword(currentPassword, newPassword)
+        .then(() => {
+          this.isChangePasswordMode = false
+          this.snackBar.open("Password updated successfully!", "Close", { duration: 3000 })
+          this.changePasswordForm.reset()
+        })
+        .catch((error: any) => {
+          console.error("Error updating password:", error)
+          this.snackBar.open(`Error updating password: ${error.message}`, "Close", { duration: 3000 })
+        })
         .finally(() => {
           this.isLoading = false
         })
@@ -246,6 +230,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       .subscribe(
         () => {
           this.snackBar.open("Favorite beer removed successfully", "Close", { duration: 3000 })
+          this.loadUserData()
         },
         (error: any) => {
           console.error("Error removing favorite beer:", error)
@@ -261,11 +246,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       .subscribe(
         () => {
           this.snackBar.open("Rating removed successfully", "Close", { duration: 3000 })
-          this.authService.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user) => {
-            if (user) {
-              this.loadUserData()
-            }
-          })
+          this.loadUserData()
         },
         (error: any) => {
           console.error("Error removing rating:", error)

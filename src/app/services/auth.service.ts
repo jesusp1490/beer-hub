@@ -243,6 +243,18 @@ export class AuthService {
     }
   }
 
+  changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    return this.afAuth.currentUser.then((user) => {
+      if (!user) {
+        throw new Error("No authenticated user")
+      }
+      const credential = firebase.auth.EmailAuthProvider.credential(user.email!, currentPassword)
+      return user.reauthenticateWithCredential(credential).then(() => {
+        return user.updatePassword(newPassword)
+      })
+    })
+  }
+
   async updateEmail(newEmail: string): Promise<void> {
     const user = await this.afAuth.currentUser
     if (user) {
