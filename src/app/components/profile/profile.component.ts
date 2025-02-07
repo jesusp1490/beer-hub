@@ -285,6 +285,27 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return Math.min(Math.max(progress, 0), 100) // Ensure the value is between 0 and 100
   }
 
+  getRankGradient(rank: UserRank | null): string {
+    if (!rank) return "radial-gradient(circle, #4a4a4a, #2a2a2a)"
+
+    const gradients: Record<string, string> = {
+      "novice": "radial-gradient(circle, #a67c52, #8b4513)",
+      "beer recruit": "radial-gradient(circle, #5f9ea0, #2f4f4f)",
+      "hop private": "radial-gradient(circle, #228b22, #006400)",
+      "malt corporal": "radial-gradient(circle, #b22222, #8b0000)",
+      "ale sergeant": "radial-gradient(circle, #6a5acd, #4b0082)",
+      "lager lieutenant": "radial-gradient(circle, #4169e1, #00008b)",
+      "stout captain": "radial-gradient(circle, #708090, #2f4f4f)",
+      "porter colonel": "radial-gradient(circle, #a52a2a, #800000)",
+      "imperial general": "radial-gradient(circle, #9932cc, #4a0e4e)",
+      "grand brewmaster": "radial-gradient(circle, #ffd700, #daa520)",
+    }
+
+    return gradients[rank.name.toLowerCase()] || "radial-gradient(circle, #4a4a4a, #2a2a2a)"
+  }
+
+
+
   private resetForm(): void {
     this.userProfile$.pipe(takeUntil(this.unsubscribe$)).subscribe((profile) => {
       if (profile) {

@@ -3,7 +3,10 @@
     <ng-container *ngIf="userProfile$ | async as userProfile">
       <div class="profile-header">
         <div class="profile-avatar-container">
-          <img [src]="userProfile.photoURL || 'assets/user-baseImg.png'" alt="Profile Picture" class="profile-avatar">
+          <img [src]="userProfile.photoURL || 'assets/user-baseImg.png'" 
+               alt="Profile Picture" 
+               class="profile-avatar"
+               [style.background-image]="getRankGradient(userProfile.rank)">
           <label for="file-upload" class="custom-file-upload">
             <mat-icon>camera_alt</mat-icon>
           </label>
@@ -164,8 +167,6 @@ a
             <img [src]="beer.beerLabelUrl" [alt]="beer.name">
             <div class="beer-info">
               <h3>{{beer.name}}</h3>
-              <!-- <p>{{beer.brewery}}</p> -->
-              <!-- Remove the rating display for favorite beers -->
             </div>
             <button mat-icon-button class="remove-button" (click)="removeFavoriteBeer(beer.id)">
               <mat-icon>close</mat-icon>

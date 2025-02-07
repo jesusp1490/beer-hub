@@ -40,7 +40,10 @@
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            border: 4px solid $color-text-light;
+            border: 4px solid transparent;
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            padding: 8px; 
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease;
 
@@ -87,18 +90,11 @@
 }
 
 .profile-tabs {
-    background-color: $color-card-background;
+    margin-top: 1rem;
 
     ::ng-deep {
         .mat-tab-label {
-            color: $color-text-secondary;
-            font-weight: 500;
-            opacity: 1;
-            transition: color 0.3s ease;
-
-            &:hover {
-                color: $color-text-light;
-            }
+            color: $color-primary;
         }
 
         .mat-tab-label-active {
@@ -107,6 +103,14 @@
 
         .mat-ink-bar {
             background-color: $color-primary;
+        }
+
+        .mdc-tab__text-label {
+            color: $color-text-secondary;
+        }
+
+        .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+            color: $color-primary;
         }
     }
 }
@@ -247,11 +251,18 @@
     }
 
     .rank-card {
-        background-color: rgba($color-secondary, 0.1);
-        border-radius: $border-radius;
+        // border-radius: 50%; // Make the rank card circular
+        // width: 700px; // Set a fixed width
+        // height: 200px; // Set a fixed height
+        margin: 0 auto; // Center the card
         padding: $spacing-medium;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         text-align: center;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        color: $color-text-light;
 
         &:hover {
             transform: translateY(-5px);
@@ -260,17 +271,22 @@
 
         mat-icon {
             font-size: $font-size-large;
-            color: $color-secondary;
             margin-bottom: $spacing-small;
         }
 
         h3 {
-            color: $color-secondary;
             margin-bottom: $spacing-small;
+            font-weight: 600;
+        }
+
+        p {
+            margin: 0;
+            font-size: $font-size-small;
         }
 
         mat-progress-bar {
-            margin: $spacing-medium 0;
+            width: 80%; // Adjust the width of the progress bar
+            margin: $spacing-small 0;
         }
     }
 }
