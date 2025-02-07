@@ -186,7 +186,7 @@
               <mat-icon>{{userProfile.rank.icon}}</mat-icon>
               <h3>{{userProfile.rank.name}}</h3>
               <p>Level {{userProfile.rank.level}}</p>
-              <mat-progress-bar [value]="calculateRankProgress(userProfile.statistics.points || 0, userProfile.rank)"></mat-progress-bar>
+              <mat-progress-bar [value]="calculateRankProgress(userProfile.statistics.points, userProfile.rank)"></mat-progress-bar>
               <p>{{userProfile.statistics.points || 0}} / {{userProfile.rank.maxPoints}} points</p>
             </div>
           </div>

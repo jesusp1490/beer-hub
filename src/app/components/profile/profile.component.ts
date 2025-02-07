@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from "@angular/core"
 import { Observable, Subject, of } from "rxjs"
-import { takeUntil, map, catchError } from "rxjs/operators"
+import { takeUntil, switchMap, map } from "rxjs/operators"
 import { AuthService } from "../../services/auth.service"
 import { UserService } from "../../services/user.service"
 import { BeerService } from "../../services/beer.service"
@@ -63,15 +63,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.authService.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user) => {
-      if (user) {
-        console.log("User authenticated:", user.uid)
-        this.loadUserData(user.uid)
-      } else {
-        console.log("No authenticated user")
-        this.router.navigate(["/login"])
-      }
-    })
+    this.loadUserData()
   }
 
   ngOnDestroy(): void {
@@ -79,18 +71,52 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete()
   }
 
-  private loadUserData(userId: string): void {
-    this.userProfile$ = this.userService.getCurrentUserProfile().pipe(
-      map((profile) => this.initializeUserProfile(profile)),
-      catchError((error) => {
-        console.error("Error loading user data:", error)
-        return of(null)
-      }),
+  private initializeForms(): void {
+    this.editForm = this.fb.group({
+      firstName: ["", Validators.required],
+      lastName: ["", Validators.required],
+      username: ["", Validators.required],
+      country: [""],
+      dob: [null],
+    })
+
+    this.changePasswordForm = this.fb.group(
+      {
+        currentPassword: ["", Validators.required],
+        newPassword: ["", [Validators.required, Validators.minLength(8)]],
+        confirmPassword: ["", Validators.required],
+      },
+      { validator: this.passwordMatchValidator },
     )
-    this.favoriteBeers$ = this.userService.getUserFavoriteBeers()
-    this.ratedBeers$ = this.userService.getUserRatedBeers()
-    this.achievements$ = this.userService.checkAndUpdateAchievements(userId)
-    this.userRank$ = this.userService.updateUserRank(userId)
+  }
+
+  private loadUserData(): void {
+    this.authService.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user) => {
+      if (user) {
+        this.userProfile$ = this.userService.getCurrentUserProfile().pipe(
+          switchMap((profile) => {
+            if (profile) {
+              return this.userService.getUserRatedBeers().pipe(
+                map((ratedBeers) => ({
+                  ...profile,
+                  statistics: {
+                    ...profile.statistics,
+                    totalBeersRated: ratedBeers.length,
+                  },
+                })),
+              )
+            }
+            return of(null)
+          }),
+        )
+        this.favoriteBeers$ = this.userService.getUserFavoriteBeers()
+        this.ratedBeers$ = this.userService.getUserRatedBeers()
+        this.achievements$ = this.userService.checkAndUpdateAchievements(user.uid)
+        this.userRank$ = this.userService.updateUserRank(user.uid)
+      } else {
+        this.router.navigate(["/login"])
+      }
+    })
   }
 
   toggleEditMode(): void {
@@ -237,7 +263,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.snackBar.open("Rating removed successfully", "Close", { duration: 3000 })
           this.authService.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user) => {
             if (user) {
-              this.loadUserData(user.uid)
+              this.loadUserData()
             }
           })
         },

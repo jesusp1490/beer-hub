@@ -55,11 +55,11 @@ export interface FavoriteBeer {
 export interface RatedBeer {
   id: string
   name: string
-  beerLabelUrl: string
-  beerImageUrl: string
   rating: number
   ratedAt: Timestamp
   country: string
   beerType: string
+  beerLabelUrl?: string
+  beerImageUrl?: string
 }
 

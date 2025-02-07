@@ -6,7 +6,9 @@ import { Beer } from "../components/beers/beers.interface"
 import { Brand } from "../components/country/brand.interface"
 import { Country } from "../components/country/country.interface"
 import { AuthService } from "./auth.service"
+import { UserService } from "./user.service"
 import firebase from "firebase/compat/app"
+import { Timestamp } from "@angular/fire/firestore"
 
 interface RatingsData {
   count: number
@@ -28,6 +30,7 @@ export class BeerService {
   constructor(
     private firestore: AngularFirestore,
     private authService: AuthService,
+    private userService: UserService,
   ) {
     this.initializeCache()
   }
@@ -298,22 +301,36 @@ export class BeerService {
               ratingsCount,
             })
 
-            return { averageRating, ratingsCount }
+            return { averageRating, ratingsCount, beerData }
+          }),
+        ).pipe(
+          switchMap(({ beerData }) => {
+            // Update user statistics
+            return this.userService.updateUserStatistics(userId, {
+              id: beerId,
+              name: beerData.name,
+              rating: rating,
+              ratedAt: Timestamp.now(),
+              country: beerData.countryId,
+              beerType: beerData.beerType,
+              beerLabelUrl: beerData.beerLabelUrl,
+              beerImageUrl: beerData.beerImageUrl,
+            })
+          }),
+          tap(() => {
+            // Update the cached beer data
+            const cachedBeers = this.cachedBeers$.value
+            const updatedBeerIndex = cachedBeers.findIndex((beer) => beer.id === beerId)
+            if (updatedBeerIndex !== -1) {
+              cachedBeers[updatedBeerIndex] = {
+                ...cachedBeers[updatedBeerIndex],
+                averageRating: cachedBeers[updatedBeerIndex].averageRating,
+                ratingsCount: (cachedBeers[updatedBeerIndex].ratingsCount || 0) + 1,
+              }
+              this.cachedBeers$.next(cachedBeers)
+            }
           }),
         )
-      }),
-      tap((result) => {
-        // Update the cached beer data
-        const cachedBeers = this.cachedBeers$.value
-        const updatedBeerIndex = cachedBeers.findIndex((beer) => beer.id === beerId)
-        if (updatedBeerIndex !== -1) {
-          cachedBeers[updatedBeerIndex] = {
-            ...cachedBeers[updatedBeerIndex],
-            averageRating: result.averageRating,
-            ratingsCount: result.ratingsCount,
-          }
-          this.cachedBeers$.next(cachedBeers)
-        }
       }),
       map(() => undefined),
       catchError((error) => {

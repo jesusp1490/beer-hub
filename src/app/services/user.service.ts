@@ -5,7 +5,7 @@ import { Observable, of, from, combineLatest, forkJoin } from "rxjs"
 import { map, switchMap, catchError, take } from "rxjs/operators"
 import { AuthService } from "./auth.service"
 import { Beer } from "../components/beers/beers.interface"
-import { UserProfile, FavoriteBeer, RatedBeer, Achievement, UserRank } from "../models/user.model"
+import { UserProfile, FavoriteBeer, RatedBeer, Achievement, UserRank, UserStatistics } from "../models/user.model"
 import { Timestamp } from "@angular/fire/firestore"
 
 @Injectable({
@@ -45,25 +45,10 @@ export class UserService {
                 if (profile) {
                   return {
                     ...profile,
-                    statistics: profile.statistics || {
-                      totalBeersRated: 0,
-                      countriesExplored: [],
-                      beerTypeStats: {},
-                      mostActiveDay: { date: "", count: 0 },
-                      registrationDate: Timestamp.now(),
-                      points: 0,
-                    },
-                    rank: profile.rank || {
-                      id: "",
-                      name: "Novice",
-                      icon: "🍺",
-                      minPoints: 0,
-                      maxPoints: 100,
-                      level: 1,
-                    },
+                    statistics: this.initializeStatistics(profile.statistics),
+                    rank: profile.rank || this.getDefaultRank(),
                   }
                 }
-                // Return null if profile is not found, instead of throwing an error
                 return null
               }),
               catchError((error) => {
@@ -76,6 +61,29 @@ export class UserService {
         }
       }),
     )
+  }
+
+  private initializeStatistics(statistics: UserStatistics | undefined): UserStatistics {
+    const defaultStats: UserStatistics = {
+      totalBeersRated: 0,
+      countriesExplored: [],
+      beerTypeStats: {},
+      mostActiveDay: { date: "", count: 0 },
+      registrationDate: Timestamp.now(),
+      points: 0,
+    }
+    return statistics ? { ...defaultStats, ...statistics } : defaultStats
+  }
+
+  private getDefaultRank(): UserRank {
+    return {
+      id: "novice",
+      name: "Novice",
+      icon: "🍺",
+      minPoints: 0,
+      maxPoints: 100,
+      level: 1,
+    }
   }
 
   updateUser(userId: string, data: Partial<UserProfile>): Promise<void> {
@@ -169,49 +177,34 @@ export class UserService {
         if (!user) {
           return of([])
         }
-        return combineLatest([
-          this.firestore
-            .collection<{ rating: number; ratedAt: Timestamp }>(`users/${user.uid}/ratings`)
-            .valueChanges({ idField: "beerId" }),
-          this.firestore.collection<Beer>("beers").valueChanges({ idField: "id" }),
-        ]).pipe(
-          map(([newRatings, allBeers]) => {
-            const oldRatings = allBeers
-              .filter((beer) => beer.rating && typeof beer.rating === "object" && user.uid in beer.rating)
-              .map((beer) => ({
-                beerId: beer.id,
-                rating: beer.rating && beer.rating[user.uid] ? (beer.rating[user.uid] as number) : 0,
-                ratedAt: null as Timestamp | null,
-              }))
-
-            const combinedRatings = [...newRatings, ...oldRatings]
-
-            return forkJoin(
-              combinedRatings.map((rating) =>
-                this.firestore
-                  .doc<Beer>(`beers/${rating.beerId}`)
-                  .valueChanges()
-                  .pipe(
-                    take(1),
-                    map(
-                      (beer) =>
-                        ({
-                          id: rating.beerId,
-                          name: beer?.name || "Unknown Beer",
-                          beerLabelUrl: beer?.beerLabelUrl || "",
-                          beerImageUrl: beer?.beerImageUrl || "",
-                          rating: rating.rating,
-                          ratedAt: rating.ratedAt,
-                          country: beer?.countryId || "",
-                          beerType: beer?.beerType || "",
-                        }) as RatedBeer,
+        return this.firestore
+          .collection<RatedBeer>(`users/${user.uid}/ratings`)
+          .valueChanges({ idField: "id" })
+          .pipe(
+            switchMap((ratings) => {
+              if (ratings.length === 0) {
+                return of([])
+              }
+              return forkJoin(
+                ratings.map((rating) =>
+                  this.firestore
+                    .doc<Beer>(`beers/${rating.id}`)
+                    .valueChanges()
+                    .pipe(
+                      take(1),
+                      map((beer) => ({
+                        ...rating,
+                        name: beer?.name || "Unknown Beer",
+                        beerLabelUrl: beer?.beerLabelUrl || "",
+                        beerImageUrl: beer?.beerImageUrl || "",
+                        country: beer?.countryId || "",
+                        beerType: beer?.beerType || "",
+                      })),
                     ),
-                  ),
-              ),
-            )
-          }),
-          switchMap((observable) => observable),
-        )
+                ),
+              )
+            }),
+          )
       }),
     )
   }
@@ -235,37 +228,34 @@ export class UserService {
         switchMap((user) => {
           if (!user) throw new Error("User not found")
 
-          const currentStats = user.statistics || {
-            totalBeersRated: 0,
-            countriesExplored: [],
-            beerTypeStats: {},
-            mostActiveDay: { date: "", count: 0 },
-            registrationDate: Timestamp.now(),
-            points: 0,
-          }
-
-          const updatedStats = {
-            ...currentStats,
-            totalBeersRated: (currentStats.totalBeersRated || 0) + 1,
-            countriesExplored: [...new Set([...(currentStats.countriesExplored || []), newRating.country])],
-            beerTypeStats: {
-              ...(currentStats.beerTypeStats || {}),
-              [newRating.beerType]: ((currentStats.beerTypeStats || {})[newRating.beerType] || 0) + 1,
-            },
-            points: this.calculatePoints({ ...user, statistics: currentStats }),
-          }
-
-          // Update most active day if necessary
-          const today = new Date().toISOString().split("T")[0]
-          if (today === updatedStats.mostActiveDay.date) {
-            updatedStats.mostActiveDay.count++
-          } else if (updatedStats.mostActiveDay.count < 1) {
-            updatedStats.mostActiveDay = { date: today, count: 1 }
-          }
+          const updatedStats = this.calculateUpdatedStatistics(user.statistics || {}, newRating)
 
           return from(this.firestore.doc(`users/${userId}`).update({ statistics: updatedStats }))
         }),
       )
+  }
+
+  private calculateUpdatedStatistics(currentStats: UserStatistics, newRating: RatedBeer): UserStatistics {
+    const updatedStats = { ...currentStats }
+    updatedStats.totalBeersRated = (updatedStats.totalBeersRated || 0) + 1
+    updatedStats.countriesExplored = Array.from(new Set([...(updatedStats.countriesExplored || []), newRating.country]))
+    updatedStats.beerTypeStats = {
+      ...(updatedStats.beerTypeStats || {}),
+      [newRating.beerType]: ((updatedStats.beerTypeStats || {})[newRating.beerType] || 0) + 1,
+    }
+
+    // Update most active day
+    const today = new Date().toISOString().split("T")[0]
+    if (today === updatedStats.mostActiveDay?.date) {
+      updatedStats.mostActiveDay.count = (updatedStats.mostActiveDay.count || 0) + 1
+    } else if (!updatedStats.mostActiveDay || (updatedStats.mostActiveDay.count || 0) < 1) {
+      updatedStats.mostActiveDay = { date: today, count: 1 }
+    }
+
+    // Calculate points (1 point per rating)
+    updatedStats.points = (updatedStats.points || 0) + 1
+
+    return updatedStats
   }
 
   checkAndUpdateAchievements(userId: string): Observable<Achievement[]> {
@@ -279,10 +269,10 @@ export class UserService {
 
           const newAchievements: Achievement[] = []
           const currentAchievements = user.achievements || []
-          const currentStats = user.statistics || { totalBeersRated: 0, countriesExplored: [] }
+          const stats = user.statistics || this.initializeStatistics(undefined)
 
           // Check for achievements
-          if (currentStats.totalBeersRated >= 1 && !currentAchievements.some((a) => a.id === "first_rater")) {
+          if (stats.totalBeersRated >= 1 && !currentAchievements.some((a) => a.id === "first_rater")) {
             newAchievements.push({
               id: "first_rater",
               name: "First Rater",
@@ -293,10 +283,7 @@ export class UserService {
             })
           }
 
-          if (
-            currentStats.countriesExplored.length >= 3 &&
-            !currentAchievements.some((a) => a.id === "beer_explorer")
-          ) {
+          if (stats.countriesExplored.length >= 3 && !currentAchievements.some((a) => a.id === "beer_explorer")) {
             newAchievements.push({
               id: "beer_explorer",
               name: "Beer Explorer",
@@ -357,15 +344,13 @@ export class UserService {
           ]
 
           const currentPoints = user.statistics?.points || 0
-          const currentRank = user.rank || ranks[0]
+          const newRank = ranks.find((r) => currentPoints >= r.minPoints && currentPoints <= r.maxPoints) || ranks[0]
 
-          const newRank = ranks.find((r) => currentPoints >= r.minPoints && currentPoints <= r.maxPoints) || currentRank
-
-          if (newRank.id !== currentRank.id) {
+          if (!user.rank || newRank.id !== user.rank.id) {
             return from(this.firestore.doc(`users/${userId}`).update({ rank: newRank })).pipe(map(() => newRank))
           }
 
-          return of(currentRank)
+          return of(user.rank)
         }),
       )
   }
