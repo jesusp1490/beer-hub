@@ -299,11 +299,11 @@ export class UserService {
           if (newAchievements.length > 0) {
             const updatedAchievements = [...currentAchievements, ...newAchievements]
             return from(this.firestore.doc(`users/${userId}`).update({ achievements: updatedAchievements })).pipe(
-              map(() => newAchievements),
+              map(() => updatedAchievements),
             )
           }
 
-          return of([])
+          return of(currentAchievements)
         }),
       )
   }

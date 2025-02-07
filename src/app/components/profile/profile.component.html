@@ -111,6 +111,9 @@
                 <p>{{achievement.description}}</p>
                 <span class="achievement-date">Unlocked: {{formatDate(achievement.unlockedAt)}}</span>
               </div>
+              <div *ngIf="achievements.length === 0" class="no-achievements">
+                <p>No achievements unlocked yet. Keep rating beers to earn achievements!</p>
+              </div>
             </ng-container>
           </div>
         </mat-tab>
