@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, ChangeDetectorRef, } from "@angular/core"
-import { Observable, Subject } from "rxjs"
-import { takeUntil } from "rxjs/operators"
+import { Observable, Subject, BehaviorSubject, combineLatest } from "rxjs"
+import { takeUntil, map } from "rxjs/operators"
 import { AuthService } from "../../services/auth.service"
 import { UserService } from "../../services/user.service"
 import { BeerService } from "../../services/beer.service"
@@ -27,11 +27,12 @@ interface RankDisplay extends UserRank {
 export class ProfileComponent implements OnInit, OnDestroy {
   @ViewChild("rankScroll") rankScroll!: ElementRef<HTMLDivElement>
 
-  userProfile$: Observable<UserProfile | null>
+  private userProfileSubject = new BehaviorSubject<UserProfile | null>(null)
+  userProfile$ = this.userProfileSubject.asObservable()
   favoriteBeers$: Observable<FavoriteBeer[]>
   ratedBeers$: Observable<RatedBeer[]>
   achievements$: Observable<Achievement[]>
-  userRank$: Observable<UserRank | null>
+  userRank$: Observable<UserRank | null> = new Observable<UserRank | null>()
   notifications$: Observable<Notification[]>
   editForm: FormGroup
   changePasswordForm: FormGroup
@@ -169,11 +170,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     private cdr: ChangeDetectorRef,
   ) {
-    this.userProfile$ = this.userService.getCurrentUserProfile()
     this.favoriteBeers$ = new Observable<FavoriteBeer[]>()
     this.ratedBeers$ = new Observable<RatedBeer[]>()
     this.achievements$ = new Observable<Achievement[]>()
-    this.userRank$ = new Observable<UserRank | null>()
     this.notifications$ = this.notificationService.getNotifications()
     this.editForm = this.fb.group({
       firstName: ["", Validators.required],
@@ -209,7 +208,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
           .pipe(takeUntil(this.unsubscribe$))
           .subscribe((profile) => {
             if (profile) {
-              this.userService.updateUserRank(profile.uid).subscribe(() => {
+              this.userProfileSubject.next(profile)
+              this.userService.updateUserRank(profile.uid).subscribe((rank) => {
+                this.userProfileSubject.next({ ...profile, rank })
                 this.cdr.detectChanges()
               })
             }
@@ -218,7 +219,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.favoriteBeers$ = this.userService.getUserFavoriteBeers()
         this.ratedBeers$ = this.userService.getUserRatedBeers()
         this.achievements$ = this.userService.checkAndUpdateAchievements(user.uid)
-        this.userRank$ = this.userService.updateUserRank(user.uid)
+
+        // Combine userProfile$ and userRank$ observables
+        this.userRank$ = combineLatest([this.userProfile$, this.userService.updateUserRank(user.uid)]).pipe(
+          map(([profile, rank]) => rank || profile?.rank || null),
+        )
 
         // Trigger change detection after all observables are set up
         this.cdr.detectChanges()
@@ -496,5 +501,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
     const rankDisplay = this.ranks.find((r) => r.id === rank.id)
     return rankDisplay ? `4px solid ${rankDisplay.borderColor}` : "none"
   }
+
+  safelyGetNestedProperty(obj: any, path: string): any {
+    return path.split(".").reduce((acc, part) => acc && acc[part], obj)
+  }
 }
+
+
 

@@ -154,25 +154,30 @@
             <h2>Your Beer Journey</h2>
             <div class="statistic-item">
               <span>Total Beers Rated:</span>
-              <span>{{ (userProfile$ | async)?.statistics?.totalBeersRated || 0 }}</span>
+              <span>{{ safelyGetNestedProperty(userProfile$ | async, 'statistics.totalBeersRated') || 0 }}</span>
             </div>
             <div class="statistic-item">
               <span>Countries Explored:</span>
-              <span>{{ (userProfile$ | async)?.statistics?.countriesExplored?.length || 0 }}</span>
+              <span>{{ safelyGetNestedProperty(userProfile$ | async, 'statistics.countriesExplored.length') || 0 }}</span>
             </div>
             <div class="statistic-item">
               <span>Most Active Day:</span>
-              <span>{{ (userProfile$ | async)?.statistics?.mostActiveDay?.date || 'N/A' }} ({{ (userProfile$ | async)?.statistics?.mostActiveDay?.count || 0 }} ratings)</span>
+              <span>
+                {{ safelyGetNestedProperty(userProfile$ | async, 'statistics.mostActiveDay.date') || 'N/A' }}
+                ({{ safelyGetNestedProperty(userProfile$ | async, 'statistics.mostActiveDay.count') || 0 }} ratings)
+              </span>
             </div>
             <div class="statistic-item">
               <span>Days Since Registration:</span>
-              <span>{{ calculateDaysSinceRegistration((userProfile$ | async)?.statistics?.registrationDate) }}</span>
+              <span>{{ calculateDaysSinceRegistration(safelyGetNestedProperty(userProfile$ | async, 'statistics.registrationDate')) }}</span>
             </div>
             <h3>Favorite Beer Types</h3>
-            <div *ngFor="let type of ((userProfile$ | async)?.statistics?.beerTypeStats | keyvalue) || []" class="statistic-item">
-              <span>{{ type.key }}:</span>
-              <span>{{ type.value }}</span>
-            </div>
+            <ng-container *ngIf="(userProfile$ | async)?.statistics?.beerTypeStats as beerTypeStats">
+              <div *ngFor="let type of beerTypeStats | keyvalue" class="statistic-item">
+                <span>{{ type.key }}:</span>
+                <span>{{ type.value }}</span>
+              </div>
+            </ng-container>
           </div>
         </ng-template>
       </mat-tab>
@@ -205,11 +210,14 @@
                 <div class="rank-progress">
                   <div class="progress-text">
                     <span>Progress to next rank</span>
-                    <span>{{ (userProfile$ | async)?.statistics?.points || 0 }} / {{ currentRank?.maxPoints === maxInfinity ? '∞' : (currentRank?.maxPoints || 0) }}</span>
+                    <span>
+                      {{ safelyGetNestedProperty(userProfile$ | async, 'statistics.points') || 0 }} /
+                      {{ (userRank$ | async)?.maxPoints === maxInfinity ? '∞' : ((userRank$ | async)?.maxPoints || 0) }}
+                    </span>
                   </div>
                   <mat-progress-bar
                     mode="determinate"
-                    [value]="calculateRankProgress((userProfile$ | async), currentRank)"
+                    [value]="calculateRankProgress((userProfile$ | async), (userRank$ | async))"
                     class="rank-progress-bar">
                   </mat-progress-bar>
                 </div>
