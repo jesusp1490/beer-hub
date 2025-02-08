@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from "@angular/core"
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, ChangeDetectorRef, } from "@angular/core"
 import { Observable, Subject } from "rxjs"
 import { takeUntil } from "rxjs/operators"
 import { AuthService } from "../../services/auth.service"
@@ -13,12 +13,20 @@ import { NewBeerRequestComponent } from "./new-beer-request.component"
 import { UserProfile, FavoriteBeer, RatedBeer, Achievement, UserRank, Notification } from "../../models/user.model"
 import { NotificationService } from "../../services/notification.service"
 
+interface RankDisplay extends UserRank {
+  backgroundColor: string
+  borderColor: string
+  textColor: string
+}
+
 @Component({
   selector: "app-profile",
   templateUrl: "./profile.component.html",
   styleUrls: ["./profile.component.scss"],
 })
 export class ProfileComponent implements OnInit, OnDestroy {
+  @ViewChild("rankScroll") rankScroll!: ElementRef<HTMLDivElement>
+
   userProfile$: Observable<UserProfile | null>
   favoriteBeers$: Observable<FavoriteBeer[]>
   ratedBeers$: Observable<RatedBeer[]>
@@ -33,6 +41,123 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   private unsubscribe$ = new Subject<void>()
 
+  readonly maxInfinity = Number.POSITIVE_INFINITY
+  currentRankPage = 0
+  ranksPerPage = 3
+
+  ranks: RankDisplay[] = [
+    {
+      id: "novice",
+      name: "Novice",
+      icon: "🍺",
+      minPoints: 0,
+      maxPoints: 9,
+      level: 0,
+      backgroundColor: "radial-gradient(circle, #a67c52, #8b4513)",
+      borderColor: "#8b4513",
+      textColor: "#ffffff",
+    },
+    {
+      id: "beer_recruit",
+      name: "Beer Recruit",
+      icon: "🏅",
+      minPoints: 10,
+      maxPoints: 20,
+      level: 1,
+      backgroundColor: "radial-gradient(circle, #5f9ea0, #2f4f4f)",
+      borderColor: "#2f4f4f",
+      textColor: "#ffffff",
+    },
+    {
+      id: "hop_private",
+      name: "Hop Private",
+      icon: "🌿",
+      minPoints: 21,
+      maxPoints: 50,
+      level: 2,
+      backgroundColor: "radial-gradient(circle, #228b22, #006400)",
+      borderColor: "#006400",
+      textColor: "#ffffff",
+    },
+    {
+      id: "malt_corporal",
+      name: "Malt Corporal",
+      icon: "🌾",
+      minPoints: 51,
+      maxPoints: 100,
+      level: 3,
+      backgroundColor: "radial-gradient(circle, #b22222, #8b0000)",
+      borderColor: "#8b0000",
+      textColor: "#ffffff",
+    },
+    {
+      id: "ale_sergeant",
+      name: "Ale Sergeant",
+      icon: "🍺",
+      minPoints: 101,
+      maxPoints: 250,
+      level: 4,
+      backgroundColor: "radial-gradient(circle, #6a5acd, #4b0082)",
+      borderColor: "#4b0082",
+      textColor: "#ffffff",
+    },
+    {
+      id: "lager_lieutenant",
+      name: "Lager Lieutenant",
+      icon: "🍻",
+      minPoints: 251,
+      maxPoints: 500,
+      level: 5,
+      backgroundColor: "radial-gradient(circle, #4169e1, #00008b)",
+      borderColor: "#00008b",
+      textColor: "#ffffff",
+    },
+    {
+      id: "stout_captain",
+      name: "Stout Captain",
+      icon: "🍺",
+      minPoints: 501,
+      maxPoints: 750,
+      level: 6,
+      backgroundColor: "radial-gradient(circle, #708090, #2f4f4f)",
+      borderColor: "#2f4f4f",
+      textColor: "#ffffff",
+    },
+    {
+      id: "porter_colonel",
+      name: "Porter Colonel",
+      icon: "🛢️",
+      minPoints: 751,
+      maxPoints: 1000,
+      level: 7,
+      backgroundColor: "radial-gradient(circle, #a52a2a, #800000)",
+      borderColor: "#800000",
+      textColor: "#ffffff",
+    },
+    {
+      id: "imperial_general",
+      name: "Imperial General",
+      icon: "👑",
+      minPoints: 1001,
+      maxPoints: 2000,
+      level: 8,
+      backgroundColor: "radial-gradient(circle, #9932cc, #4a0e4e)",
+      borderColor: "#4a0e4e",
+      textColor: "#ffffff",
+    },
+    {
+      id: "grand_brewmaster",
+      name: "Grand Brewmaster",
+      icon: "🏆",
+      minPoints: 2001,
+      maxPoints: Number.POSITIVE_INFINITY,
+      level: 9,
+      backgroundColor: "radial-gradient(circle, #ffd700, #daa520)",
+      borderColor: "#daa520",
+      textColor: "#000000",
+    },
+  ]
+
   constructor(
     private authService: AuthService,
     private userService: UserService,
@@ -42,6 +167,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private fb: FormBuilder,
     private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.userProfile$ = this.userService.getCurrentUserProfile()
     this.favoriteBeers$ = new Observable<FavoriteBeer[]>()
@@ -83,7 +209,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
           .pipe(takeUntil(this.unsubscribe$))
           .subscribe((profile) => {
             if (profile) {
-              this.userService.updateUserRank(profile.uid).subscribe()
+              this.userService.updateUserRank(profile.uid).subscribe(() => {
+                this.cdr.detectChanges()
+              })
             }
           })
 
@@ -91,13 +219,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.ratedBeers$ = this.userService.getUserRatedBeers()
         this.achievements$ = this.userService.checkAndUpdateAchievements(user.uid)
         this.userRank$ = this.userService.updateUserRank(user.uid)
+
+        // Trigger change detection after all observables are set up
+        this.cdr.detectChanges()
       } else {
         this.router.navigate(["/login"])
       }
     })
   }
 
-  // Add this method for testing rank changes
   addPointsForTesting(): void {
     const userId = "current-user-id" // Replace with actual user ID
     this.userService.addPointsToUser(userId, 100).then(() => {
@@ -279,10 +409,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   }
 
-  calculateRankProgress(points: number | undefined, rank: UserRank | null): number {
-    if (!points || !rank) return 0
+  calculateRankProgress(userProfile: UserProfile | null, rank: UserRank | null): number {
+    if (!userProfile || !rank || !userProfile.statistics || userProfile.statistics.points === undefined) return 0
+    const points = userProfile.statistics.points
     const progress = ((points - rank.minPoints) / (rank.maxPoints - rank.minPoints)) * 100
-    return Math.min(Math.max(progress, 0), 100) // Ensure the value is between 0 and 100
+    return Math.min(Math.max(progress, 0), 100)
   }
 
   getRankGradient(rank: UserRank | null): string {
@@ -328,6 +459,42 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return newPassword && confirmPassword && newPassword.value === confirmPassword.value
       ? null
       : { passwordMismatch: true }
+  }
+
+  getCurrentRankIndex(currentRank: UserRank | null): number {
+    if (!currentRank) return 0
+    return this.ranks.findIndex((rank) => rank.id === currentRank.id)
+  }
+
+  getVisibleRanks(): RankDisplay[] {
+    const startIndex = this.currentRankPage * this.ranksPerPage
+    return this.ranks.slice(startIndex, startIndex + this.ranksPerPage)
+  }
+
+  nextRankPage(): void {
+    if ((this.currentRankPage + 1) * this.ranksPerPage < this.ranks.length) {
+      this.currentRankPage++
+    }
+  }
+
+  previousRankPage(): void {
+    if (this.currentRankPage > 0) {
+      this.currentRankPage--
+    }
+  }
+
+  canGoToPreviousPage(): boolean {
+    return this.currentRankPage > 0
+  }
+
+  canGoToNextPage(): boolean {
+    return (this.currentRankPage + 1) * this.ranksPerPage < this.ranks.length
+  }
+
+  getProfilePictureBorderStyle(rank: UserRank | null): string {
+    if (!rank) return "none"
+    const rankDisplay = this.ranks.find((r) => r.id === rank.id)
+    return rankDisplay ? `4px solid ${rankDisplay.borderColor}` : "none"
   }
 }
 

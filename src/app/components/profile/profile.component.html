@@ -1,76 +1,66 @@
 <div class="profile-container">
   <div class="profile-content">
-    <ng-container *ngIf="userProfile$ | async as userProfile">
-      <div class="profile-header">
-        <div class="profile-avatar-container">
-          <img [src]="userProfile.photoURL || 'assets/user-baseImg.png'" alt="Profile Picture" class="profile-avatar"
-            [style.background-image]="getRankGradient(userProfile.rank)">
-          <label for="file-upload" class="custom-file-upload">
-            <mat-icon>camera_alt</mat-icon>
-          </label>
-          <input id="file-upload" type="file" (change)="onFileSelected($event)" accept="image/*">
-        </div>
-        <h1 class="profile-name">{{ userProfile.firstName }} {{ userProfile.lastName }}</h1>
-        <p class="profile-username">{{ userProfile.username }}</p>
+    <div class="profile-header">
+      <div class="profile-avatar-container">
+        <img [src]="(userProfile$ | async)?.photoURL || '/assets/default-avatar.png'" alt="Profile Picture" class="profile-avatar" [style.border]="getProfilePictureBorderStyle((userRank$ | async))">
+        <label for="file-upload" class="custom-file-upload">
+          <mat-icon>edit</mat-icon>
+        </label>
+        <input id="file-upload" type="file" (change)="onFileSelected($event)" accept="image/*">
       </div>
+      <h2 class="profile-name">{{ (userProfile$ | async)?.firstName }} {{ (userProfile$ | async)?.lastName }}</h2>
+      <p class="profile-username">{{ (userProfile$ | async)?.username }}</p>
+    </div>
 
-      <mat-tab-group animationDuration="300ms" class="profile-tabs" mat-align-tabs="center">
-        <mat-tab label="Profile">
-          <div class="profile-info">
+    <mat-tab-group class="profile-tabs">
+      <mat-tab label="Profile">
+        <ng-template matTabContent>
+          <div class="profile-info" *ngIf="!isEditMode">
             <div class="info-item">
               <mat-icon>person</mat-icon>
-              <span>{{ userProfile.firstName }} {{ userProfile.lastName }}</span>
+              <span>{{ (userProfile$ | async)?.firstName }} {{ (userProfile$ | async)?.lastName }}</span>
             </div>
             <div class="info-item">
               <mat-icon>account_circle</mat-icon>
-              <span>{{ userProfile.username }}</span>
+              <span>{{ (userProfile$ | async)?.username }}</span>
             </div>
             <div class="info-item">
               <mat-icon>email</mat-icon>
-              <span>{{ userProfile.email }}</span>
+              <span>{{ (userProfile$ | async)?.email }}</span>
             </div>
             <div class="info-item">
-              <mat-icon>public</mat-icon>
-              <span>{{ userProfile.country || 'Not specified' }}</span>
+              <mat-icon>flag</mat-icon>
+              <span>{{ (userProfile$ | async)?.country || 'Not specified' }}</span>
             </div>
             <div class="info-item">
               <mat-icon>cake</mat-icon>
-              <span>{{ formatDate(userProfile.dob) }}</span>
+              <span>{{ formatDate((userProfile$ | async)?.dob) }}</span>
             </div>
           </div>
 
-          <div class="profile-actions">
-            <button mat-raised-button color="primary" (click)="toggleEditMode()">
-              <mat-icon>edit</mat-icon> Edit Profile
-            </button>
-            <button mat-raised-button color="accent" (click)="toggleChangePasswordMode()">
-              <mat-icon>lock</mat-icon> Change Password
-            </button>
-          </div>
-
-          <form *ngIf="isEditMode" [formGroup]="editForm" (ngSubmit)="saveProfile()" class="edit-form">
+          <form [formGroup]="editForm" (ngSubmit)="saveProfile()" class="edit-form" *ngIf="isEditMode">
             <div class="form-row">
-              <mat-form-field appearance="outline">
+              <mat-form-field appearance="fill">
                 <mat-label>First Name</mat-label>
                 <input matInput formControlName="firstName" required>
               </mat-form-field>
-              <mat-form-field appearance="outline">
+              <mat-form-field appearance="fill">
                 <mat-label>Last Name</mat-label>
                 <input matInput formControlName="lastName" required>
               </mat-form-field>
             </div>
             <div class="form-row">
-              <mat-form-field appearance="outline">
+              <mat-form-field appearance="fill">
                 <mat-label>Username</mat-label>
                 <input matInput formControlName="username" required>
               </mat-form-field>
-              <mat-form-field appearance="outline">
+              <mat-form-field appearance="fill">
                 <mat-label>Country</mat-label>
                 <input matInput formControlName="country">
               </mat-form-field>
             </div>
             <div class="form-row">
-              <mat-form-field appearance="outline">
+              <mat-form-field appearance="fill">
                 <mat-label>Date of Birth</mat-label>
                 <input matInput [matDatepicker]="picker" formControlName="dob">
                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -78,167 +68,184 @@
               </mat-form-field>
             </div>
             <div class="form-actions">
-              <button mat-button (click)="toggleEditMode()">Cancel</button>
-              <button mat-raised-button color="primary" type="submit" [disabled]="editForm.invalid">Save
-                Changes</button>
+              <button mat-button type="button" (click)="toggleEditMode()">Cancel</button>
+              <button mat-raised-button color="primary" type="submit" [disabled]="editForm.invalid">Save</button>
             </div>
           </form>
 
-          <form *ngIf="isChangePasswordMode" [formGroup]="changePasswordForm" (ngSubmit)="changePassword()"
-            class="change-password-form">
-            <mat-form-field appearance="outline">
+          <div class="profile-actions">
+            <button mat-raised-button color="primary" (click)="toggleEditMode()" *ngIf="!isEditMode">Edit Profile</button>
+            <button mat-raised-button color="accent" (click)="toggleChangePasswordMode()" *ngIf="!isChangePasswordMode">Change Password</button>
+          </div>
+
+          <form [formGroup]="changePasswordForm" (ngSubmit)="changePassword()" class="change-password-form" *ngIf="isChangePasswordMode">
+            <mat-form-field appearance="fill">
               <mat-label>Current Password</mat-label>
-              <input matInput formControlName="currentPassword" type="password" required>
+              <input matInput type="password" formControlName="currentPassword" required>
             </mat-form-field>
-            <mat-form-field appearance="outline">
+            <mat-form-field appearance="fill">
               <mat-label>New Password</mat-label>
-              <input matInput formControlName="newPassword" type="password" required>
+              <input matInput type="password" formControlName="newPassword" required>
             </mat-form-field>
-            <mat-form-field appearance="outline">
+            <mat-form-field appearance="fill">
               <mat-label>Confirm New Password</mat-label>
-              <input matInput formControlName="confirmPassword" type="password" required>
+              <input matInput type="password" formControlName="confirmPassword" required>
             </mat-form-field>
             <div class="form-actions">
-              <button mat-button (click)="toggleChangePasswordMode()">Cancel</button>
-              <button mat-raised-button color="primary" type="submit" [disabled]="changePasswordForm.invalid">Change
-                Password</button>
+              <button mat-button type="button" (click)="toggleChangePasswordMode()">Cancel</button>
+              <button mat-raised-button color="primary" type="submit" [disabled]="changePasswordForm.invalid">Change Password</button>
             </div>
           </form>
-        </mat-tab>
+        </ng-template>
+      </mat-tab>
 
-        <mat-tab label="Achievements">
-          <div class="achievements-grid">
-            <ng-container *ngIf="(achievements$ | async) as achievements">
-              <div *ngFor="let achievement of achievements" class="achievement-card">
-                <mat-icon>{{achievement.icon}}</mat-icon>
-                <h3>{{achievement.name}}</h3>
-                <p>{{achievement.description}}</p>
-                <span class="achievement-date">Unlocked: {{formatDate(achievement.unlockedAt)}}</span>
+      <mat-tab label="Favorite Beers">
+        <ng-template matTabContent>
+          <div class="beer-grid">
+            <div *ngFor="let beer of favoriteBeers$ | async" class="beer-card">
+              <img [src]="beer.beerLabelUrl">
+              <div class="beer-info">
+                <h3>{{ beer.name }}</h3>
               </div>
-              <div *ngIf="achievements.length === 0" class="no-achievements">
-                <p>No achievements unlocked yet. Keep rating beers to earn achievements!</p>
-              </div>
-            </ng-container>
+              <button mat-icon-button class="remove-button" (click)="removeFavoriteBeer(beer.id)">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
           </div>
-        </mat-tab>
+        </ng-template>
+      </mat-tab>
 
-        <mat-tab label="Statistics">
+      <mat-tab label="Rated Beers">
+        <ng-template matTabContent>
+          <div class="beer-grid">
+            <div *ngFor="let beer of ratedBeers$ | async" class="beer-card">
+              <img [src]="beer.beerLabelUrl">
+              <div class="beer-info">
+                <h3>{{ beer.name }}</h3>
+                <div class="rating">
+                  <span class="rating-value">{{ beer.rating }}/5</span>
+                  <span class="rating-date">{{ formatDate(beer.ratedAt) }}</span>
+                </div>
+              </div>
+              <button mat-icon-button class="remove-rating" (click)="removeRating(beer.id)">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab label="Achievements">
+        <ng-template matTabContent>
+          <div class="achievements-grid">
+            <div *ngFor="let achievement of achievements$ | async" class="achievement-card">
+              <mat-icon>{{ achievement.icon }}</mat-icon>
+              <h3>{{ achievement.name }}</h3>
+              <p>{{ achievement.description }}</p>
+              <p class="achievement-date">Unlocked: {{ formatDate(achievement.unlockedAt) }}</p>
+            </div>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab label="Statistics">
+        <ng-template matTabContent>
           <div class="statistics-container">
             <h2>Your Beer Journey</h2>
             <div class="statistic-item">
-              <span>Total Beers Rated</span>
-              <span>{{userProfile.statistics.totalBeersRated || 0}}</span>
+              <span>Total Beers Rated:</span>
+              <span>{{ (userProfile$ | async)?.statistics?.totalBeersRated || 0 }}</span>
             </div>
             <div class="statistic-item">
-              <span>Countries Explored</span>
-              <span>{{userProfile.statistics.countriesExplored.length || 0}}</span>
+              <span>Countries Explored:</span>
+              <span>{{ (userProfile$ | async)?.statistics?.countriesExplored?.length || 0 }}</span>
             </div>
             <div class="statistic-item">
-              <span>Most Active Day</span>
-              <span>{{userProfile.statistics.mostActiveDay.date || 'N/A'}} ({{userProfile.statistics.mostActiveDay.count
-                || 0}} ratings)</span>
+              <span>Most Active Day:</span>
+              <span>{{ (userProfile$ | async)?.statistics?.mostActiveDay?.date || 'N/A' }} ({{ (userProfile$ | async)?.statistics?.mostActiveDay?.count || 0 }} ratings)</span>
             </div>
             <div class="statistic-item">
-              <span>Time on Platform</span>
-              <span>{{calculateDaysSinceRegistration(userProfile.statistics.registrationDate) || 0}} days</span>
+              <span>Days Since Registration:</span>
+              <span>{{ calculateDaysSinceRegistration((userProfile$ | async)?.statistics?.registrationDate) }}</span>
             </div>
-            <div class="statistic-item">
-              <span>Total Points</span>
-              <span>{{userProfile.statistics.points || 0}}</span>
+            <h3>Favorite Beer Types</h3>
+            <div *ngFor="let type of ((userProfile$ | async)?.statistics?.beerTypeStats | keyvalue) || []" class="statistic-item">
+              <span>{{ type.key }}:</span>
+              <span>{{ type.value }}</span>
             </div>
           </div>
-        </mat-tab>
+        </ng-template>
+      </mat-tab>
 
-        <mat-tab label="Rank">
-          <div class="rank-container" *ngIf="userProfile.rank">
-            <h2>Your Current Rank</h2>
-            <div class="rank-card">
-              <mat-icon>{{userProfile.rank.icon}}</mat-icon>
-              <h3>{{userProfile.rank.name}}</h3>
-              <p>Level {{userProfile.rank.level}}</p>
-              <mat-progress-bar
-                [value]="calculateRankProgress(userProfile.statistics.points, userProfile.rank)"></mat-progress-bar>
-              <p>{{userProfile.statistics.points || 0}} / {{userProfile.rank.maxPoints}} points</p>
-            </div>
-          </div>
-        </mat-tab>
-
-        <mat-tab label="Favorite Beers">
-          <div class="beer-grid">
-            <ng-container *ngIf="(favoriteBeers$ | async) as favoriteBeers">
-              <div *ngFor="let beer of favoriteBeers" class="beer-card">
-                <img [src]="beer.beerLabelUrl" [alt]="beer.name">
-                <div class="beer-info">
-                  <h3>{{beer.name}}</h3>
-                </div>
-                <button mat-icon-button class="remove-button" (click)="removeFavoriteBeer(beer.id)">
-                  <mat-icon>close</mat-icon>
-                </button>
-              </div>
-            </ng-container>
-          </div>
-        </mat-tab>
-
-        <mat-tab label="Rated Beers">
-          <div class="beer-grid">
-            <ng-container *ngIf="(ratedBeers$ | async) as ratedBeers">
-              <div *ngFor="let beer of ratedBeers" class="beer-card">
-                <img [src]="beer.beerLabelUrl" [alt]="beer.name">
-                <div class="beer-info">
-                  <h3>{{beer.name}}</h3>
-                  <div class="rating">
-                    <span class="rating-value">{{beer.rating | number:'1.1-1'}}</span>
-                    <span class="rating-date">{{formatDate(beer.ratedAt)}}</span>
+      <mat-tab label="Rank">
+        <div class="rank-container">
+          <ng-container *ngIf="(userProfile$ | async) as userProfile">
+            <ng-container *ngIf="userProfile.rank as currentRank">
+              <div class="ranks-display">
+                <button class="scroll-button left" (click)="previousRankPage()" [disabled]="!canGoToPreviousPage()">&lt;</button>
+                <div class="ranks-scroll" #rankScroll>
+                  <div class="rank-cards">
+                    <div *ngFor="let rank of getVisibleRanks()" 
+                         class="rank-card" 
+                         [class.current]="rank.id === currentRank.id"
+                         [style.background-image]="rank.backgroundColor">
+                      <div class="rank-points">{{ rank.minPoints }} RP</div>
+                      <div class="rank-emblem" [style.border-color]="rank.borderColor">
+                        <span class="rank-icon">{{ rank.icon }}</span>
+                      </div>
+                      <div class="rank-info" [style.color]="rank.textColor">
+                        <h3>{{ rank.name }}</h3>
+                        <p>Level {{ rank.level }}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <button mat-icon-button class="remove-rating" (click)="removeRating(beer.id)">
-                  <mat-icon>delete</mat-icon>
-                </button>
+                <button class="scroll-button right" (click)="nextRankPage()" [disabled]="!canGoToNextPage()">&gt;</button>
+                
+                <div class="rank-progress">
+                  <div class="progress-text">
+                    <span>Progress to next rank</span>
+                    <span>{{ (userProfile$ | async)?.statistics?.points || 0 }} / {{ currentRank?.maxPoints === maxInfinity ? '∞' : (currentRank?.maxPoints || 0) }}</span>
+                  </div>
+                  <mat-progress-bar
+                    mode="determinate"
+                    [value]="calculateRankProgress((userProfile$ | async), currentRank)"
+                    class="rank-progress-bar">
+                  </mat-progress-bar>
+                </div>
               </div>
             </ng-container>
-          </div>
-        </mat-tab>
+          </ng-container>
+        </div>
+      </mat-tab>
 
-        <mat-tab label="Notifications">
+      <mat-tab label="Notifications">
+        <ng-template matTabContent>
           <div class="notifications-container">
-            <h2>Your Notifications</h2>
-            <ng-container *ngIf="notifications$ | async as notifications">
-              <div *ngIf="notifications.length > 0; else noNotifications">
-                <mat-list>
-                  <mat-list-item *ngFor="let notification of notifications" [class.unread]="!notification.read"
-                    (click)="markNotificationAsRead(notification.id)">
-                    <mat-icon matListIcon
-                      [ngClass]="{'rank-icon': notification.type === 'rank', 'achievement-icon': notification.type === 'achievement'}">
-                      {{ notification.type === 'rank' ? 'emoji_events' : 'stars' }}
-                    </mat-icon>
-                    <div matLine>{{notification.message}}</div>
-                    <div matLine>{{notification.timestamp | date:'medium'}}</div>
-                  </mat-list-item>
-                </mat-list>
-              </div>
-              <ng-template #noNotifications>
-                <p>You have no notifications at the moment.</p>
-              </ng-template>
-            </ng-container>
-
-            <!-- Add this button for testing -->
-            <button mat-raised-button color="primary" (click)="addPointsForTesting()">
-              Add Points (Test Rank Change)
-            </button>
+            <h2>Notifications</h2>
+            <mat-list>
+              <mat-list-item *ngFor="let notification of notifications$ | async" [class.unread]="!notification.read" (click)="markNotificationAsRead(notification.id)">
+                <mat-icon [ngClass]="{'rank-icon': notification.type === 'rank', 'achievement-icon': notification.type === 'achievement'}" mat-list-icon>
+                  {{ notification.type === 'rank' ? 'stars' : 'emoji_events' }}
+                </mat-icon>
+                <div mat-line class="notification-content">
+                  <p class="notification-message">{{ notification.message }}</p>
+                  <p class="notification-timestamp">{{ notification.timestamp | date:'medium' }}</p>
+                </div>
+              </mat-list-item>
+            </mat-list>
+            <p *ngIf="(notifications$ | async)?.length === 0" class="no-notifications">No notifications at this time.</p>
           </div>
-        </mat-tab>
-      </mat-tab-group>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
 
-      <div class="profile-footer">
-        <button mat-raised-button color="primary" (click)="openNewBeerModal()">
-          <mat-icon>add</mat-icon> Request New Beer
-        </button>
-        <button mat-raised-button color="warn" (click)="signOut()">
-          <mat-icon>exit_to_app</mat-icon> Logout
-        </button>
-      </div>
-    </ng-container>
+    <div class="profile-footer">
+      <button mat-raised-button color="warn" (click)="signOut()">Sign Out</button>
+      <button mat-raised-button color="primary" (click)="openNewBeerModal()">Request New Beer</button>
+    </div>
   </div>
 </div>
 
 <mat-progress-spinner *ngIf="isLoading" mode="indeterminate"></mat-progress-spinner>
+

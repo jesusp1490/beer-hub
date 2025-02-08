@@ -43,6 +43,7 @@ export interface UserRank {
   minPoints: number
   maxPoints: number
   level: number
+  points?: number // Add points property
 }
 
 export interface FavoriteBeer {
