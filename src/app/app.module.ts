@@ -13,7 +13,7 @@ import { SharedModule } from "./shared/shared.module"
 import { BeersModule } from "./components/beers/beers.module"
 import { ProfileModule } from "./components/profile/profile.module"
 
-// Material Modulesa
+// Material Modules
 import { MatInputModule } from "@angular/material/input"
 import { MatButtonModule } from "@angular/material/button"
 import { MatFormFieldModule } from "@angular/material/form-field"
@@ -46,6 +46,8 @@ import { LanguageSwitcherComponent } from "./components/language-switcher/langua
 import { AuthService } from "./services/auth.service"
 import { RateLimiterService } from "./services/rate-limiter.service"
 import { GlobalErrorHandler } from "./services/error-handler.service"
+import { NotificationService } from "./services/notification.service"
+import { UserService } from "./services/user.service"
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http)
@@ -71,7 +73,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     RouterModule,
     AppRoutingModule,
     SharedModule,
-    // BeersModule,
+    BeersModule,
     ProfileModule,
     TranslateModule.forRoot({
       defaultLanguage: "en",
@@ -95,7 +97,13 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatSliderModule,
     MatSnackBarModule,
   ],
-  providers: [AuthService, RateLimiterService, { provide: ErrorHandler, useClass: GlobalErrorHandler }],
+  providers: [
+    AuthService,
+    RateLimiterService,
+    NotificationService,
+    UserService,
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
+  ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

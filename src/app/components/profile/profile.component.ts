@@ -507,5 +507,3 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 }
 
-
-
