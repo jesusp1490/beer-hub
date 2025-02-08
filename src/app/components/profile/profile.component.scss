@@ -43,7 +43,7 @@
             border: 4px solid transparent;
             background-origin: border-box;
             background-clip: padding-box, border-box;
-            padding: 8px; 
+            padding: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease;
 
@@ -251,10 +251,10 @@
     }
 
     .rank-card {
-        // border-radius: 50%; // Make the rank card circular
-        // width: 700px; // Set a fixed width
-        // height: 200px; // Set a fixed height
-        margin: 0 auto; // Center the card
+        // border-radius: 50%;
+        // width: 200px;
+        // height: 200px;
+        margin: 0 auto;
         padding: $spacing-medium;
         display: flex;
         flex-direction: column;
@@ -285,7 +285,7 @@
         }
 
         mat-progress-bar {
-            width: 80%; // Adjust the width of the progress bar
+            width: 80%;
             margin: $spacing-small 0;
         }
     }
@@ -371,6 +371,41 @@ mat-progress-spinner {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.notifications-container {
+    padding: $spacing-large;
+
+    h2 {
+        color: $color-primary;
+        margin-bottom: $spacing-medium;
+    }
+
+    .mat-list-item {
+        border-bottom: 1px solid $color-hover;
+        transition: $color-background-dark 0.3s ease;
+
+        &:hover {
+            background-color: rgba($color-primary, 0.1);
+        }
+
+        &.unread {
+            background-color: rgba($color-secondary, 0.1);
+            font-weight: bold;
+        }
+
+        .mat-line {
+            color: $color-text-light;
+        }
+    }
+
+    .rank-icon {
+        color: $color-primary;
+    }
+
+    .achievement-icon {
+        color: $color-secondary;
+    }
 }
 
 @media (max-width: $breakpoint-tablet) {

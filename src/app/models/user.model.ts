@@ -63,3 +63,11 @@ export interface RatedBeer {
   beerImageUrl?: string
 }
 
+export interface Notification {
+  id: string
+  message: string
+  type: "rank" | "achievement"
+  timestamp: Date
+  read: boolean
+}
+

@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from "@angular/core"
-import { Observable, Subject, combineLatest } from "rxjs"
-import { takeUntil, map } from "rxjs/operators"
+import { Observable, Subject } from "rxjs"
+import { takeUntil } from "rxjs/operators"
 import { AuthService } from "../../services/auth.service"
 import { UserService } from "../../services/user.service"
 import { BeerService } from "../../services/beer.service"
@@ -10,7 +10,8 @@ import { MatDialog } from "@angular/material/dialog"
 import { Timestamp } from "@angular/fire/firestore"
 import { FormBuilder, FormGroup, Validators } from "@angular/forms"
 import { NewBeerRequestComponent } from "./new-beer-request.component"
-import { UserProfile, FavoriteBeer, RatedBeer, Achievement, UserRank } from "../../models/user.model"
+import { UserProfile, FavoriteBeer, RatedBeer, Achievement, UserRank, Notification } from "../../models/user.model"
+import { NotificationService } from "../../services/notification.service"
 
 @Component({
   selector: "app-profile",
@@ -23,6 +24,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   ratedBeers$: Observable<RatedBeer[]>
   achievements$: Observable<Achievement[]>
   userRank$: Observable<UserRank | null>
+  notifications$: Observable<Notification[]>
   editForm: FormGroup
   changePasswordForm: FormGroup
   isLoading = false
@@ -39,12 +41,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private fb: FormBuilder,
+    private notificationService: NotificationService,
   ) {
-    this.userProfile$ = new Observable<UserProfile | null>()
+    this.userProfile$ = this.userService.getCurrentUserProfile()
     this.favoriteBeers$ = new Observable<FavoriteBeer[]>()
     this.ratedBeers$ = new Observable<RatedBeer[]>()
     this.achievements$ = new Observable<Achievement[]>()
     this.userRank$ = new Observable<UserRank | null>()
+    this.notifications$ = this.notificationService.getNotifications()
     this.editForm = this.fb.group({
       firstName: ["", Validators.required],
       lastName: ["", Validators.required],
@@ -74,34 +78,30 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private loadUserData(): void {
     this.authService.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user) => {
       if (user) {
-        this.userProfile$ = combineLatest([
-          this.userService.getCurrentUserProfile(),
-          this.userService.getUserRatedBeers(),
-          this.userService.checkAndUpdateAchievements(user.uid),
-          this.userService.updateUserRank(user.uid),
-        ]).pipe(
-          map(([profile, ratedBeers, achievements, rank]) => {
+        this.userService
+          .getCurrentUserProfile()
+          .pipe(takeUntil(this.unsubscribe$))
+          .subscribe((profile) => {
             if (profile) {
-              return {
-                ...profile,
-                statistics: {
-                  ...profile.statistics,
-                  totalBeersRated: ratedBeers.length,
-                },
-                achievements: achievements,
-                rank: rank,
-              }
+              this.userService.updateUserRank(profile.uid).subscribe()
             }
-            return null
-          }),
-        )
+          })
 
         this.favoriteBeers$ = this.userService.getUserFavoriteBeers()
         this.ratedBeers$ = this.userService.getUserRatedBeers()
         this.achievements$ = this.userService.checkAndUpdateAchievements(user.uid)
+        this.userRank$ = this.userService.updateUserRank(user.uid)
       } else {
         this.router.navigate(["/login"])
       }
+    })
+  }
+
+  // Add this method for testing rank changes
+  addPointsForTesting(): void {
+    const userId = "current-user-id" // Replace with actual user ID
+    this.userService.addPointsToUser(userId, 100).then(() => {
+      this.loadUserData() // Reload user data to trigger rank update
     })
   }
 
@@ -289,7 +289,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (!rank) return "radial-gradient(circle, #4a4a4a, #2a2a2a)"
 
     const gradients: Record<string, string> = {
-      "novice": "radial-gradient(circle, #a67c52, #8b4513)",
+      novice: "radial-gradient(circle, #a67c52, #8b4513)",
       "beer recruit": "radial-gradient(circle, #5f9ea0, #2f4f4f)",
       "hop private": "radial-gradient(circle, #228b22, #006400)",
       "malt corporal": "radial-gradient(circle, #b22222, #8b0000)",
@@ -304,7 +304,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return gradients[rank.name.toLowerCase()] || "radial-gradient(circle, #4a4a4a, #2a2a2a)"
   }
 
-
+  markNotificationAsRead(id: string): void {
+    this.notificationService.markAsRead(id)
+  }
 
   private resetForm(): void {
     this.userProfile$.pipe(takeUntil(this.unsubscribe$)).subscribe((profile) => {
@@ -326,52 +328,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return newPassword && confirmPassword && newPassword.value === confirmPassword.value
       ? null
       : { passwordMismatch: true }
-  }
-
-  private initializeUserProfile(profile: UserProfile | null): UserProfile {
-    const defaultProfile: UserProfile = {
-      uid: "",
-      email: "",
-      displayName: "",
-      photoURL: "",
-      firstName: "",
-      lastName: "",
-      username: "",
-      country: "",
-      dob: null,
-      statistics: {
-        totalBeersRated: 0,
-        countriesExplored: [],
-        beerTypeStats: {},
-        mostActiveDay: { date: "", count: 0 },
-        registrationDate: Timestamp.now(),
-        points: 0,
-      },
-      rank: {
-        id: "",
-        name: "Novice",
-        icon: "🍺",
-        minPoints: 0,
-        maxPoints: 100,
-        level: 1,
-      },
-      achievements: [],
-    }
-
-    if (!profile) {
-      return defaultProfile
-    }
-
-    return {
-      ...defaultProfile,
-      ...profile,
-      statistics: {
-        ...defaultProfile.statistics,
-        ...(profile.statistics || {}),
-      },
-      rank: profile.rank || defaultProfile.rank,
-      achievements: profile.achievements || [],
-    }
   }
 }
 

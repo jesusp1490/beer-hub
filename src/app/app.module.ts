@@ -13,7 +13,7 @@ import { SharedModule } from "./shared/shared.module"
 import { BeersModule } from "./components/beers/beers.module"
 import { ProfileModule } from "./components/profile/profile.module"
 
-// Material Modules
+// Material Modulesa
 import { MatInputModule } from "@angular/material/input"
 import { MatButtonModule } from "@angular/material/button"
 import { MatFormFieldModule } from "@angular/material/form-field"
@@ -23,6 +23,7 @@ import { MatIconModule } from "@angular/material/icon"
 import { MatExpansionModule } from "@angular/material/expansion"
 import { MatCheckboxModule } from "@angular/material/checkbox"
 import { MatSliderModule } from "@angular/material/slider"
+import { MatSnackBarModule } from "@angular/material/snack-bar"
 
 // Firebase Modules
 import { AngularFireModule } from "@angular/fire/compat"
@@ -92,6 +93,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatExpansionModule,
     MatCheckboxModule,
     MatSliderModule,
+    MatSnackBarModule,
   ],
   providers: [AuthService, RateLimiterService, { provide: ErrorHandler, useClass: GlobalErrorHandler }],
   bootstrap: [AppComponent],

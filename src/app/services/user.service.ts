@@ -7,6 +7,7 @@ import { AuthService } from "./auth.service"
 import { Beer } from "../components/beers/beers.interface"
 import { UserProfile, FavoriteBeer, RatedBeer, Achievement, UserRank, UserStatistics } from "../models/user.model"
 import { Timestamp } from "@angular/fire/firestore"
+import { NotificationService } from "./notification.service"
 
 @Injectable({
   providedIn: "root",
@@ -16,6 +17,7 @@ export class UserService {
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
     private authService: AuthService,
+    private notificationService: NotificationService,
   ) {}
 
   getCurrentUser(): Observable<UserProfile | null> {
@@ -421,7 +423,17 @@ export class UserService {
               this.firestore.doc(`users/${userId}`).update({
                 achievements: updatedAchievements,
               }),
-            ).pipe(map(() => updatedAchievements))
+            ).pipe(
+              tap(() => {
+                newAchievements.forEach((achievement) => {
+                  this.notificationService.addNotification(
+                    `New achievement unlocked: ${achievement.name}!`,
+                    "achievement",
+                  )
+                })
+              }),
+              map(() => updatedAchievements),
+            )
           }
 
           return of(currentAchievements)
@@ -497,12 +509,22 @@ export class UserService {
           const newRank = ranks.find((r) => points >= r.minPoints && points <= r.maxPoints) || ranks[0]
           console.log(`New rank: ${JSON.stringify(newRank)}`)
 
-          return from(this.firestore.doc(`users/${userId}`).update({ rank: newRank })).pipe(
-            map(() => {
-              console.log(`Rank updated successfully to: ${newRank.name}`)
-              return newRank
-            }),
-          )
+          if (!user.rank || newRank.name !== user.rank.name) {
+            return from(this.firestore.doc(`users/${userId}`).update({ rank: newRank })).pipe(
+              tap(() => {
+                this.notificationService.addNotification(
+                  `Congratulations! You've reached the rank of ${newRank.name}!`,
+                  "rank",
+                )
+              }),
+              map(() => {
+                console.log(`Rank updated successfully to: ${newRank.name}`)
+                return newRank
+              }),
+            )
+          }
+
+          return of(newRank)
         }),
         catchError((error) => {
           console.error(`Error updating rank: ${error}`)
@@ -562,6 +584,24 @@ export class UserService {
     }
 
     return query.valueChanges()
+  }
+
+  addPointsToUser(userId: string, points: number): Promise<void> {
+    return this.firestore
+      .doc(`users/${userId}`)
+      .get()
+      .pipe(
+        take(1),
+        switchMap((doc) => {
+          const userData = doc.data() as UserProfile
+          const newPoints = (userData.statistics?.points || 0) + points
+          return this.firestore.doc(`users/${userId}`).update({
+            "statistics.points": newPoints,
+          })
+        }),
+        switchMap(() => this.updateUserRank(userId).pipe(map(() => {}))),
+      )
+      .toPromise()
   }
 }
 

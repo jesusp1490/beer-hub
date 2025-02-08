@@ -3,10 +3,8 @@
     <ng-container *ngIf="userProfile$ | async as userProfile">
       <div class="profile-header">
         <div class="profile-avatar-container">
-          <img [src]="userProfile.photoURL || 'assets/user-baseImg.png'" 
-               alt="Profile Picture" 
-               class="profile-avatar"
-               [style.background-image]="getRankGradient(userProfile.rank)">
+          <img [src]="userProfile.photoURL || 'assets/user-baseImg.png'" alt="Profile Picture" class="profile-avatar"
+            [style.background-image]="getRankGradient(userProfile.rank)">
           <label for="file-upload" class="custom-file-upload">
             <mat-icon>camera_alt</mat-icon>
           </label>
@@ -81,11 +79,13 @@
             </div>
             <div class="form-actions">
               <button mat-button (click)="toggleEditMode()">Cancel</button>
-              <button mat-raised-button color="primary" type="submit" [disabled]="editForm.invalid">Save Changes</button>
+              <button mat-raised-button color="primary" type="submit" [disabled]="editForm.invalid">Save
+                Changes</button>
             </div>
           </form>
 
-          <form *ngIf="isChangePasswordMode" [formGroup]="changePasswordForm" (ngSubmit)="changePassword()" class="change-password-form">
+          <form *ngIf="isChangePasswordMode" [formGroup]="changePasswordForm" (ngSubmit)="changePassword()"
+            class="change-password-form">
             <mat-form-field appearance="outline">
               <mat-label>Current Password</mat-label>
               <input matInput formControlName="currentPassword" type="password" required>
@@ -100,7 +100,8 @@
             </mat-form-field>
             <div class="form-actions">
               <button mat-button (click)="toggleChangePasswordMode()">Cancel</button>
-              <button mat-raised-button color="primary" type="submit" [disabled]="changePasswordForm.invalid">Change Password</button>
+              <button mat-raised-button color="primary" type="submit" [disabled]="changePasswordForm.invalid">Change
+                Password</button>
             </div>
           </form>
         </mat-tab>
@@ -120,7 +121,7 @@
             </ng-container>
           </div>
         </mat-tab>
-a
+
         <mat-tab label="Statistics">
           <div class="statistics-container">
             <h2>Your Beer Journey</h2>
@@ -134,7 +135,8 @@ a
             </div>
             <div class="statistic-item">
               <span>Most Active Day</span>
-              <span>{{userProfile.statistics.mostActiveDay.date || 'N/A'}} ({{userProfile.statistics.mostActiveDay.count || 0}} ratings)</span>
+              <span>{{userProfile.statistics.mostActiveDay.date || 'N/A'}} ({{userProfile.statistics.mostActiveDay.count
+                || 0}} ratings)</span>
             </div>
             <div class="statistic-item">
               <span>Time on Platform</span>
@@ -154,49 +156,78 @@ a
               <mat-icon>{{userProfile.rank.icon}}</mat-icon>
               <h3>{{userProfile.rank.name}}</h3>
               <p>Level {{userProfile.rank.level}}</p>
-              <mat-progress-bar [value]="calculateRankProgress(userProfile.statistics.points, userProfile.rank)"></mat-progress-bar>
+              <mat-progress-bar
+                [value]="calculateRankProgress(userProfile.statistics.points, userProfile.rank)"></mat-progress-bar>
               <p>{{userProfile.statistics.points || 0}} / {{userProfile.rank.maxPoints}} points</p>
             </div>
           </div>
         </mat-tab>
 
         <mat-tab label="Favorite Beers">
-      <div class="beer-grid">
-        <ng-container *ngIf="(favoriteBeers$ | async) as favoriteBeers">
-          <div *ngFor="let beer of favoriteBeers" class="beer-card">
-            <img [src]="beer.beerLabelUrl" [alt]="beer.name">
-            <div class="beer-info">
-              <h3>{{beer.name}}</h3>
-            </div>
-            <button mat-icon-button class="remove-button" (click)="removeFavoriteBeer(beer.id)">
-              <mat-icon>close</mat-icon>
-            </button>
-          </div>
-        </ng-container>
-      </div>
-    </mat-tab>
-
-    <mat-tab label="Rated Beers">
-      <div class="beer-grid">
-        <ng-container *ngIf="(ratedBeers$ | async) as ratedBeers">
-          <div *ngFor="let beer of ratedBeers" class="beer-card">
-            <img [src]="beer.beerLabelUrl" [alt]="beer.name">
-            <div class="beer-info">
-              <h3>{{beer.name}}</h3>
-              <!-- <p>{{beer.brewery}}</p> -->
-              <div class="rating">
-                <span class="rating-value">{{beer.rating | number:'1.1-1'}}</span>
-                <span class="rating-date">{{formatDate(beer.ratedAt)}}</span>
+          <div class="beer-grid">
+            <ng-container *ngIf="(favoriteBeers$ | async) as favoriteBeers">
+              <div *ngFor="let beer of favoriteBeers" class="beer-card">
+                <img [src]="beer.beerLabelUrl" [alt]="beer.name">
+                <div class="beer-info">
+                  <h3>{{beer.name}}</h3>
+                </div>
+                <button mat-icon-button class="remove-button" (click)="removeFavoriteBeer(beer.id)">
+                  <mat-icon>close</mat-icon>
+                </button>
               </div>
-            </div>
-            <button mat-icon-button class="remove-rating" (click)="removeRating(beer.id)">
-              <mat-icon>delete</mat-icon>
+            </ng-container>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Rated Beers">
+          <div class="beer-grid">
+            <ng-container *ngIf="(ratedBeers$ | async) as ratedBeers">
+              <div *ngFor="let beer of ratedBeers" class="beer-card">
+                <img [src]="beer.beerLabelUrl" [alt]="beer.name">
+                <div class="beer-info">
+                  <h3>{{beer.name}}</h3>
+                  <div class="rating">
+                    <span class="rating-value">{{beer.rating | number:'1.1-1'}}</span>
+                    <span class="rating-date">{{formatDate(beer.ratedAt)}}</span>
+                  </div>
+                </div>
+                <button mat-icon-button class="remove-rating" (click)="removeRating(beer.id)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </ng-container>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Notifications">
+          <div class="notifications-container">
+            <h2>Your Notifications</h2>
+            <ng-container *ngIf="notifications$ | async as notifications">
+              <div *ngIf="notifications.length > 0; else noNotifications">
+                <mat-list>
+                  <mat-list-item *ngFor="let notification of notifications" [class.unread]="!notification.read"
+                    (click)="markNotificationAsRead(notification.id)">
+                    <mat-icon matListIcon
+                      [ngClass]="{'rank-icon': notification.type === 'rank', 'achievement-icon': notification.type === 'achievement'}">
+                      {{ notification.type === 'rank' ? 'emoji_events' : 'stars' }}
+                    </mat-icon>
+                    <div matLine>{{notification.message}}</div>
+                    <div matLine>{{notification.timestamp | date:'medium'}}</div>
+                  </mat-list-item>
+                </mat-list>
+              </div>
+              <ng-template #noNotifications>
+                <p>You have no notifications at the moment.</p>
+              </ng-template>
+            </ng-container>
+
+            <!-- Add this button for testing -->
+            <button mat-raised-button color="primary" (click)="addPointsForTesting()">
+              Add Points (Test Rank Change)
             </button>
           </div>
-        </ng-container>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
+        </mat-tab>
+      </mat-tab-group>
 
       <div class="profile-footer">
         <button mat-raised-button color="primary" (click)="openNewBeerModal()">
@@ -211,4 +242,3 @@ a
 </div>
 
 <mat-progress-spinner *ngIf="isLoading" mode="indeterminate"></mat-progress-spinner>
-

@@ -12,7 +12,7 @@ import { MatSnackBarModule } from "@angular/material/snack-bar"
 import { MatDialogModule } from "@angular/material/dialog"
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner"
 import { MatProgressBarModule } from "@angular/material/progress-bar"
-
+import { MatListModule } from "@angular/material/list"
 import { NewBeerRequestComponent } from "./new-beer-request.component"
 import { ProfileComponent } from "./profile.component"
 
@@ -32,6 +32,7 @@ import { ProfileComponent } from "./profile.component"
     MatDialogModule,
     MatProgressSpinnerModule,
     MatProgressBarModule,
+    MatListModule,
   ],
 })
 export class ProfileModule {}
