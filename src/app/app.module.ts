@@ -12,6 +12,7 @@ import { AppComponent } from "./app.component"
 import { SharedModule } from "./shared/shared.module"
 import { BeersModule } from "./components/beers/beers.module"
 import { ProfileModule } from "./components/profile/profile.module"
+import { DashboardModule } from "./components/dashboard/dashboard.module"
 
 // Material Modules
 import { MatInputModule } from "@angular/material/input"
@@ -63,6 +64,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     FilterSearchComponent,
     ForgotPasswordComponent,
     LanguageSwitcherComponent,
+    // DashboardComponent,
   ],
   imports: [
     BrowserModule,
@@ -75,6 +77,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     SharedModule,
     BeersModule,
     ProfileModule,
+    DashboardModule,
     TranslateModule.forRoot({
       defaultLanguage: "en",
       loader: {

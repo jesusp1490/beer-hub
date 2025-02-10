@@ -13,6 +13,7 @@ export interface UserProfile {
   statistics: UserStatistics
   achievements: Achievement[]
   rank: UserRank
+  bio: string | null
 }
 
 export interface UserStatistics {
@@ -43,7 +44,7 @@ export interface UserRank {
   minPoints: number
   maxPoints: number
   level: number
-  points?: number // Add points property
+  points?: number
 }
 
 export interface FavoriteBeer {
