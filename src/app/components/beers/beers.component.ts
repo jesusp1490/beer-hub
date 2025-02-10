@@ -7,7 +7,6 @@ import { Subject } from "rxjs"
 import { takeUntil } from "rxjs/operators"
 import Swiper from "swiper"
 import { Navigation, Pagination } from "swiper/modules"
-
 import { Beer } from "./beers.interface"
 import { Brand } from "../country/brand.interface"
 
@@ -112,12 +111,17 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.swiper) {
         this.swiper.destroy()
       }
+
+      const totalSlides = this.beers.length
+      const slidesPerView = Math.min(5, totalSlides)
+
       this.swiper = new Swiper(this.swiperContainer.nativeElement, {
         modules: [Navigation, Pagination],
-        slidesPerView: 1,
-        spaceBetween: 30,
-        centeredSlides: true,
-        loop: true,
+        slidesPerView: slidesPerView,
+        spaceBetween: 80, 
+        // centeredSlides: true,
+        loop: totalSlides > 5,
+        loopAdditionalSlides: 5,
         pagination: {
           el: ".swiper-pagination",
           clickable: true,
@@ -126,16 +130,40 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
           nextEl: ".swiper-button-next",
           prevEl: ".swiper-button-prev",
         },
-        breakpoints: {
-          640: {
-            slidesPerView: 2,
+        on: {
+          init: (swiper: Swiper) => {
+            this.updateSlideStyles(swiper)
           },
-          1024: {
-            slidesPerView: 3,
+          slideChange: (swiper: Swiper) => {
+            this.updateSlideStyles(swiper)
           },
         },
       })
     }
+  }
+
+  private updateSlideStyles(swiper: Swiper): void {
+    const slides = swiper.slides
+    const activeIndex = swiper.activeIndex
+    const totalSlides = slides.length
+    const visibleSlides = Math.min(5, totalSlides)
+
+    slides.forEach((slide: HTMLElement, index: number) => {
+      slide.classList.remove("swiper-slide-visible", "swiper-slide-active", "swiper-slide-prev", "swiper-slide-next")
+
+      let relativeIndex = (index - activeIndex + totalSlides) % totalSlides
+      if (relativeIndex < 0) relativeIndex += totalSlides
+      if (relativeIndex >= 0 && relativeIndex < visibleSlides) {
+        slide.classList.add("swiper-slide-visible")
+        if (relativeIndex === Math.floor(visibleSlides / 2)) {
+          slide.classList.add("swiper-slide-active")
+        } else if (relativeIndex === Math.floor(visibleSlides / 2) - 1) {
+          slide.classList.add("swiper-slide-prev")
+        } else if (relativeIndex === Math.floor(visibleSlides / 2) + 1) {
+          slide.classList.add("swiper-slide-next")
+        }
+      }
+    })
   }
 
   selectBeer(beerId: string): void {
@@ -146,3 +174,4 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
     this.location.back()
   }
 }
+

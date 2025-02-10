@@ -5,7 +5,7 @@
 
 .beers-container {
   position: relative;
-  // padding-top: 100px; // Adjust this value as needed
+  padding: 2rem 0;
 
   .brand-header {
     position: absolute;
@@ -33,20 +33,39 @@
 
   .swiper-container {
     width: 100%;
-    // padding: 20px 40px;
-    overflow: visible;
+    height: 650px;
+    overflow: hidden;
+    padding: 3rem 0;
+  }
+
+  .swiper-wrapper {
+    display: flex;
+    align-items: center;
   }
 
   .swiper-slide {
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: all 0.3s ease;
+    opacity: 1;
+    pointer-events: auto;
+
+    &.swiper-slide-active {
+      // transform: scale(1.2);
+      z-index: 2;
+    }
+
+    &.swiper-slide-prev,
+    &.swiper-slide-next {
+      // transform: scale(1.1);
+      z-index: 1;
+    }
   }
 
   .beer-card {
     width: 100%;
-    max-width: 300px;
-    // padding: 20px;
+    max-width: 200px;
     text-align: center;
     cursor: pointer;
     transition: transform 0.3s ease;
@@ -58,7 +77,7 @@
 
   .beer-image {
     width: 100%;
-    max-width: 190px;
+    max-width: 150px;
     height: auto;
     margin: 0 auto 15px;
     display: block;
@@ -66,12 +85,12 @@
 
   .beer-info {
     h3 {
-      font-size: 20px;
+      font-size: 18px;
       margin-bottom: 5px;
     }
 
     p {
-      font-size: 16px;
+      font-size: 14px;
       color: #666;
     }
   }
@@ -101,38 +120,44 @@
 
   .swiper-button-next,
   .swiper-button-prev {
-    color: #ffa726;
+    width: 50px;
+    height: 50px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 
     &::after {
-      font-size: 24px;
+      content: none;
     }
-  }
-
-  .swiper-pagination-bullet-active {
-    background-color: #ffa726;
   }
 
   .swiper-button-next {
     right: 10px;
+    background-image: url('https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fleft-arrow.webp?alt=media&token=e0e787c6-bf5f-44ba-964e-4d88772b851d');
   }
 
   .swiper-button-prev {
     left: 10px;
+    background-image: url('https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fright-arrow.webp?alt=media&token=c1eb360a-a88b-4902-855f-5dc7c68273a3');
+  }
+
+  .swiper-pagination-bullet-active {
+    background-color: #ffa726;
   }
 }
 
 @media (max-width: 1366px) {
   .beers-container {
     .brand-header h1 {
-      font-size: 4rem;
+      font-size: 10rem;
     }
 
     .beer-card {
-      max-width: 250px;
+      max-width: 180px;
     }
 
     .beer-image {
-      max-width: 150px;
+      max-width: 130px;
     }
   }
 }
@@ -140,31 +165,47 @@
 @media (max-width: 1024px) {
   .beers-container {
     .brand-header h1 {
-      font-size: 3rem;
+      font-size: 8rem;
     }
 
     .beer-card {
-      max-width: 200px;
+      max-width: 160px;
     }
 
     .beer-image {
-      max-width: 120px;
+      max-width: 110px;
     }
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .beers-container {
     .brand-header h1 {
-      font-size: 2rem;
+      font-size: 6rem;
     }
 
     .beer-card {
-      max-width: 150px;
+      max-width: 140px;
     }
 
     .beer-image {
       max-width: 100px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .beers-container {
+    .brand-header h1 {
+      font-size: 4rem;
+    }
+
+    .beer-card {
+      max-width: 120px;
+    }
+
+    .beer-image {
+      max-width: 90px;
     }
   }
 }
