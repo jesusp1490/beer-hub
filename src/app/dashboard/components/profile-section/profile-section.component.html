@@ -1,85 +1,14 @@
-<mat-card>
-  <mat-card-header>
-    <mat-card-title>Profile</mat-card-title>
-    <button mat-icon-button [matMenuTriggerFor]="menu" class="more-options">
-      <mat-icon>more_vert</mat-icon>
+<div class="profile-section">
+  <div class="profile-picture">
+    <img [src]="userProfile?.photoURL || 'assets/default-avatar.png'" alt="Profile Picture">
+    <button mat-mini-fab color="primary" class="change-picture-btn" (click)="fileInput.click()">
+      <mat-icon>edit</mat-icon>
     </button>
-    <mat-menu #menu="matMenu">
-      <button mat-menu-item (click)="toggleEditMode()">
-        <mat-icon>edit</mat-icon>
-        <span>{{ editMode ? 'Cancel Edit' : 'Edit Profile' }}</span>
-      </button>
-    </mat-menu>
-  </mat-card-header>
-
-  <mat-card-content>
-    <div class="profile-content" *ngIf="!editMode; else editForm">
-      <div class="profile-picture-container">
-        <img [src]="userProfile?.photoURL || '/assets/default-avatar.png'" 
-             alt="Profile picture"
-             class="profile-picture">
-        <button mat-mini-fab color="primary" class="change-picture-button"
-                (click)="fileInput.click()">
-          <mat-icon>photo_camera</mat-icon>
-        </button>
-        <input #fileInput type="file" hidden (change)="updateProfilePicture($event)"
-               accept="image/*">
-      </div>
-
-      <div class="profile-info">
-        <h3>{{ userProfile?.displayName }}</h3>
-        <p class="country">{{ userProfile?.country }}</p>
-        <p class="email">{{ userProfile?.email }}</p>
-        <p class="bio">{{ userProfile?.bio || 'No bio yet' }}</p>
-      </div>
-
-      <div class="profile-stats">
-        <div class="stat">
-          <span class="stat-value">{{ userProfile?.statistics?.totalBeersRated || 0 }}</span>
-          <span class="stat-label">Beers Rated</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value">{{ userProfile?.statistics?.countriesExplored?.length || 0 }}</span>
-          <span class="stat-label">Countries</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value">{{ userProfile?.statistics?.points || 0 }}</span>
-          <span class="stat-label">Points</span>
-        </div>
-      </div>
-    </div>
-
-    <ng-template #editForm>
-      <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="edit-form">
-        <mat-form-field appearance="outline">
-          <mat-label>Display Name</mat-label>
-          <input matInput formControlName="displayName" required>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Country</mat-label>
-          <input matInput formControlName="country" required>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Bio</mat-label>
-          <textarea matInput formControlName="bio" rows="3"></textarea>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Date of Birth</mat-label>
-          <input matInput [matDatepicker]="picker" formControlName="dob" required>
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-        </mat-form-field>
-
-        <div class="form-actions">
-          <button mat-button type="button" (click)="toggleEditMode()">Cancel</button>
-          <button mat-raised-button color="primary" type="submit"
-                  [disabled]="!profileForm.valid">Save</button>
-        </div>
-      </form>
-    </ng-template>
-  </mat-card-content>
-</mat-card>
+    <input #fileInput type="file" (change)="updateProfilePicture($event)" style="display: none;">
+  </div>
+  <h2>{{ userProfile?.displayName }}</h2>
+  <p>{{ userProfile?.email }}</p>
+  <p>{{ userProfile?.country }}</p>
+  <p>Joined: {{ userProfile?.statistics?.registrationDate?.toDate() | date }}</p>
+</div>
 

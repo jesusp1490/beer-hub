@@ -1,0 +1,13 @@
+<div class="achievements-section">
+  <h3>Recent Achievements</h3>
+  <div class="achievements-list">
+    <div *ngFor="let achievement of recentAchievements" class="achievement-item">
+      <div class="achievement-icon">{{ achievement.icon }}</div>
+      <div class="achievement-details">
+        <h4>{{ achievement.name }}</h4>
+        <p>{{ achievement.description }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+

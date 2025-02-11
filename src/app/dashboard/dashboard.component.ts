@@ -1,8 +1,5 @@
-import { Component, type OnInit, type OnDestroy } from "@angular/core"
-import { Subject } from "rxjs"
-import { takeUntil } from "rxjs/operators"
+import { Component, OnInit } from "@angular/core"
 import { UserService } from "../services/user.service"
-import { AuthService } from "../services/auth.service"
 import { UserProfile } from "../models/user.model"
 
 @Component({
@@ -10,39 +7,27 @@ import { UserProfile } from "../models/user.model"
   templateUrl: "./dashboard.component.html",
   styleUrls: ["./dashboard.component.scss"],
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit {
   userProfile: UserProfile | null = null
   loading = true
-  private destroy$ = new Subject<void>()
 
-  constructor(
-    private userService: UserService,
-    private authService: AuthService,
-  ) {}
+  constructor(private userService: UserService) {}
 
   ngOnInit(): void {
     this.loadUserProfile()
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next()
-    this.destroy$.complete()
-  }
-
   private loadUserProfile(): void {
-    this.userService
-      .getCurrentUserProfile()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (profile) => {
-          this.userProfile = profile
-          this.loading = false
-        },
-        error: (error) => {
-          console.error("Error loading user profile:", error)
-          this.loading = false
-        },
-      })
+    this.userService.getCurrentUserProfile().subscribe({
+      next: (profile) => {
+        this.userProfile = profile
+        this.loading = false
+      },
+      error: (error) => {
+        console.error("Error loading user profile:", error)
+        this.loading = false
+      },
+    })
   }
 }
 

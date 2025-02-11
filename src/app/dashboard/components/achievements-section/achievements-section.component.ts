@@ -1,5 +1,5 @@
 import { Component, Input } from "@angular/core"
-import { UserProfile } from "../../../models/user.model"
+import { UserProfile, Achievement } from "../../../models/user.model"
 
 @Component({
   selector: "app-achievements-section",
@@ -8,8 +8,9 @@ import { UserProfile } from "../../../models/user.model"
 })
 export class AchievementsSectionComponent {
   @Input() userProfile: UserProfile | null = null
-  @Input() previewMode = false
 
-  // Implement the component logic here
+  get recentAchievements(): Achievement[] {
+    return this.userProfile?.achievements?.slice(0, 3) || []
+  }
 }
 

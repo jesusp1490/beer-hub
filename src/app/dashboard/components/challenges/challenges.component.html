@@ -1,0 +1,12 @@
+<div class="challenges-section">
+  <h3>Active Challenges</h3>
+  <div class="challenges-list">
+    <div *ngFor="let challenge of challenges" class="challenge-item">
+      <h4>{{ challenge.name }}</h4>
+      <p>{{ challenge.description }}</p>
+      <mat-progress-bar [value]="challenge.progress"></mat-progress-bar>
+      <span class="progress-text">{{ challenge.progress }}%</span>
+    </div>
+  </div>
+</div>
+

@@ -8,8 +8,18 @@ import { UserProfile } from "../../../models/user.model"
 })
 export class StatisticsComponent {
   @Input() userProfile: UserProfile | null = null
-  @Input() detailed = false
 
-  // Implement the component logic here
+  get totalBeersRated(): number {
+    return this.userProfile?.statistics?.totalBeersRated || 0
+  }
+
+  get countriesExplored(): number {
+    return this.userProfile?.statistics?.countriesExplored?.length || 0
+  }
+
+  get favoriteStyle(): string {
+    const beerTypeStats = this.userProfile?.statistics?.beerTypeStats || {}
+    return Object.entries(beerTypeStats).reduce((a, b) => (a[1] > b[1] ? a : b))[0]
+  }
 }
 

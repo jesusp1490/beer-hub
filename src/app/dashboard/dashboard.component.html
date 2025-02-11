@@ -2,59 +2,14 @@
   <div class="dashboard-header">
     <h1>Welcome, {{ userProfile?.displayName || 'Beer Enthusiast' }}!</h1>
   </div>
-
-  <div class="dashboard-content">
-    <mat-tab-group animationDuration="0ms" class="dashboard-tabs">
-      <!-- Overview Tab -->
-      <mat-tab label="Overview">
-        <div class="dashboard-grid">
-          <app-profile-section
-            [userProfile]="userProfile"
-            class="dashboard-card profile-section">
-          </app-profile-section>
-
-          <app-ranking-section
-            [userProfile]="userProfile"
-            class="dashboard-card ranking-section">
-          </app-ranking-section>
-
-          <app-statistics
-            [userProfile]="userProfile"
-            class="dashboard-card statistics-section">
-          </app-statistics>
-
-          <app-achievements-section
-            [userProfile]="userProfile"
-            [previewMode]="true"
-            class="dashboard-card achievements-section">
-          </app-achievements-section>
-        </div>
-      </mat-tab>
-
-      <!-- Achievements Tab -->
-      <mat-tab label="Achievements">
-        <app-achievements-section
-          [userProfile]="userProfile"
-          [previewMode]="false">
-        </app-achievements-section>
-      </mat-tab>
-
-      <!-- Challenges Tab -->
-      <mat-tab label="Challenges">
-        <app-challenges [userProfile]="userProfile"></app-challenges>
-      </mat-tab>
-
-      <!-- Statistics Tab -->
-      <mat-tab label="Statistics">
-        <div class="statistics-grid">
-          <app-statistics
-            [userProfile]="userProfile"
-            [detailed]="true">
-          </app-statistics>
-          <app-leaderboard></app-leaderboard>
-        </div>
-      </mat-tab>
-    </mat-tab-group>
+  
+  <div class="dashboard-grid">
+    <app-profile-section [userProfile]="userProfile" class="dashboard-item profile-section"></app-profile-section>
+    <app-ranking-section [userProfile]="userProfile" class="dashboard-item ranking-section"></app-ranking-section>
+    <app-statistics [userProfile]="userProfile" class="dashboard-item statistics-section"></app-statistics>
+    <app-achievements-section [userProfile]="userProfile" class="dashboard-item achievements-section"></app-achievements-section>
+    <app-challenges [userProfile]="userProfile" class="dashboard-item challenges-section"></app-challenges>
+    <app-leaderboard class="dashboard-item leaderboard-section"></app-leaderboard>
   </div>
 </div>
 

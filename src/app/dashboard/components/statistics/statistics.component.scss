@@ -1,0 +1,26 @@
+.statistics-section {
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-top: 1rem;
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+
+            .stat-value {
+                font-size: 1.5rem;
+                font-weight: bold;
+                margin-bottom: 0.5rem;
+            }
+
+            .stat-label {
+                font-size: 0.9rem;
+                color: #666;
+            }
+        }
+    }
+}

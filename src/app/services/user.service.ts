@@ -565,7 +565,7 @@ export class UserService {
     )
   }
 
-  getLeaderboard(type: "global" | "country", limit = 10): Observable<UserProfile[]> {
+  getLeaderboard(type: "global" | "country" = "global", limit = 10): Observable<UserProfile[]> {
     const query = this.firestore.collection<UserProfile>("users", (ref) =>
       ref.orderBy("statistics.points", "desc").limit(limit),
     )
