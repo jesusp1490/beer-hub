@@ -1,138 +1,26 @@
-<div class="dashboard-container" *ngIf="!loading && userProfile">
-  <!-- Profile Section -->
-  <mat-card class="profile-section">
-    <mat-card-header>
-      <div mat-card-avatar [style.backgroundImage]="'url(' + userProfile.photoURL + ')'" class="profile-avatar"></div>
-      <mat-card-title>{{ userProfile.displayName }}</mat-card-title>
-      <mat-card-subtitle>
-        Level {{ userProfile.rank.level }} - {{ userProfile.rank.name }}
-      </mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="profile-stats">
-        <div class="stat-item">
-          <mat-icon>sports_bar</mat-icon>
-          <span>{{ userProfile.statistics.totalBeersRated }}</span>
-          <p>Beers Rated</p>
-        </div>
-        <div class="stat-item">
-          <mat-icon>public</mat-icon>
-          <span>{{ userProfile.statistics.uniqueCountries }}</span>
-          <p>Countries</p>
-        </div>
-        <div class="stat-item">
-          <mat-icon>style</mat-icon>
-          <span>{{ userProfile.statistics.uniqueStyles }}</span>
-          <p>Styles</p>
-        </div>
-      </div>
-      <mat-progress-bar
-        [value]="userProfile.rank.progress * 100"
-        [color]="'accent'"
-        class="rank-progress"
-      ></mat-progress-bar>
-      <p class="rank-progress-text">
-        {{ userProfile.rank.points }} / {{ (userProfile.rank.level + 1) * 100 }} points to next level
-      </p>
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-raised-button color="primary" (click)="viewDetailedProfile()">View Full Profile</button>
-    </mat-card-actions>
-  </mat-card>
-
-  <!-- Achievements Section -->
-  <mat-card class="achievements-section">
-    <mat-card-header>
-      <mat-card-title>Recent Achievements</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-list>
-        <mat-list-item *ngFor="let achievement of recentAchievements">
-          <mat-icon matListIcon>emoji_events</mat-icon>
-          <div matLine>{{ achievement.name }}</div>
-          <div matLine class="achievement-date">
-            {{ achievement.dateUnlocked?.toDate() | date }}
-          </div>
-          <button
-            mat-icon-button
-            (click)="shareAchievement(achievement)"
-            matTooltip="Share Achievement"
-          >
-            <mat-icon>share</mat-icon>
-          </button>
-        </mat-list-item>
-      </mat-list>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Active Challenges Section -->
-  <mat-card class="challenges-section">
-    <mat-card-header>
-      <mat-card-title>Active Challenges</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-list>
-        <mat-list-item *ngFor="let challenge of activeChallenges">
-          <mat-icon matListIcon>flag</mat-icon>
-          <div matLine>{{ challenge.name }}</div>
-          <div matLine class="challenge-description">{{ challenge.description }}</div>
-          <div class="challenge-progress-container">
-            <mat-progress-bar
-              [value]="(challenge.progress / challenge.threshold) * 100"
-              color="primary"
-            ></mat-progress-bar>
-            <span class="challenge-progress-text">
-              {{ challenge.progress }} / {{ challenge.threshold }}
-            </span>
-          </div>
-        </mat-list-item>
-      </mat-list>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Statistics Section -->
-  <mat-card class="statistics-section">
-    <mat-card-header>
-      <mat-card-title>Your Beer Statistics</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="charts-container">
-        <div class="chart-wrapper">
-          <canvas id="ratingChart"></canvas>
-        </div>
-        <div class="chart-wrapper">
-          <canvas id="styleChart"></canvas>
-        </div>
-        <div class="chart-wrapper">
-          <canvas id="countryChart"></canvas>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Leaderboard Section -->
-  <mat-card class="leaderboard-section">
-    <mat-card-header>
-      <mat-card-title>Top Beer Explorers</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-list>
-        <mat-list-item *ngFor="let user of topUsers; let i = index">
-          <div matListItemAvatar class="leaderboard-avatar">
-            <img [src]="user.photoURL || '/assets/images/default-avatar.png'" [alt]="user.displayName">
-            <span class="leaderboard-rank">{{ i + 1 }}</span>
-          </div>
-          <div matLine>{{ user.displayName }}</div>
-          <div matLine class="leaderboard-stats">
-            Level {{ user.rank.level }} · {{ user.points }} points
-          </div>
-        </mat-list-item>
-      </mat-list>
-    </mat-card-content>
-  </mat-card>
+<div class="dashboard-container" *ngIf="!loading && !error">
+  <div class="dashboard-grid">
+    <app-profile-section [userProfile]="userProfile"></app-profile-section>
+    <app-ranking-section [userProfile]="userProfile"></app-ranking-section>
+    <app-statistics [userProfile]="userProfile"></app-statistics>
+    <app-achievement-section [achievements]="achievements"></app-achievement-section>
+    <app-challenges [challenges]="challenges"></app-challenges>
+    <app-leaderboard 
+      [globalLeaderboard]="globalLeaderboard"
+      [countryLeaderboard]="countryLeaderboard">
+    </app-leaderboard>
+  </div>
 </div>
 
 <div class="loading-container" *ngIf="loading">
   <mat-spinner></mat-spinner>
+</div>
+
+<div class="error-container" *ngIf="error">
+  <mat-card>
+    <mat-card-content>
+      <p>{{ error }}</p>
+    </mat-card-content>
+  </mat-card>
 </div>
 

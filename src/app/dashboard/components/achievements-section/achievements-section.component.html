@@ -1,13 +1,16 @@
-<div class="achievements-section">
-  <h3>Recent Achievements</h3>
-  <div class="achievements-list">
-    <div *ngFor="let achievement of recentAchievements" class="achievement-item">
-      <div class="achievement-icon">{{ achievement.icon }}</div>
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Recent Achievements</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div *ngFor="let achievement of achievements" class="achievement-item">
+      <mat-icon>{{ achievement.icon }}</mat-icon>
       <div class="achievement-details">
-        <h4>{{ achievement.name }}</h4>
+        <h3>{{ achievement.name }}</h3>
         <p>{{ achievement.description }}</p>
+        <small>Unlocked: {{ convertTimestamp(achievement.dateUnlocked) | date }}</small>
       </div>
     </div>
-  </div>
-</div>
+  </mat-card-content>
+</mat-card>
 

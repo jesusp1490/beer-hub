@@ -84,8 +84,8 @@ export class UserService {
       registrationDate: Timestamp.now(),
       points: 0,
       lastRatingDate: Timestamp.now(),
-      uniqueStyles: 0,
-      uniqueCountries: 0,
+      uniqueStylesCount: 0,
+      uniqueCountriesCount: 0,
     }
     return statistics ? { ...defaultStats, ...statistics } : defaultStats
   }
@@ -274,8 +274,8 @@ export class UserService {
 
     updatedStats.points = (updatedStats.points || 0) + 1
     updatedStats.lastRatingDate = Timestamp.now()
-    updatedStats.uniqueStyles = Object.keys(updatedStats.beerTypeStats || {}).length
-    updatedStats.uniqueCountries = updatedStats.countriesExplored?.length || 0
+    updatedStats.uniqueStylesCount = Object.keys(updatedStats.beerTypeStats || {}).length
+    updatedStats.uniqueCountriesCount = updatedStats.countriesExplored?.length || 0
 
     return updatedStats
   }
@@ -300,6 +300,7 @@ export class UserService {
               name: "First Rater",
               description: "Rate your first beer",
               dateUnlocked: Timestamp.now(),
+              icon: "star", // Add this line
             })
           }
 
@@ -309,6 +310,7 @@ export class UserService {
               name: "Beer Explorer",
               description: "Rate beers from 3 different countries",
               dateUnlocked: Timestamp.now(),
+              icon: "public", // Add this line
             })
           }
 

@@ -12,7 +12,7 @@ import { LogInComponent } from "./components/log-in/log-in.component"
 import { AuthGuard } from "./guards/auth.guard"
 import { ForgotPasswordComponent } from "./components/forgot-password/forgot-password.component"
 
-const routes: Routes = [
+export const routes: Routes = [
   { path: "", redirectTo: "/home", pathMatch: "full" },
   { path: "home", component: HomeComponent },
   { path: "map", component: MapComponent },

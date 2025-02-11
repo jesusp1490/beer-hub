@@ -28,18 +28,16 @@ export interface UserStatistics {
   registrationDate: Timestamp
   points: number
   lastRatingDate: Timestamp
-  uniqueStyles: number
-  uniqueCountries: number
+  uniqueStylesCount: number
+  uniqueCountriesCount: number
 }
 
 export interface Achievement {
   id: string
   name: string
   description: string
-  icon?: string
-  dateUnlocked?: Timestamp
-  progress?: number
-  threshold?: number
+  icon?: string 
+  dateUnlocked: Timestamp
 }
 
 export interface UserRank {
@@ -65,9 +63,11 @@ export interface RatedBeer {
   beerId: string
   rating: number
   review?: string
-  date: Timestamp
+  date?: Timestamp
   country?: string
   beerType?: string
+  beerLabelUrl?: string
+  name?: string
 }
 
 export interface LeaderboardEntry {

@@ -1,13 +1,30 @@
-<div class="leaderboard-container">
-  <h2>Leaderboard</h2>
-  <mat-list>
-    <mat-list-item *ngFor="let entry of leaderboardEntries; let i = index">
-      <span matListItemTitle>{{ i + 1 }}. {{ entry.displayName }}</span>
-      <span matListItemLine>
-        <strong>Rank:</strong> {{ entry.rank.level }}
-        <strong>Points:</strong> {{ entry.points }}
-      </span>
-    </mat-list-item>
-  </mat-list>
-</div>
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Leaderboard</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-tab-group>
+      <mat-tab label="Global">
+        <mat-list>
+          <mat-list-item *ngFor="let entry of globalLeaderboard; let i = index">
+            <span mat-line>
+              <strong>{{ i + 1 }}. {{ entry.displayName }}</strong>
+            </span>
+            <span mat-line>Points: {{ entry.points }}</span>
+          </mat-list-item>
+        </mat-list>
+      </mat-tab>
+      <mat-tab label="Country">
+        <mat-list>
+          <mat-list-item *ngFor="let entry of countryLeaderboard; let i = index">
+            <span mat-line>
+              <strong>{{ i + 1 }}. {{ entry.displayName }}</strong>
+            </span>
+            <span mat-line>Points: {{ entry.points }}</span>
+          </mat-list-item>
+        </mat-list>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card-content>
+</mat-card>
 

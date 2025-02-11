@@ -1,12 +1,11 @@
-<div class="ranking-section">
-  <h3>Your Rank</h3>
-  <div class="rank-info" *ngIf="currentRank">
-    <div class="rank-icon">{{ currentRank.icon }}</div>
-    <div class="rank-details">
-      <h4>{{ currentRank.name }}</h4>
-      <mat-progress-bar [value]="progressToNextRank"></mat-progress-bar>
-      <p>{{ userProfile?.statistics?.points || 0 }} / {{ currentRank.maxPoints }} points</p>
-    </div>
-  </div>
-</div>
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ currentRank?.name }}</mat-card-title>
+    <mat-card-subtitle>Level {{ currentRank?.level }}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
+    <p>{{ userProfile?.statistics?.points || 0 }} / {{ getNextRankPoints() }} points</p>
+  </mat-card-content>
+</mat-card>
 

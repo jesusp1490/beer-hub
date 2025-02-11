@@ -1,154 +1,32 @@
 .dashboard-container {
+    padding: 20px;
+}
+
+.dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    padding: 1.5rem;
-    max-width: 1400px;
-    margin: 0 auto;
-
-    mat-card {
-        height: fit-content;
-    }
+    gap: 20px;
 }
 
-.profile-section {
-    grid-column: 1 / -1;
-
-    .profile-avatar {
-        width: 60px;
-        height: 60px;
-        background-size: cover;
-        background-position: center;
-        border-radius: 50%;
-    }
-
-    .profile-stats {
-        display: flex;
-        justify-content: space-around;
-        margin: 1.5rem 0;
-
-        .stat-item {
-            text-align: center;
-
-            mat-icon {
-                font-size: 2rem;
-                height: 2rem;
-                width: 2rem;
-                color: #666;
-            }
-
-            span {
-                display: block;
-                font-size: 1.5rem;
-                font-weight: bold;
-                margin: 0.5rem 0;
-            }
-
-            p {
-                margin: 0;
-                color: #666;
-            }
-        }
-    }
-
-    .rank-progress {
-        margin: 1rem 0;
-    }
-
-    .rank-progress-text {
-        text-align: center;
-        color: #666;
-        margin: 0.5rem 0;
-    }
+.dashboard-item {
+    min-height: 200px;
 }
 
-.achievements-section,
-.challenges-section {
-
-    .achievement-date,
-    .challenge-description {
-        color: #666;
-        font-size: 0.9rem;
-    }
-
-    .challenge-progress-container {
-        width: 100%;
-        margin-top: 0.5rem;
-
-        mat-progress-bar {
-            margin-bottom: 0.25rem;
-        }
-
-        .challenge-progress-text {
-            font-size: 0.8rem;
-            color: #666;
-            text-align: right;
-        }
-    }
-}
-
-.statistics-section {
-    grid-column: 1 / -1;
-
-    .charts-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
-
-        .chart-wrapper {
-            position: relative;
-            height: 300px;
-        }
-    }
-}
-
-.leaderboard-section {
-    .leaderboard-avatar {
-        position: relative;
-
-        img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-        }
-
-        .leaderboard-rank {
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            background: #ffd700;
-            color: #000;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-    }
-
-    .leaderboard-stats {
-        color: #666;
-        font-size: 0.9rem;
-    }
-}
-
-.loading-container {
+.loading-container,
+.error-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 400px;
+    height: 100vh;
+}
+
+mat-card {
+    height: 100%;
+    box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
-    .dashboard-container {
-        grid-template-columns: 1fr;
-    }
-
-    .statistics-section .charts-container {
+    .dashboard-grid {
         grid-template-columns: 1fr;
     }
 }
