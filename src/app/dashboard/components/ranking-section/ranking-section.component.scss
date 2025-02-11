@@ -1,0 +1,88 @@
+.rank-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    .current-rank {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+
+        .rank-icon {
+            font-size: 2rem;
+            margin-right: 0.5rem;
+        }
+
+        h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+    }
+
+    .rank-progress {
+        width: 100%;
+        margin-bottom: 0.5rem;
+
+        mat-progress-bar {
+            margin-bottom: 0.25rem;
+        }
+
+        .progress-text {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+    }
+
+    .next-rank {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+}
+
+.rank-list {
+    h4 {
+        margin-bottom: 0.5rem;
+        color: var(--text-secondary);
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+            display: flex;
+            align-items: center;
+            padding: 0.25rem 0;
+            font-size: 0.875rem;
+
+            &.current {
+                font-weight: bold;
+                color: var(--primary-color);
+            }
+
+            .rank-icon {
+                margin-right: 0.5rem;
+            }
+
+            .rank-name {
+                flex-grow: 1;
+            }
+
+            .rank-points {
+                color: var(--text-secondary);
+            }
+        }
+    }
+}
+
+:host {
+    --primary-color: #ff9800;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+
+    @media (prefers-color-scheme: light) {
+        --text-secondary: rgba(0, 0, 0, 0.6);
+    }
+}

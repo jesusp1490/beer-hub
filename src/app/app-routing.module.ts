@@ -12,7 +12,7 @@ import { SignUpComponent } from "./components/sign-up/sign-up.component"
 import { LogInComponent } from "./components/log-in/log-in.component"
 import { AuthGuard } from "./guards/auth.guard"
 import { ForgotPasswordComponent } from "./components/forgot-password/forgot-password.component"
-import { DashboardComponent } from "./components/dashboard/dashboard.component"
+import { DashboardComponent } from "./dashboard/dashboard.component"
 
 const routes: Routes = [
   { path: "", redirectTo: "/home", pathMatch: "full" },

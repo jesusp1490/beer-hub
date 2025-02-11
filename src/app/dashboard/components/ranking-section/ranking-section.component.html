@@ -1,0 +1,33 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Your Rank</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="rank-info" *ngIf="currentRank">
+      <div class="current-rank">
+        <span class="rank-icon">{{ currentRank.icon }}</span>
+        <h3>{{ currentRank.name }}</h3>
+      </div>
+      <div class="rank-progress">
+        <mat-progress-bar mode="determinate" [value]="progressToNextRank"></mat-progress-bar>
+        <span class="progress-text">
+          {{ userProfile?.statistics?.points || 0 }} / {{ nextRank?.minPoints || 'Max' }} points
+        </span>
+      </div>
+      <p *ngIf="nextRank" class="next-rank">
+        Next rank: {{ nextRank.name }} ({{ nextRank.icon }})
+      </p>
+    </div>
+    <div class="rank-list">
+      <h4>Rank Hierarchy</h4>
+      <ul>
+        <li *ngFor="let rank of ranks" [class.current]="rank.id === currentRank?.id">
+          <span class="rank-icon">{{ rank.icon }}</span>
+          <span class="rank-name">{{ rank.name }}</span>
+          <span class="rank-points">{{ rank.minPoints }}+ points</span>
+        </li>
+      </ul>
+    </div>
+  </mat-card-content>
+</mat-card>
+
