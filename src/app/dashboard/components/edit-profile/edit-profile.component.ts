@@ -1,47 +1,68 @@
-import { Component, Inject } from "@angular/core"
+import { Component, OnInit } from "@angular/core"
 import { FormBuilder, FormGroup, Validators } from "@angular/forms"
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog"
-import { UserProfile } from "../../../models/user.model"
 import { UserService } from "../../../services/user.service"
+import { UserProfile } from "../../../models/user.model"
+import { Router } from "@angular/router"
+import { NotificationService } from "../../../services/notification.service"
 
 @Component({
   selector: "app-edit-profile",
   templateUrl: "./edit-profile.component.html",
   styleUrls: ["./edit-profile.component.scss"],
 })
-export class EditProfileComponent {
-  profileForm: FormGroup;
+export class EditProfileComponent implements OnInit {
+  profileForm: FormGroup
+  userProfile: UserProfile | null = null
 
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
-    private dialogRef: MatDialogRef<EditProfileComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: UserProfile
+    private router: Router,
+    private notificationService: NotificationService,
   ) {
     this.profileForm = this.fb.group({
-      displayName: [data.displayName || '', Validators.required],
-      firstName: [data.firstName || ''],
-      lastName: [data.lastName || ''],
-      country: [data.country || ''],
-      bio: [data.bio || '']
-    });
+      firstName: ["", Validators.required],
+      lastName: ["", Validators.required],
+      bio: [""],
+    })
+  }
+
+  ngOnInit(): void {
+    this.userService.getCurrentUserProfile().subscribe((data: UserProfile | null) => {
+      if (data) {
+        this.userProfile = data
+        this.profileForm.patchValue({
+          firstName: data.firstName || "",
+          lastName: data.lastName || "",
+          bio: data.bio || "",
+        })
+      }
+    })
   }
 
   onSubmit(): void {
-    if (this.profileForm.valid) {
-      this.userService.updateUserProfile(this.profileForm.value).subscribe({
-        next: () => {
-          this.dialogRef.close(true)
+    if (this.profileForm.valid && this.userProfile) {
+      const updatedProfile: Partial<UserProfile> = {
+        firstName: this.profileForm.get("firstName")?.value,
+        lastName: this.profileForm.get("lastName")?.value,
+        bio: this.profileForm.get("bio")?.value,
+      }
+
+      this.userService.updateUserProfile(updatedProfile).subscribe(
+        () => {
+          this.notificationService.showSuccess("Profile updated successfully")
+          this.router.navigate(["/profile"])
         },
-        error: (error) => {
+        (error) => {
           console.error("Error updating profile:", error)
+          this.notificationService.showError("Error updating profile")
         },
-      })
+      )
     }
   }
 
   onCancel(): void {
-    this.dialogRef.close()
+    this.router.navigate(["/profile"])
   }
 }
 

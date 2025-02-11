@@ -9,12 +9,7 @@ import { AuthService } from "./auth.service"
 import { UserService } from "./user.service"
 import firebase from "firebase/compat/app"
 import { Timestamp } from "@angular/fire/firestore"
-
-interface RatingsData {
-  count: number
-  total: number
-  average: number
-}
+import { RatedBeer } from "../models/user.model"
 
 @Injectable({
   providedIn: "root",
@@ -306,16 +301,15 @@ export class BeerService {
         ).pipe(
           switchMap(({ beerData }) => {
             // Update user statistics
-            return this.userService.updateUserStatistics(userId, {
-              id: beerId,
-              name: beerData.name,
-              rating: rating,
-              ratedAt: Timestamp.now(),
+            const ratedBeer: RatedBeer = {
+              beerId,
+              rating,
+              review: "", // Add an empty review or remove this line if it's optional
+              date: Timestamp.now(),
               country: beerData.countryId,
               beerType: beerData.beerType,
-              beerLabelUrl: beerData.beerLabelUrl,
-              beerImageUrl: beerData.beerImageUrl,
-            })
+            }
+            return this.userService.updateUserStatistics(userId, ratedBeer)
           }),
           tap(() => {
             // Update the cached beer data

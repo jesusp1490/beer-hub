@@ -1,11 +1,21 @@
 import { Injectable } from "@angular/core"
 import { AngularFirestore } from "@angular/fire/compat/firestore"
+import firebase from "firebase/compat/app"
 import { AngularFireStorage } from "@angular/fire/compat/storage"
 import { Observable, of, from, combineLatest, forkJoin } from "rxjs"
 import { map, switchMap, catchError, take, tap } from "rxjs/operators"
 import { AuthService } from "./auth.service"
 import { Beer } from "../components/beers/beers.interface"
-import { UserProfile, FavoriteBeer, RatedBeer, Achievement, UserRank, UserStatistics } from "../models/user.model"
+import {
+  UserProfile,
+  RatedBeer,
+  Achievement,
+  UserRank,
+  UserStatistics,
+  LeaderboardEntry,
+  Reward,
+  FavoriteBeer,
+} from "../models/user.model"
 import { Timestamp } from "@angular/fire/firestore"
 import { NotificationService } from "./notification.service"
 
@@ -73,18 +83,19 @@ export class UserService {
       mostActiveDay: { date: "", count: 0 },
       registrationDate: Timestamp.now(),
       points: 0,
+      lastRatingDate: Timestamp.now(),
+      uniqueStyles: 0,
+      uniqueCountries: 0,
     }
     return statistics ? { ...defaultStats, ...statistics } : defaultStats
   }
 
   private getDefaultRank(): UserRank {
     return {
-      id: "novice",
-      name: "Novice",
-      icon: "🍺",
-      minPoints: 0,
-      maxPoints: 9,
       level: 0,
+      points: 0,
+      progress: 0,
+      name: "Novice",
     }
   }
 
@@ -242,10 +253,16 @@ export class UserService {
   private calculateUpdatedStatistics(currentStats: UserStatistics, newRating: RatedBeer): UserStatistics {
     const updatedStats = { ...currentStats }
     updatedStats.totalBeersRated = (updatedStats.totalBeersRated || 0) + 1
-    updatedStats.countriesExplored = Array.from(new Set([...(updatedStats.countriesExplored || []), newRating.country]))
-    updatedStats.beerTypeStats = {
-      ...(updatedStats.beerTypeStats || {}),
-      [newRating.beerType]: ((updatedStats.beerTypeStats || {})[newRating.beerType] || 0) + 1,
+    if (newRating.country) {
+      updatedStats.countriesExplored = Array.from(
+        new Set([...(updatedStats.countriesExplored || []), newRating.country]),
+      )
+    }
+    if (newRating.beerType) {
+      updatedStats.beerTypeStats = {
+        ...(updatedStats.beerTypeStats || {}),
+        [newRating.beerType]: ((updatedStats.beerTypeStats || {})[newRating.beerType] || 0) + 1,
+      }
     }
 
     const today = new Date().toISOString().split("T")[0]
@@ -256,6 +273,9 @@ export class UserService {
     }
 
     updatedStats.points = (updatedStats.points || 0) + 1
+    updatedStats.lastRatingDate = Timestamp.now()
+    updatedStats.uniqueStyles = Object.keys(updatedStats.beerTypeStats || {}).length
+    updatedStats.uniqueCountries = updatedStats.countriesExplored?.length || 0
 
     return updatedStats
   }
@@ -279,9 +299,7 @@ export class UserService {
               id: "first_rater",
               name: "First Rater",
               description: "Rate your first beer",
-              icon: "🏅",
-              unlockedAt: Timestamp.now(),
-              category: "beginner",
+              dateUnlocked: Timestamp.now(),
             })
           }
 
@@ -290,130 +308,7 @@ export class UserService {
               id: "beer_explorer",
               name: "Beer Explorer",
               description: "Rate beers from 3 different countries",
-              icon: "🌍",
-              unlockedAt: Timestamp.now(),
-              category: "beginner",
-            })
-          }
-
-          const internationalAdventurerLevels = [5, 10, 20]
-          const highestInternationalLevel = internationalAdventurerLevels.filter(
-            (level) => stats.countriesExplored.length >= level,
-          ).length
-          if (
-            highestInternationalLevel > 0 &&
-            !currentAchievements.some((a) => a.id === `international_adventurer_${highestInternationalLevel}`)
-          ) {
-            newAchievements.push({
-              id: `international_adventurer_${highestInternationalLevel}`,
-              name: "International Adventurer",
-              description: `Rate beers from ${internationalAdventurerLevels[highestInternationalLevel - 1]}+ countries`,
-              icon: "✈️",
-              unlockedAt: Timestamp.now(),
-              category: "intermediate",
-            })
-          }
-
-          const stoutLoverLevels = [10, 25, 50]
-          const highestStoutLevel = stoutLoverLevels.filter(
-            (level) => (stats.beerTypeStats["Stout"] || 0) >= level,
-          ).length
-          if (highestStoutLevel > 0 && !currentAchievements.some((a) => a.id === `stout_lover_${highestStoutLevel}`)) {
-            newAchievements.push({
-              id: `stout_lover_${highestStoutLevel}`,
-              name: "Stout Lover",
-              description: `Rate ${stoutLoverLevels[highestStoutLevel - 1]} Stout beers`,
-              icon: "🍫",
-              unlockedAt: Timestamp.now(),
-              category: "intermediate",
-            })
-          }
-
-          if ((stats.beerTypeStats["IPA"] || 0) >= 30 && !currentAchievements.some((a) => a.id === "ipa_expert")) {
-            newAchievements.push({
-              id: "ipa_expert",
-              name: "IPA Expert",
-              description: "Rate 30 IPA beers",
-              icon: "🌿",
-              unlockedAt: Timestamp.now(),
-              category: "intermediate",
-            })
-          }
-
-          if (
-            Object.keys(stats.beerTypeStats).length >= 5 &&
-            !currentAchievements.some((a) => a.id === "malt_master")
-          ) {
-            newAchievements.push({
-              id: "malt_master",
-              name: "Malt Master",
-              description: "Rate at least 5 different beer styles",
-              icon: "🌾",
-              unlockedAt: Timestamp.now(),
-              category: "intermediate",
-            })
-          }
-
-          if (stats.totalBeersRated >= 500 && !currentAchievements.some((a) => a.id === "beer_encyclopedia")) {
-            newAchievements.push({
-              id: "beer_encyclopedia",
-              name: "Beer Encyclopedia",
-              description: "Rate 500 beers",
-              icon: "📚",
-              unlockedAt: Timestamp.now(),
-              category: "advanced",
-            })
-          }
-
-          if (stats.countriesExplored.length >= 30 && !currentAchievements.some((a) => a.id === "global_beer_tour")) {
-            newAchievements.push({
-              id: "global_beer_tour",
-              name: "Global Beer Tour",
-              description: "Rate beers from 30 countries",
-              icon: "🌎",
-              unlockedAt: Timestamp.now(),
-              category: "advanced",
-            })
-          }
-
-          if (stats.totalBeersRated >= 1000 && !currentAchievements.some((a) => a.id === "grand_hops_master")) {
-            newAchievements.push({
-              id: "grand_hops_master",
-              name: "Grand Hops Master",
-              description: "Rate 1,000 beers",
-              icon: "👑",
-              unlockedAt: Timestamp.now(),
-              category: "advanced",
-            })
-          }
-
-          if (
-            Object.keys(stats.beerTypeStats).length >= 20 &&
-            !currentAchievements.some((a) => a.id === "flavor_collector")
-          ) {
-            newAchievements.push({
-              id: "flavor_collector",
-              name: "Flavor Collector",
-              description: "Rate beers from 20 different styles",
-              icon: "🍻",
-              unlockedAt: Timestamp.now(),
-              category: "advanced",
-            })
-          }
-
-          const continents = ["North America", "South America", "Europe", "Asia", "Africa", "Australia", "Antarctica"]
-          const ratedContinents = new Set(stats.countriesExplored.map((country) => this.getContinent(country)))
-          if (
-            ratedContinents.size === continents.length &&
-            !currentAchievements.some((a) => a.id === "real_beer_hunter")
-          ) {
-            newAchievements.push({
-              id: "real_beer_hunter",
-              name: "The Real Beer Hunter",
-              description: "Try a beer from every continent",
-              icon: "🔥",
-              unlockedAt: Timestamp.now(),
-              category: "advanced",
+              dateUnlocked: Timestamp.now(),
             })
           }
 
@@ -441,33 +336,7 @@ export class UserService {
       )
   }
 
-  private getContinent(country: string): string {
-    const continentMap: { [key: string]: string } = {
-      "United States": "North America",
-      Canada: "North America",
-      Mexico: "North America",
-      Brazil: "South America",
-      Argentina: "South America",
-      "United Kingdom": "Europe",
-      Germany: "Europe",
-      France: "Europe",
-      China: "Asia",
-      Japan: "Asia",
-      India: "Asia",
-      Egypt: "Africa",
-      "South Africa": "Africa",
-      Nigeria: "Africa",
-      Australia: "Oceania",
-      "New Zealand": "Oceania",
-      Antarctica: "Antarctica",
-    }
-
-    return continentMap[country] || "Unknown"
-  }
-
   updateUserRank(userId: string, currentPoints?: number): Observable<UserRank> {
-    console.log(`Updating rank for user ${userId} with ${currentPoints} points`)
-
     return this.firestore
       .doc<UserProfile>(`users/${userId}`)
       .valueChanges()
@@ -477,95 +346,47 @@ export class UserService {
           if (!user) throw new Error("User not found")
 
           const points = currentPoints !== undefined ? currentPoints : user.statistics?.points || 0
-          console.log(`Current points: ${points}`)
+          const newRank: UserRank = this.calculateRank(points)
 
-          const ranks: UserRank[] = [
-            { id: "novice", name: "Novice", icon: "🍺", minPoints: 0, maxPoints: 9, level: 0 },
-            { id: "beer_recruit", name: "Beer Recruit", icon: "🏅", minPoints: 10, maxPoints: 20, level: 1 },
-            { id: "hop_private", name: "Hop Private", icon: "🌿", minPoints: 21, maxPoints: 50, level: 2 },
-            { id: "malt_corporal", name: "Malt Corporal", icon: "🌾", minPoints: 51, maxPoints: 100, level: 3 },
-            { id: "ale_sergeant", name: "Ale Sergeant", icon: "🍺", minPoints: 101, maxPoints: 250, level: 4 },
-            { id: "lager_lieutenant", name: "Lager Lieutenant", icon: "🍻", minPoints: 251, maxPoints: 500, level: 5 },
-            { id: "stout_captain", name: "Stout Captain", icon: "🍺", minPoints: 501, maxPoints: 750, level: 6 },
-            { id: "porter_colonel", name: "Porter Colonel", icon: "🛢️", minPoints: 751, maxPoints: 1000, level: 7 },
-            {
-              id: "imperial_general",
-              name: "Imperial General",
-              icon: "👑",
-              minPoints: 1001,
-              maxPoints: 2000,
-              level: 8,
-            },
-            {
-              id: "grand_brewmaster",
-              name: "Grand Brewmaster",
-              icon: "🏆",
-              minPoints: 2001,
-              maxPoints: Number.POSITIVE_INFINITY,
-              level: 9,
-            },
-          ]
-
-          const newRank = ranks.find((r) => points >= r.minPoints && points <= r.maxPoints) || ranks[0]
-          console.log(`New rank: ${JSON.stringify(newRank)}`)
-
-          if (!user.rank || newRank.name !== user.rank.name) {
+          if (!user.rank || newRank.level !== user.rank.level) {
             return from(this.firestore.doc(`users/${userId}`).update({ rank: newRank })).pipe(
               tap(() => {
                 this.notificationService.addNotification(
-                  `Congratulations! You've reached the rank of ${newRank.name}!`,
+                  `Congratulations! You've reached level ${newRank.level}!`,
                   "rank",
                 )
               }),
-              map(() => {
-                console.log(`Rank updated successfully to: ${newRank.name}`)
-                return newRank
-              }),
+              map(() => newRank),
             )
           }
 
           return of(newRank)
         }),
-        catchError((error) => {
-          console.error(`Error updating rank: ${error}`)
-          throw error
-        }),
       )
   }
 
-  manuallyUpdateRank(userId: string): Observable<UserRank> {
-    return this.updateUserRank(userId, 0).pipe(
-      tap((newRank) => {
-        console.log(`Manually updated rank: ${JSON.stringify(newRank)}`)
-      }),
-    )
+  private calculateRank(points: number): UserRank {
+    const levels = [
+      { level: 0, name: "Novice", minPoints: 0, maxPoints: 9 },
+      { level: 1, name: "Beer Recruit", minPoints: 10, maxPoints: 24 },
+      { level: 2, name: "Hop Private", minPoints: 25, maxPoints: 49 },
+      { level: 3, name: "Malt Corporal", minPoints: 50, maxPoints: 99 },
+      { level: 4, name: "Ale Sergeant", minPoints: 100, maxPoints: 199 },
+      { level: 5, name: "Lager Lieutenant", minPoints: 200, maxPoints: Number.POSITIVE_INFINITY },
+    ]
+
+    const currentLevel = levels.find((l) => points >= l.minPoints && points <= l.maxPoints) || levels[levels.length - 1]
+    const progress = (points - currentLevel.minPoints) / (currentLevel.maxPoints - currentLevel.minPoints)
+
+    return {
+      level: currentLevel.level,
+      name: currentLevel.name,
+      points: points,
+      progress: Math.min(progress, 1),
+    }
   }
 
-  removeFavoriteBeer(beerId: string): Observable<void> {
-    return this.authService.user$.pipe(
-      switchMap((user) => {
-        if (user) {
-          return from(this.firestore.doc(`users/${user.uid}/favorites/${beerId}`).delete())
-        } else {
-          throw new Error("No authenticated user")
-        }
-      }),
-    )
-  }
-
-  removeUserRating(beerId: string): Observable<void> {
-    return this.authService.user$.pipe(
-      switchMap((user) => {
-        if (user) {
-          return from(this.firestore.doc(`users/${user.uid}/ratings/${beerId}`).delete())
-        } else {
-          throw new Error("No authenticated user")
-        }
-      }),
-    )
-  }
-
-  getLeaderboard(type: "global" | "country" = "global", limit = 10): Observable<UserProfile[]> {
+  getLeaderboard(type: "global" | "country" = "global", limit = 10): Observable<LeaderboardEntry[]> {
     const query = this.firestore.collection<UserProfile>("users", (ref) =>
       ref.orderBy("statistics.points", "desc").limit(limit),
     )
@@ -579,29 +400,45 @@ export class UserService {
               ref.where("country", "==", user.country).orderBy("statistics.points", "desc").limit(limit),
             )
             .valueChanges()
+            .pipe(
+              map((users) =>
+                users.map((user) => ({
+                  userId: user.uid,
+                  displayName: user.displayName,
+                  photoURL: user.photoURL,
+                  rank: user.rank,
+                  points: user.statistics.points,
+                })),
+              ),
+            )
         }),
       )
     }
 
-    return query.valueChanges()
+    return query.valueChanges().pipe(
+      map((users) =>
+        users.map((user) => ({
+          userId: user.uid,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          rank: user.rank,
+          points: user.statistics.points,
+        })),
+      ),
+    )
   }
 
-  addPointsToUser(userId: string, points: number): Promise<void> {
-    return this.firestore
-      .doc(`users/${userId}`)
-      .get()
-      .pipe(
-        take(1),
-        switchMap((doc) => {
-          const userData = doc.data() as UserProfile
-          const newPoints = (userData.statistics?.points || 0) + points
-          return this.firestore.doc(`users/${userId}`).update({
-            "statistics.points": newPoints,
-          })
-        }),
-        switchMap(() => this.updateUserRank(userId).pipe(map(() => {}))),
-      )
-      .toPromise()
+  addReward(userId: string, reward: Reward): Promise<void> {
+    return this.firestore.doc(`users/${userId}`).update({
+      rewards: firebase.firestore.FieldValue.arrayUnion(reward),
+    })
+  }
+
+  shareAchievement(userId: string, achievementId: string): Promise<void> {
+    // Implement social media sharing logic here
+    // This is a placeholder function
+    console.log(`Sharing achievement ${achievementId} for user ${userId}`)
+    return Promise.resolve()
   }
 }
 

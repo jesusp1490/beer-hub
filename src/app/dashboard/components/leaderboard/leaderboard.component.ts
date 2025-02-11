@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core"
 import { UserService } from "../../../services/user.service"
-import { UserProfile } from "../../../models/user.model"
+import { LeaderboardEntry } from "../../../models/user.model"
 
 @Component({
   selector: "app-leaderboard",
@@ -8,7 +8,7 @@ import { UserProfile } from "../../../models/user.model"
   styleUrls: ["./leaderboard.component.scss"],
 })
 export class LeaderboardComponent implements OnInit {
-  leaderboard: UserProfile[] = []
+  leaderboardEntries: LeaderboardEntry[] = []
 
   constructor(private userService: UserService) {}
 
@@ -16,13 +16,15 @@ export class LeaderboardComponent implements OnInit {
     this.loadLeaderboard()
   }
 
-  private loadLeaderboard(): void {
-    this.userService.getLeaderboard().subscribe({
-      next: (users) => {
-        this.leaderboard = users
+  loadLeaderboard(): void {
+    this.userService.getLeaderboard().subscribe(
+      (entries: LeaderboardEntry[]) => {
+        this.leaderboardEntries = entries
       },
-      error: (error) => console.error("Error loading leaderboard:", error),
-    })
+      (error) => {
+        console.error("Error loading leaderboard:", error)
+      },
+    )
   }
 }
 

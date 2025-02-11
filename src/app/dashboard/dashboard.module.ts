@@ -9,13 +9,23 @@ import { MatFormFieldModule } from "@angular/material/form-field"
 import { MatCardModule } from "@angular/material/card"
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner"
 import { MatDividerModule } from "@angular/material/divider"
+import { MatProgressBarModule } from "@angular/material/progress-bar"
+import { MatListModule } from "@angular/material/list"
 import { DashboardComponent } from "./dashboard.component"
 import { EditProfileComponent } from "./components/edit-profile/edit-profile.component"
 import { NewBeerRequestComponent } from "./components/new-beer-request/new-beer-request.component"
+import { ChangePasswordComponent } from "./components/change-password/change-password.component"
+import { LeaderboardComponent } from "./components/leaderboard/leaderboard.component"
 import { DashboardRoutingModule } from "../dashboard-routing.module"
 
 @NgModule({
-  declarations: [DashboardComponent, EditProfileComponent, NewBeerRequestComponent],
+  declarations: [
+    DashboardComponent,
+    EditProfileComponent,
+    NewBeerRequestComponent,
+    ChangePasswordComponent,
+    LeaderboardComponent,
+  ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -27,6 +37,8 @@ import { DashboardRoutingModule } from "../dashboard-routing.module"
     MatCardModule,
     MatProgressSpinnerModule,
     MatDividerModule,
+    MatProgressBarModule,
+    MatListModule,
     DashboardRoutingModule,
   ],
 })

@@ -23,6 +23,11 @@ import { MatExpansionModule } from "@angular/material/expansion"
 import { MatCheckboxModule } from "@angular/material/checkbox"
 import { MatSliderModule } from "@angular/material/slider"
 import { MatSnackBarModule } from "@angular/material/snack-bar"
+import { MatCardModule } from "@angular/material/card"
+import { MatListModule } from "@angular/material/list"
+import { MatProgressBarModule } from "@angular/material/progress-bar"
+import { MatTooltipModule } from "@angular/material/tooltip"
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner"
 
 // Firebase Modules
 import { AngularFireModule } from "@angular/fire/compat"
@@ -94,6 +99,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatCheckboxModule,
     MatSliderModule,
     MatSnackBarModule,
+    MatCardModule,
+    MatListModule,
+    MatProgressBarModule,
+    MatTooltipModule,
+    MatProgressSpinnerModule,
   ],
   providers: [
     AuthService,

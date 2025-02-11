@@ -1,19 +1,13 @@
-<div class="leaderboard-section">
-  <table class="leaderboard-table">
-    <thead>
-      <tr>
-        <th>Rank</th>
-        <th>Name</th>
-        <th>Points</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let user of leaderboard; let i = index">
-        <td>{{ i + 1 }}</td>
-        <td>{{ user.displayName }}</td>
-        <td>{{ user.statistics.points || 0 }}</td>
-      </tr>
-    </tbody>
-  </table>
+<div class="leaderboard-container">
+  <h2>Leaderboard</h2>
+  <mat-list>
+    <mat-list-item *ngFor="let entry of leaderboardEntries; let i = index">
+      <span matListItemTitle>{{ i + 1 }}. {{ entry.displayName }}</span>
+      <span matListItemLine>
+        <strong>Rank:</strong> {{ entry.rank.level }}
+        <strong>Points:</strong> {{ entry.points }}
+      </span>
+    </mat-list-item>
+  </mat-list>
 </div>
 

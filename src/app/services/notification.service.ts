@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core"
 import { MatSnackBar } from "@angular/material/snack-bar"
-import { BehaviorSubject, Observable } from "rxjs"
+import { Observable, BehaviorSubject } from "rxjs"
 import { Notification } from "../models/user.model"
+import { Timestamp } from "firebase/firestore"
 
 @Injectable({
   providedIn: "root",
@@ -11,39 +12,47 @@ export class NotificationService {
 
   constructor(private snackBar: MatSnackBar) {}
 
+  showSuccess(message: string): void {
+    this.snackBar.open(message, "Close", {
+      duration: 3000,
+      panelClass: ["success-snackbar"],
+    })
+  }
+
+  showError(message: string): void {
+    this.snackBar.open(message, "Close", {
+      duration: 5000,
+      panelClass: ["error-snackbar"],
+    })
+  }
+
+  addNotification(message: string, type: string): void {
+    const notification: Notification = {
+      id: Date.now().toString(),
+      message,
+      type,
+      timestamp: Timestamp.now(),
+      read: false,
+    }
+
+    const current = this.notifications.value
+    this.notifications.next([notification, ...current])
+  }
+
   getNotifications(): Observable<Notification[]> {
     return this.notifications.asObservable()
   }
 
-  addNotification(message: string, type: "rank" | "achievement"): void {
-    const newNotification: Notification = {
-      id: Date.now().toString(),
-      message,
-      type,
-      timestamp: new Date(),
-      read: false,
-    }
-
-    const currentNotifications = this.notifications.value
-    this.notifications.next([newNotification, ...currentNotifications])
-
-    this.showPushNotification(newNotification)
-  }
-
-  markAsRead(id: string): void {
-    const updatedNotifications = this.notifications.value.map((notification) =>
-      notification.id === id ? { ...notification, read: true } : notification,
+  markAsRead(notificationId: string): void {
+    const current = this.notifications.value
+    const updated = current.map((notification) =>
+      notification.id === notificationId ? { ...notification, read: true } : notification,
     )
-    this.notifications.next(updatedNotifications)
+    this.notifications.next(updated)
   }
 
-  private showPushNotification(notification: Notification): void {
-    this.snackBar.open(notification.message, "Close", {
-      duration: 5000,
-      horizontalPosition: "end",
-      verticalPosition: "top",
-      panelClass: notification.type === "rank" ? "rank-notification" : "achievement-notification",
-    })
+  clearNotifications(): void {
+    this.notifications.next([])
   }
 }
 
