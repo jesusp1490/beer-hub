@@ -1,0 +1,37 @@
+<h2 mat-dialog-title>Edit Profile</h2>
+<mat-dialog-content>
+  <form [formGroup]="profileForm" class="profile-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Display Name</mat-label>
+      <input matInput formControlName="displayName" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>First Name</mat-label>
+      <input matInput formControlName="firstName">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Last Name</mat-label>
+      <input matInput formControlName="lastName">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Country</mat-label>
+      <input matInput formControlName="country">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Bio</mat-label>
+      <textarea matInput formControlName="bio" rows="4"></textarea>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!profileForm.valid">
+    Save Changes
+  </button>
+</mat-dialog-actions>
+

@@ -4,7 +4,6 @@ import { RouterModule } from "@angular/router"
 import { FormsModule, ReactiveFormsModule } from "@angular/forms"
 import { SlickCarouselModule } from "ngx-slick-carousel"
 import { SharedModule } from "../../shared/shared.module"
-
 import { BeersComponent } from "./beers.component"
 import { BeerDetailsComponent } from "../beer-details/beer-details.component"
 

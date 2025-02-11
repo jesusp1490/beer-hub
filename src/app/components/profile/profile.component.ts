@@ -9,7 +9,7 @@ import { MatSnackBar } from "@angular/material/snack-bar"
 import { MatDialog } from "@angular/material/dialog"
 import { Timestamp } from "@angular/fire/firestore"
 import { FormBuilder, FormGroup, Validators } from "@angular/forms"
-import { NewBeerRequestComponent } from "./new-beer-request.component"
+import { NewBeerRequestComponent } from "../../dashboard/components/new-beer-request/new-beer-request.component"
 import { UserProfile, FavoriteBeer, RatedBeer, Achievement, UserRank, Notification } from "../../models/user.model"
 import { NotificationService } from "../../services/notification.service"
 

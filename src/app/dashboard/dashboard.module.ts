@@ -1,55 +1,34 @@
 import { NgModule } from "@angular/core"
 import { CommonModule } from "@angular/common"
-import { RouterModule } from "@angular/router"
 import { ReactiveFormsModule } from "@angular/forms"
-import { MatCardModule } from "@angular/material/card"
+import { MatDialogModule } from "@angular/material/dialog"
 import { MatButtonModule } from "@angular/material/button"
 import { MatIconModule } from "@angular/material/icon"
-import { MatTabsModule } from "@angular/material/tabs"
-import { MatProgressBarModule } from "@angular/material/progress-bar"
-import { MatDialogModule } from "@angular/material/dialog"
-import { MatMenuModule } from "@angular/material/menu"
-import { MatFormFieldModule } from "@angular/material/form-field"
 import { MatInputModule } from "@angular/material/input"
-import { MatDatepickerModule } from "@angular/material/datepicker"
-import { MatNativeDateModule } from "@angular/material/core"
+import { MatFormFieldModule } from "@angular/material/form-field"
+import { MatCardModule } from "@angular/material/card"
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner"
+import { MatDividerModule } from "@angular/material/divider"
 import { DashboardComponent } from "./dashboard.component"
-import { ProfileSectionComponent } from "./components/profile-section/profile-section.component"
-import { RankingSectionComponent } from "./components/ranking-section/ranking-section.component"
-import { AchievementsSectionComponent } from "./components/achievements-section/achievements-section.component"
-import { StatisticsComponent } from "./components/statistics/statistics.component"
-import { ChallengesComponent } from "./components/challenges/challenges.component"
-import { LeaderboardComponent } from "./components/leaderboard/leaderboard.component"
+import { EditProfileComponent } from "./components/edit-profile/edit-profile.component"
+import { NewBeerRequestComponent } from "./components/new-beer-request/new-beer-request.component"
+import { DashboardRoutingModule } from "../dashboard-routing.module"
 
 @NgModule({
-  declarations: [
-    DashboardComponent,
-    ProfileSectionComponent,
-    RankingSectionComponent,
-    AchievementsSectionComponent,
-    StatisticsComponent,
-    ChallengesComponent,
-    LeaderboardComponent,
-  ],
+  declarations: [DashboardComponent, EditProfileComponent, NewBeerRequestComponent],
   imports: [
     CommonModule,
-    RouterModule.forChild([{ path: "", component: DashboardComponent }]),
     ReactiveFormsModule,
-    MatCardModule,
+    MatDialogModule,
     MatButtonModule,
     MatIconModule,
-    MatTabsModule,
-    MatProgressBarModule,
-    MatDialogModule,
-    MatMenuModule,
-    MatFormFieldModule,
     MatInputModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
+    MatFormFieldModule,
+    MatCardModule,
     MatProgressSpinnerModule,
+    MatDividerModule,
+    DashboardRoutingModule,
   ],
-  exports: [DashboardComponent],
 })
 export class DashboardModule {}
 

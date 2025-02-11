@@ -1,15 +1,80 @@
 <div class="dashboard-container" *ngIf="!loading; else loadingTemplate">
-  <div class="dashboard-header">
-    <h1>Welcome, {{ userProfile?.displayName || 'Beer Enthusiast' }}!</h1>
+  <div class="dashboard-sidebar">
+    <div class="user-profile">
+      <div class="profile-header">
+        <img [src]="userProfile?.photoURL || 'assets/default-avatar.png'" alt="Profile Picture" class="profile-picture">
+        <div class="profile-info">
+          <h2>{{ userProfile?.displayName }}</h2>
+          <p class="user-rank">{{ userProfile?.rank?.name }}</p>
+        </div>
+      </div>
+      <div class="profile-actions">
+        <button mat-button (click)="openEditProfile()">
+          <mat-icon>edit</mat-icon>
+          Edit Profile
+        </button>
+        <button mat-button (click)="requestNewBeer()">
+          <mat-icon>add</mat-icon>
+          Request Beer
+        </button>
+        <button mat-button color="warn" (click)="logout()">
+          <mat-icon>exit_to_app</mat-icon>
+          Logout
+        </button>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="quick-stats">
+      <div class="stat-card">
+        <span class="stat-value">{{ userProfile?.statistics?.totalBeersRated || 0 }}</span>
+        <span class="stat-label">Beers Rated</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ userProfile?.statistics?.countriesExplored?.length || 0 }}</span>
+        <span class="stat-label">Countries</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ userProfile?.statistics?.points || 0 }}</span>
+        <span class="stat-label">Points</span>
+      </div>
+    </div>
   </div>
-  
-  <div class="dashboard-grid">
-    <app-profile-section [userProfile]="userProfile" class="dashboard-item profile-section"></app-profile-section>
-    <app-ranking-section [userProfile]="userProfile" class="dashboard-item ranking-section"></app-ranking-section>
-    <app-statistics [userProfile]="userProfile" class="dashboard-item statistics-section"></app-statistics>
-    <app-achievements-section [userProfile]="userProfile" class="dashboard-item achievements-section"></app-achievements-section>
-    <app-challenges [userProfile]="userProfile" class="dashboard-item challenges-section"></app-challenges>
-    <app-leaderboard class="dashboard-item leaderboard-section"></app-leaderboard>
+
+  <div class="dashboard-main">
+    <div class="dashboard-header">
+      <h1>Beer Journey Dashboard</h1>
+    </div>
+
+    <div class="dashboard-grid">
+      <mat-card class="dashboard-card chart-card">
+        <mat-card-header>
+          <mat-card-title>Rating Trends</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <canvas id="ratingChart"></canvas>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="dashboard-card chart-card">
+        <mat-card-header>
+          <mat-card-title>Beer Styles</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <canvas id="styleChart"></canvas>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="dashboard-card chart-card">
+        <mat-card-header>
+          <mat-card-title>Countries Explored</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <canvas id="countryChart"></canvas>
+        </mat-card-content>
+      </mat-card>
+    </div>
   </div>
 </div>
 

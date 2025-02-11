@@ -7,12 +7,10 @@ import { BeersComponent } from "./components/beers/beers.component"
 import { BeerDetailsComponent } from "./components/beer-details/beer-details.component"
 import { AboutComponent } from "./components/about/about.component"
 import { ContactComponent } from "./components/contact/contact.component"
-import { ProfileComponent } from "./components/profile/profile.component"
 import { SignUpComponent } from "./components/sign-up/sign-up.component"
 import { LogInComponent } from "./components/log-in/log-in.component"
 import { AuthGuard } from "./guards/auth.guard"
 import { ForgotPasswordComponent } from "./components/forgot-password/forgot-password.component"
-import { DashboardComponent } from "./dashboard/dashboard.component"
 
 const routes: Routes = [
   { path: "", redirectTo: "/home", pathMatch: "full" },
@@ -20,7 +18,6 @@ const routes: Routes = [
   { path: "map", component: MapComponent },
   { path: "about", component: AboutComponent },
   { path: "contact", component: ContactComponent },
-  { path: "profile", component: ProfileComponent, canActivate: [AuthGuard] },
   { path: "beers", component: BeersComponent },
   { path: "beers/:id", component: BeerDetailsComponent },
   { path: "beer/:id", component: BeerDetailsComponent },
@@ -35,7 +32,7 @@ const routes: Routes = [
   { path: "forgot-password", component: ForgotPasswordComponent },
   {
     path: "dashboard",
-    component: DashboardComponent,
+    loadChildren: () => import("./dashboard/dashboard.module").then((m) => m.DashboardModule),
     canActivate: [AuthGuard],
   },
   { path: "**", redirectTo: "/home" },

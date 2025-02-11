@@ -1,5 +1,4 @@
 <div class="leaderboard-section">
-  <h3>Top Beer Enthusiasts</h3>
   <table class="leaderboard-table">
     <thead>
       <tr>
@@ -12,7 +11,7 @@
       <tr *ngFor="let user of leaderboard; let i = index">
         <td>{{ i + 1 }}</td>
         <td>{{ user.displayName }}</td>
-        <td>{{ user.statistics?.points || 0 }}</td>
+        <td>{{ user.statistics.points || 0 }}</td>
       </tr>
     </tbody>
   </table>

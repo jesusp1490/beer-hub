@@ -13,11 +13,10 @@ import { MatDialogModule } from "@angular/material/dialog"
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner"
 import { MatProgressBarModule } from "@angular/material/progress-bar"
 import { MatListModule } from "@angular/material/list"
-import { ProfileComponent } from "./profile.component"
-import { SharedModule } from "../../shared/shared.module"
+import { ProfileSectionComponent } from "./profile-section.component"
 
 @NgModule({
-  declarations: [ProfileComponent],
+  declarations: [ProfileSectionComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -33,8 +32,8 @@ import { SharedModule } from "../../shared/shared.module"
     MatProgressSpinnerModule,
     MatProgressBarModule,
     MatListModule,
-    SharedModule,
   ],
+  exports: [ProfileSectionComponent],
 })
-export class ProfileModule {}
+export class ProfileSectionModule {}
 
