@@ -1,32 +1,194 @@
+@import 'src/styles/_variables.scss';
+
 .dashboard-container {
-    padding: 20px;
+    max-width: $breakpoint-large-desktop;
+    margin: 0 auto;
+    padding: $spacing-large;
+    background-color: $color-background-dark;
+    min-height: 100vh;
+    font-family: $font-family-primary;
+    color: $color-text-light;
 }
 
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-large;
+
+    h1 {
+        font-size: $font-size-large;
+        font-weight: 600;
+        color: $color-primary;
+    }
+
+    .user-actions {
+        display: flex;
+        align-items: center;
+        gap: $spacing-medium;
+
+        .search-input {
+            padding: $spacing-small $spacing-medium;
+            border: 1px solid $color-tag-background;
+            border-radius: $border-radius;
+            font-size: $font-size-small;
+            background-color: $color-card-background;
+            color: $color-text-light;
+        }
+
+        .icon-button {
+            background: none;
+            border: none;
+            font-size: $font-size-large;
+            cursor: pointer;
+            color: $color-text-secondary;
+            transition: color 0.3s ease;
+
+            &:hover {
+                color: $color-primary;
+            }
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: $spacing-small;
+
+            span {
+                font-size: $font-size-small;
+                font-weight: 500;
+            }
+
+            .avatar {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+            }
+        }
+    }
 }
 
-.dashboard-item {
-    min-height: 200px;
+.dashboard-content {
+    .stats-overview {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: $spacing-medium;
+        margin-bottom: $spacing-large;
+
+        .stat-card {
+            background-color: $color-card-background;
+            border-radius: $border-radius;
+            padding: $spacing-medium;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+
+            &:hover {
+                background-color: $color-hover;
+            }
+
+            h3 {
+                font-size: $font-size-small;
+                font-weight: 600;
+                color: $color-text-secondary;
+                margin-bottom: $spacing-small;
+            }
+
+            p {
+                font-size: $font-size-large;
+                font-weight: 700;
+                color: $color-primary;
+            }
+        }
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: $spacing-medium;
+
+        .dashboard-card {
+            background-color: $color-card-background;
+            border-radius: $border-radius;
+            padding: $spacing-medium;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    }
 }
 
-.loading-container,
-.error-container {
+.loading-overlay,
+.error-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba($color-background-dark, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    z-index: 1000;
 }
 
-mat-card {
-    height: 100%;
-    box-sizing: border-box;
+.error-message {
+    background-color: $color-card-background;
+    padding: $spacing-large;
+    border-radius: $border-radius;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+
+    h2 {
+        color: $color-secondary;
+        margin-bottom: $spacing-medium;
+    }
+
+    p {
+        color: $color-text-light;
+    }
 }
 
-@media (max-width: 768px) {
-    .dashboard-grid {
-        grid-template-columns: 1fr;
+// Responsive design
+@include phone {
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+
+        .user-actions {
+            margin-top: $spacing-medium;
+            width: 100%;
+        }
+    }
+
+    .dashboard-content {
+        .stats-overview {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+}
+
+@include tablet {
+    .dashboard-content {
+        .dashboard-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+}
+
+@include desktop {
+    // The default styles are already suitable for desktop
+}
+
+@include large-desktop {
+    .dashboard-container {
+        max-width: $breakpoint-large-desktop;
+    }
+}
+
+@include extra-large-desktop {
+    .dashboard-container {
+        max-width: $breakpoint-extra-large-desktop;
     }
 }

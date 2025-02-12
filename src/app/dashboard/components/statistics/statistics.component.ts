@@ -1,7 +1,7 @@
-import { Component, Input, type OnChanges, ViewChild, type ElementRef } from "@angular/core"
+import { Component, Input, OnChanges, ViewChild, ElementRef } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { MatCardModule } from "@angular/material/card"
-import { Chart, type ChartConfiguration } from "chart.js/auto"
+import { Chart, ChartConfiguration } from "chart.js/auto"
 import { UserProfile } from "../../../models/user.model"
 
 @Component({
@@ -16,32 +16,8 @@ export class StatisticsComponent implements OnChanges {
   @ViewChild("beerStylesChart") beerStylesChartRef!: ElementRef
 
   beerStylesChart: Chart | null = null
-  totalBeersRated = 0
-  countriesExplored = 0
-  favoriteStyle = ""
 
   ngOnChanges(): void {
-    this.updateStatistics()
-    this.updateCharts()
-  }
-
-  private updateStatistics(): void {
-    if (this.userProfile && this.userProfile.statistics) {
-      this.totalBeersRated = this.userProfile.statistics.totalBeersRated || 0
-      this.countriesExplored = this.userProfile.statistics.countriesExplored?.length || 0
-      this.favoriteStyle = this.getFavoriteStyle()
-    }
-  }
-
-  private getFavoriteStyle(): string {
-    if (this.userProfile && this.userProfile.statistics && this.userProfile.statistics.beerTypeStats) {
-      const beerTypeStats = this.userProfile.statistics.beerTypeStats
-      return Object.keys(beerTypeStats).reduce((a, b) => (beerTypeStats[a] > beerTypeStats[b] ? a : b), "")
-    }
-    return ""
-  }
-
-  private updateCharts(): void {
     if (this.userProfile && this.beerStylesChartRef) {
       this.createBeerStylesChart()
     }
@@ -52,31 +28,67 @@ export class StatisticsComponent implements OnChanges {
     const data = this.userProfile?.statistics?.beerTypeStats || {}
 
     const config: ChartConfiguration = {
-      type: "pie",
+      type: "bar",
       data: {
         labels: Object.keys(data),
         datasets: [
           {
             data: Object.values(data),
-            backgroundColor: [
-              "rgba(255, 99, 132, 0.8)",
-              "rgba(54, 162, 235, 0.8)",
-              "rgba(255, 206, 86, 0.8)",
-              "rgba(75, 192, 192, 0.8)",
-              "rgba(153, 102, 255, 0.8)",
-            ],
+            backgroundColor: this.generateColors(Object.keys(data).length),
+            borderColor: "rgba(255, 255, 255, 0.1)",
+            borderWidth: 1,
+            borderRadius: 4,
+            maxBarThickness: 35,
           },
         ],
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: {
-            position: "top",
+            display: false,
           },
           title: {
             display: true,
-            text: "Beer Styles Rated",
+            text: "Beer Styles Distribution",
+            color: "#e0e0e0",
+            font: {
+              size: 16,
+              weight: "bold",
+              family: "'Montserrat', sans-serif",
+            },
+            padding: {
+              top: 10,
+              bottom: 20,
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              color: "#a0a0a0",
+              font: {
+                size: 12,
+                family: "'Montserrat', sans-serif",
+              },
+            },
+            grid: {
+              color: "rgba(255, 255, 255, 0.1)",
+            },
+          },
+          x: {
+            ticks: {
+              color: "#a0a0a0",
+              font: {
+                size: 12,
+                family: "'Montserrat', sans-serif",
+              },
+            },
+            grid: {
+              display: false,
+            },
           },
         },
       },
@@ -86,6 +98,14 @@ export class StatisticsComponent implements OnChanges {
       this.beerStylesChart.destroy()
     }
     this.beerStylesChart = new Chart(ctx, config)
+  }
+
+  private generateColors(count: number): string[] {
+    const baseColor = [255, 167, 38] // A shade of orange
+    return Array.from({ length: count }, (_, i) => {
+      const shade = 1 - (i / count) * 0.6 // Adjust this value to change color variation
+      return `rgba(${baseColor[0] * shade}, ${baseColor[1] * shade}, ${baseColor[2] * shade}, 0.7)`
+    })
   }
 }
 
