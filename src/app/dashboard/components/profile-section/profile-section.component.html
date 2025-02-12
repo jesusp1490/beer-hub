@@ -1,14 +1,42 @@
-<div class="profile-section">
-  <div class="profile-picture">
-    <img [src]="userProfile?.photoURL || 'assets/default-avatar.png'" alt="Profile Picture">
-    <button mat-mini-fab color="primary" class="change-picture-btn" (click)="fileInput.click()">
-      <mat-icon>edit</mat-icon>
-    </button>
-    <input #fileInput type="file" (change)="updateProfilePicture($event)" style="display: none;">
+<div class="profile-container" *ngIf="userProfile">
+  <div class="profile-header">
+    <div class="profile-picture-container">
+      <img [src]="userProfile.photoURL || '/assets/default-avatar.png'" alt="Profile Picture" class="profile-picture">
+      <button mat-mini-fab color="primary" class="edit-picture-button" (click)="fileInput.click()">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <input #fileInput type="file" (change)="updateProfilePicture($event)" style="display: none;">
+    </div>
+    <div class="profile-info">
+      <h2>{{ userProfile.displayName }}</h2>
+      <p>{{ userProfile.email }}</p>
+      <button mat-stroked-button color="primary" (click)="toggleEditMode()">
+        {{ editMode ? 'Save Profile' : 'Edit Profile' }}
+      </button>
+    </div>
   </div>
-  <h2>{{ userProfile?.displayName }}</h2>
-  <p>{{ userProfile?.email }}</p>
-  <p>{{ userProfile?.country }}</p>
-  <p>Joined: {{ userProfile?.statistics?.registrationDate?.toDate() | date }}</p>
-</div>
 
+  <div class="profile-details" *ngIf="!editMode">
+    <p><strong>Username:</strong> {{ userProfile.username }}</p>
+    <p><strong>Country:</strong> {{ userProfile.country }}</p>
+    <p><strong>Joined:</strong> {{ getDateString(userProfile.statistics?.registrationDate) }}</p>
+    <p><strong>Total Beers Rated:</strong> {{ userProfile.statistics?.totalBeersRated || 0 }}</p>
+  </div>
+
+  <div class="profile-edit" *ngIf="editMode">
+    <mat-form-field appearance="outline">
+      <mat-label>Username</mat-label>
+      <input matInput [(ngModel)]="editedProfile.username" name="username">
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Country</mat-label>
+      <input matInput [(ngModel)]="editedProfile.country" name="country">
+    </mat-form-field>
+  </div>
+
+  <div class="rank-info" *ngIf="userProfile.rank">
+    <h3>Current Rank: {{ userProfile.rank.name }}</h3>
+    <mat-progress-bar mode="determinate" [value]="getRankProgress(userProfile.rank)"></mat-progress-bar>
+    <p>{{ userProfile.rank.points }} / {{ userProfile.rank.points + 100 }} points to next rank</p>
+  </div>
+</div>

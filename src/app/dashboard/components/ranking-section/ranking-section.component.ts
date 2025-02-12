@@ -1,8 +1,8 @@
-import { Component, Input, SimpleChanges } from "@angular/core"
+import { Component, Input, type SimpleChanges } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { MatCardModule } from "@angular/material/card"
 import { MatProgressBarModule } from "@angular/material/progress-bar"
-import { UserProfile, UserRank } from "../../../models/user.model"
+import type { UserProfile, UserRank } from "../../../models/user.model"
 
 @Component({
   selector: "app-ranking-section",

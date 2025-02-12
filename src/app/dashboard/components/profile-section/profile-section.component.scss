@@ -1,32 +1,77 @@
-.profile-section {
-    text-align: center;
+.profile-container {
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
-    .profile-picture {
-        position: relative;
-        width: 150px;
-        height: 150px;
-        margin: 0 auto 1rem;
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
 
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-        }
+.profile-picture-container {
+    position: relative;
+    margin-right: 20px;
+}
 
-        .change-picture-btn {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-        }
-    }
+.profile-picture {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.edit-picture-button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translate(25%, 25%);
+}
+
+.profile-info {
+    flex: 1;
 
     h2 {
-        margin-bottom: 0.5rem;
+        margin: 0 0 5px;
+        font-size: 24px;
     }
 
     p {
-        margin: 0.25rem 0;
+        margin: 0 0 10px;
         color: #666;
     }
+}
+
+.profile-details,
+.profile-edit {
+    margin-bottom: 20px;
+
+    p {
+        margin: 5px 0;
+    }
+}
+
+.profile-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.rank-info {
+    h3 {
+        margin: 0 0 10px;
+        font-size: 18px;
+    }
+
+    p {
+        margin: 5px 0 0;
+        font-size: 14px;
+        color: #666;
+    }
+}
+
+mat-progress-bar {
+    margin-bottom: 5px;
 }
