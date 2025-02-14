@@ -13,6 +13,8 @@ import { MatIconModule } from "@angular/material/icon"
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner"
 import { Router, RouterModule } from "@angular/router"
 import { Timestamp } from "@angular/fire/firestore"
+import { MatSelectModule } from "@angular/material/select"
+import { getNames } from "country-list"
 
 @Component({
   selector: "app-sign-up",
@@ -32,12 +34,14 @@ import { Timestamp } from "@angular/fire/firestore"
     MatIconModule,
     MatProgressSpinnerModule,
     RouterModule,
+    MatSelectModule,
   ],
 })
 export class SignUpComponent implements OnInit {
   signUpForm!: FormGroup
   hidePassword = true
   isLoading = false
+  countries: string[] = getNames()
 
   constructor(
     private fb: FormBuilder,
@@ -68,6 +72,7 @@ export class SignUpComponent implements OnInit {
         const uid = result.user?.uid
 
         if (uid) {
+          const registrationDate = Timestamp.now()
           await this.firestore
             .collection("users")
             .doc(uid)
@@ -78,7 +83,7 @@ export class SignUpComponent implements OnInit {
               country,
               dob: dob ? Timestamp.fromDate(dob) : null,
               email,
-              createdAt: Timestamp.now(),
+              createdAt: registrationDate,
               photoURL: null,
               emailVerified: false,
               rank: { name: "Novice", level: 1, points: 0, progress: 0, pointsToNextRank: 100 },
@@ -89,7 +94,7 @@ export class SignUpComponent implements OnInit {
                 totalBeersRated: 0,
                 countriesExplored: [],
                 beerTypeStats: {},
-                registrationDate: Timestamp.now(),
+                registrationDate: registrationDate,
                 averageRating: 0,
                 favoriteBrewery: "",
                 points: 0,

@@ -14,6 +14,7 @@ import { StatisticsComponent } from "./components/statistics/statistics.componen
 import { LeaderboardComponent } from "./components/leaderboard/leaderboard.component"
 import { ChallengesComponent } from "./components/challenges/challenges.component"
 import { AchievementSectionComponent } from "./components/achievements-section/achievements-section.component"
+import { Timestamp } from "firebase/firestore"
 
 @Component({
   selector: "app-dashboard",
@@ -64,25 +65,31 @@ export class DashboardComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error("Error loading user profile:", error)
-          // Handle the error, maybe set default values or show an error message
           this.userProfile = null
           this.userStats = null
         },
       })
   }
 
-  onEditField(event: { field: string; value: string }): void {
+  onEditField(event: { field: string; value: string | Date }): void {
     if (this.userProfile) {
+      const updatedProfile: Partial<UserProfile> = { ...this.userProfile }
+
+      if (event.field === "dob") {
+        updatedProfile.dob = Timestamp.fromDate(event.value as Date)
+      } else if (event.field === "firstName" || event.field === "lastName") {
+        updatedProfile[event.field] = event.value as string
+      } else {
+        ;(updatedProfile as any)[event.field] = event.value
+      }
+
       this.userService
-        .updateUserProfile({
-          ...this.userProfile,
-          [event.field]: event.value,
-        })
+        .updateUserProfile(updatedProfile)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
             console.log(`Field ${event.field} updated successfully`)
-            this.loadUserProfile() // Reload the profile after update
+            this.loadUserProfile()
           },
           error: (error) => {
             console.error(`Error updating ${event.field}:`, error)
@@ -112,7 +119,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (url) => {
           console.log("Profile picture uploaded:", url)
-          this.loadUserProfile() // Reload the profile after update
+          this.loadUserProfile()
         },
         error: (error) => {
           console.error("Error uploading profile picture:", error)

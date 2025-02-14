@@ -67,7 +67,7 @@
               }
             ],
             "allowedCommonJsDependencies": [
-              "jquery"
+              "jquery", "country-list"
             ]
           },
           "configurations": {

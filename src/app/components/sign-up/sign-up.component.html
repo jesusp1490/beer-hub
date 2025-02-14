@@ -60,8 +60,11 @@
 
         <mat-form-field appearance="fill">
           <mat-label>Country</mat-label>
-          <input matInput formControlName="country" required>
-          <mat-icon matSuffix>public</mat-icon>
+          <mat-select formControlName="country" required>
+            <mat-option *ngFor="let country of countries" [value]="country">
+              {{country}}
+            </mat-option>
+          </mat-select>
           <mat-error *ngIf="signUpForm.get('country')?.invalid && (signUpForm.get('country')?.dirty || signUpForm.get('country')?.touched)">
             Country is required
           </mat-error>
