@@ -56,20 +56,7 @@
   </div>
 
   <!-- Rank Card -->
-  <div class="rank-card">
-    <img [src]="userProfile?.rank?.icon || 'assets/ranks/novice.png'" alt="Rank Icon">
-    <div class="rank-info">
-      <h3>{{ userProfile?.rank?.name || 'Hop Private' }}</h3>
-      <p>Level {{ userProfile?.rank?.level || 2 }}</p>
-    </div>
-    <mat-progress-bar
-      mode="determinate"
-      [value]="35"
-    ></mat-progress-bar>
-    <p class="progress-text">
-      35 / 100 points
-    </p>
-  </div>
+  <app-ranking-section [userProfile]="userProfile"></app-ranking-section>
 
   <!-- Action Buttons -->
   <div class="action-buttons">

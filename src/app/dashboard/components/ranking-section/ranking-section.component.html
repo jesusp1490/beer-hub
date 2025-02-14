@@ -1,36 +1,46 @@
-<mat-card class="ranking-section">
-  <mat-card-header>
-    <mat-card-title>Your Rank</mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <div class="current-rank" *ngIf="currentRank">
-      <div class="rank-icon">{{ currentRank.icon }}</div>
-      <div class="rank-info">
-        <h2>{{ currentRank.name }} {{ currentRank.level }}</h2>
-        <p>{{ userProfile?.statistics?.totalBeersRated || 0 }} beers rated</p>
-      </div>
+<div class="current-rank-card" *ngIf="currentRank">
+  <div class="rank-header">
+    <div class="rank-icon">{{ currentRank.icon }}</div>
+    <div class="rank-info">
+      <h3>{{ currentRank.name }}</h3>
+      <p>Level {{ currentRank.level }}</p>
     </div>
-    <div class="progress-container">
-      <mat-progress-spinner
-        class="progress-circle"
-        [value]="progress"
-        [diameter]="100"
-        [strokeWidth]="10"
-        mode="determinate"
-      ></mat-progress-spinner>
-      <span class="progress-text">{{ progress.toFixed(0) }}%</span>
-    </div>
-    <p class="remaining-xp">{{ remainingXP }} XP to reach next level</p>
+  </div>
+  <div class="progress-info">
+    <mat-progress-bar
+      mode="determinate"
+      [value]="progress"
+    ></mat-progress-bar>
+    <p class="progress-text">
+      {{ remainingXP }} points to next rank
+    </p>
+  </div>
+</div>
 
-    <div class="all-ranks">
-      <h3>Rank Progression</h3>
-      <div class="rank-list">
-        <div *ngFor="let rank of allRanks" class="rank-item" [ngClass]="getRankStatus(rank)">
-          <span class="rank-icon">{{ rank.icon }}</span>
-          <span class="rank-name">{{ rank.name }}</span>
-        </div>
+<mat-expansion-panel class="rank-progression">
+  <mat-expansion-panel-header>
+    <mat-panel-title>Rank Progression</mat-panel-title>
+  </mat-expansion-panel-header>
+  
+  <div class="rank-cards">
+    <div 
+      *ngFor="let rank of allRanks" 
+      class="rank-card" 
+      [class.locked]="getRankStatus(rank) === 'locked'"
+      [class.current]="getRankStatus(rank) === 'current'"
+      [class.unlocked]="getRankStatus(rank) === 'unlocked'"
+    >
+      <div class="rank-icon">{{ rank.icon }}</div>
+      <div class="rank-name">{{ rank.name }}</div>
+      <div class="rank-levels">
+        <span 
+          *ngFor="let level of ['I', 'II', 'III']"
+          [class.active]="isCurrentLevel(rank.name, level)"
+        >
+          {{ level }}
+        </span>
       </div>
     </div>
-  </mat-card-content>
-</mat-card>
+  </div>
+</mat-expansion-panel>
 

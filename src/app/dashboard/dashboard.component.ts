@@ -6,8 +6,8 @@ import { UserService } from "../services/user.service"
 import { AuthService } from "../services/auth.service"
 import { BeerService } from "../services/beer.service"
 import { UserStatistics, UserProfile } from "../models/user.model"
-import { Subject } from "rxjs"
-import { takeUntil } from "rxjs/operators"
+import { Subject, of } from "rxjs"
+import { takeUntil, take, switchMap } from "rxjs/operators"
 import { ProfileSectionComponent } from "./components/profile-section/profile-section.component"
 import { RankingSectionComponent } from "./components/ranking-section/ranking-section.component"
 import { StatisticsComponent } from "./components/statistics/statistics.component"
@@ -48,6 +48,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadUserProfile()
+    this.fixUserRank()
   }
 
   ngOnDestroy(): void {
@@ -69,6 +70,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
           console.error("Error loading user profile:", error)
           this.userProfile = null
           this.userStats = null
+        },
+      })
+  }
+
+  private fixUserRank(): void {
+    this.userService
+      .getCurrentUser()
+      .pipe(
+        take(1),
+        switchMap((user) => {
+          if (user?.uid) {
+            return this.userService.recalculateUserPoints(user.uid)
+          }
+          return of(null)
+        }),
+      )
+      .subscribe({
+        next: () => {
+          console.log("User rank recalculated")
+          this.loadUserProfile()
+        },
+        error: (error) => {
+          console.error("Error recalculating user rank:", error)
         },
       })
   }

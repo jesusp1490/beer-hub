@@ -19,6 +19,18 @@ import {
 import { Timestamp } from "@angular/fire/firestore"
 import { NotificationService } from "./notification.service"
 
+interface RankLevel {
+  name: string
+  minXP: number
+  maxXP: number
+}
+
+interface RankDefinition {
+  name: string
+  icon: string
+  levels: RankLevel[]
+}
+
 @Injectable({
   providedIn: "root",
 })
@@ -365,116 +377,123 @@ export class UserService {
       )
   }
 
-  private calculateRank(ratings: number): UserRank {
-    const ranks = [
-      {
-        name: "Beer Recruit",
-        icon: "🍺",
-        levels: [
-          { name: "I", min: 0, max: 20 },
-          { name: "II", min: 21, max: 40 },
-          { name: "III", min: 41, max: 60 },
-        ],
-      },
-      {
-        name: "Hop Private",
-        icon: "🌿",
-        levels: [
-          { name: "I", min: 61, max: 100 },
-          { name: "II", min: 101, max: 140 },
-          { name: "III", min: 141, max: 180 },
-        ],
-      },
-      {
-        name: "Malt Corporal",
-        icon: "🌾",
-        levels: [
-          { name: "I", min: 181, max: 250 },
-          { name: "II", min: 251, max: 320 },
-          { name: "III", min: 321, max: 400 },
-        ],
-      },
-      {
-        name: "Ale Sergeant",
-        icon: "🍺",
-        levels: [
-          { name: "I", min: 401, max: 500 },
-          { name: "II", min: 501, max: 600 },
-          { name: "III", min: 601, max: 700 },
-        ],
-      },
-      {
-        name: "Lager Lieutenant",
-        icon: "🛢",
-        levels: [
-          { name: "I", min: 701, max: 850 },
-          { name: "II", min: 851, max: 1000 },
-          { name: "III", min: 1001, max: 1200 },
-        ],
-      },
-      {
-        name: "Stout Captain",
-        icon: "🍻",
-        levels: [
-          { name: "I", min: 1201, max: 1400 },
-          { name: "II", min: 1401, max: 1600 },
-          { name: "III", min: 1601, max: 1800 },
-        ],
-      },
-      {
-        name: "Porter Colonel",
-        icon: "🛢",
-        levels: [
-          { name: "I", min: 1801, max: 2000 },
-          { name: "II", min: 2001, max: 2200 },
-          { name: "III", min: 2201, max: 2500 },
-        ],
-      },
-      {
-        name: "Imperial General",
-        icon: "👑",
-        levels: [
-          { name: "I", min: 2501, max: 2800 },
-          { name: "II", min: 2801, max: 3100 },
-          { name: "III", min: 3101, max: 3500 },
-        ],
-      },
-      {
-        name: "Grand Brewmaster",
-        icon: "🏆",
-        levels: [
-          { name: "I", min: 3501, max: 4000 },
-          { name: "II", min: 4001, max: 4500 },
-          { name: "III", min: 4501, max: Number.POSITIVE_INFINITY },
-        ],
-      },
-    ]
+  private readonly rankDefinitions: RankDefinition[] = [
+    {
+      name: "Beer Recruit",
+      icon: "🍺",
+      levels: [
+        { name: "I", minXP: 0, maxXP: 19 },
+        { name: "II", minXP: 20, maxXP: 39 },
+        { name: "III", minXP: 40, maxXP: 59 },
+      ],
+    },
+    {
+      name: "Hop Private",
+      icon: "🌿",
+      levels: [
+        { name: "I", minXP: 60, maxXP: 99 },
+        { name: "II", minXP: 100, maxXP: 139 },
+        { name: "III", minXP: 140, maxXP: 179 },
+      ],
+    },
+    {
+      name: "Malt Corporal",
+      icon: "🌾",
+      levels: [
+        { name: "I", minXP: 180, maxXP: 249 },
+        { name: "II", minXP: 250, maxXP: 319 },
+        { name: "III", minXP: 320, maxXP: 399 },
+      ],
+    },
+    {
+      name: "Ale Sergeant",
+      icon: "🍺",
+      levels: [
+        { name: "I", minXP: 400, maxXP: 499 },
+        { name: "II", minXP: 500, maxXP: 599 },
+        { name: "III", minXP: 600, maxXP: 699 },
+      ],
+    },
+    {
+      name: "Lager Lieutenant",
+      icon: "🍻",
+      levels: [
+        { name: "I", minXP: 700, maxXP: 849 },
+        { name: "II", minXP: 850, maxXP: 999 },
+        { name: "III", minXP: 1000, maxXP: 1199 },
+      ],
+    },
+    {
+      name: "Stout Captain",
+      icon: "🍻",
+      levels: [
+        { name: "I", minXP: 1200, maxXP: 1399 },
+        { name: "II", minXP: 1400, maxXP: 1599 },
+        { name: "III", minXP: 1600, maxXP: 1799 },
+      ],
+    },
+    {
+      name: "Porter Colonel",
+      icon: "🏆",
+      levels: [
+        { name: "I", minXP: 1800, maxXP: 1999 },
+        { name: "II", minXP: 2000, maxXP: 2199 },
+        { name: "III", minXP: 2200, maxXP: 2499 },
+      ],
+    },
+    {
+      name: "Imperial General",
+      icon: "👑",
+      levels: [
+        { name: "I", minXP: 2500, maxXP: 2799 },
+        { name: "II", minXP: 2800, maxXP: 3099 },
+        { name: "III", minXP: 3100, maxXP: 3499 },
+      ],
+    },
+    {
+      name: "Grand Brewmaster",
+      icon: "🏆",
+      levels: [
+        { name: "I", minXP: 3500, maxXP: 3999 },
+        { name: "II", minXP: 4000, maxXP: 4499 },
+        { name: "III", minXP: 4500, maxXP: Number.POSITIVE_INFINITY },
+      ],
+    },
+  ]
 
-    let currentRank = ranks[0]
-    let currentLevel = currentRank.levels[0]
+  private calculateRank(points: number): UserRank {
+    let currentRank: RankDefinition | undefined
+    let currentLevel: RankLevel | undefined
 
-    for (const rank of ranks) {
+    // Find the appropriate rank and level based on points
+    for (const rank of this.rankDefinitions) {
       for (const level of rank.levels) {
-        if (ratings >= level.min && ratings <= level.max) {
+        if (points >= level.minXP && points <= level.maxXP) {
           currentRank = rank
           currentLevel = level
           break
         }
       }
-      if (currentRank === rank) break
+      if (currentRank && currentLevel) break
     }
 
-    const nextLevel = this.getNextLevel(ranks, currentRank, currentLevel)
-    const progress = (ratings - currentLevel.min) / (currentLevel.max - currentLevel.min)
-    const pointsToNextRank = nextLevel ? nextLevel.min - ratings : 0
+    // If no rank found (shouldn't happen), use first rank level I
+    if (!currentRank || !currentLevel) {
+      currentRank = this.rankDefinitions[0]
+      currentLevel = currentRank.levels[0]
+    }
+
+    // Calculate progress within current level
+    const levelProgress = ((points - currentLevel.minXP) / (currentLevel.maxXP - currentLevel.minXP)) * 100
+    const pointsToNextRank = currentLevel.maxXP - points
 
     return {
-      name: `${currentRank.name} ${currentLevel.name}`,
+      name: currentRank.name,
       icon: currentRank.icon,
       level: currentLevel.name,
-      progress: progress,
-      pointsToNextRank: pointsToNextRank,
-      points: ratings,
+      progress: Math.min(levelProgress, 100),
+      pointsToNextRank: Math.max(pointsToNextRank, 0),
+      points: points,
     }
   }
 
@@ -522,5 +541,126 @@ export class UserService {
     console.log(`Sharing achievement ${achievementId} for user ${userId}`)
     return Promise.resolve()
   }
+
+  // Add this new method to recalculate points and fix ranks
+  recalculateUserPoints(userId: string): Observable<void> {
+    return this.firestore
+      .doc<UserProfile>(`users/${userId}`)
+      .valueChanges()
+      .pipe(
+        take(1),
+        switchMap((user) => {
+          if (!user) throw new Error("User not found")
+
+          // Calculate total points based on all actions
+          let totalPoints = 0
+
+          // Points from beer ratings (1 XP each)
+          totalPoints += user.statistics?.totalBeersRated || 0
+
+          // Points from achievements (based on level)
+          user.achievements?.forEach((achievement) => {
+            if (achievement.id.includes("bronze")) totalPoints += 10
+            if (achievement.id.includes("silver")) totalPoints += 25
+            if (achievement.id.includes("gold")) totalPoints += 50
+          })
+
+          // Update user statistics with new points
+          const updatedStats: UserStatistics = {
+            ...(user.statistics || this.initializeStatistics(undefined)),
+            points: totalPoints,
+          }
+
+          // Calculate new rank based on total points
+          const newRank = this.calculateRank(totalPoints)
+
+          // Update both statistics and rank in the database
+          return from(
+            this.firestore.doc(`users/${userId}`).update({
+              statistics: updatedStats,
+              rank: newRank,
+            }),
+          )
+        }),
+      )
+  }
+
+  // Update the point calculation for different actions
+  addPoints(
+    userId: string,
+    action: "rate" | "request" | "add" | "review" | "challenge" | "achievement",
+    level?: "bronze" | "silver" | "gold",
+  ): Observable<void> {
+    const pointsMap = {
+      rate: 1, // Rating a beer
+      request: 3, // Requesting a new beer
+      add: 5, // Adding a new beer to database
+      review: 2, // Writing a detailed review
+      challenge: 10, // Basic challenge completion
+      achievement: level === "bronze" ? 10 : level === "silver" ? 25 : 50, // Achievement points
+    }
+
+    const points = pointsMap[action]
+
+    return this.firestore
+      .doc<UserProfile>(`users/${userId}`)
+      .valueChanges()
+      .pipe(
+        take(1),
+        switchMap((user) => {
+          if (!user) throw new Error("User not found")
+
+          const currentPoints = user.statistics?.points || 0
+          const newPoints = currentPoints + points
+
+          // Update statistics with new points
+          const updatedStats: UserStatistics = {
+            ...(user.statistics || this.initializeStatistics(undefined)),
+            points: newPoints,
+          }
+
+          // Calculate new rank based on total points
+          const newRank = this.calculateRank(newPoints)
+
+          // Update both statistics and rank
+          return from(
+            this.firestore.doc(`users/${userId}`).update({
+              statistics: updatedStats,
+              rank: newRank,
+            }),
+          )
+        }),
+      )
+  }
+
+  // Update the rate beer method to add points
+  rateBeer(userId: string, beerId: string, rating: number, review?: string): Observable<void> {
+    return this.addPoints(userId, "rate").pipe(
+      switchMap(() => {
+        if (review && review.length >= 50) {
+          // If detailed review
+          return this.addPoints(userId, "review")
+        }
+        return of(void 0)
+      }),
+    )
+  }
+
+  // Update the request new beer method to add points
+  requestNewBeer(userId: string, beerDetails: any): Observable<void> {
+    return this.addPoints(userId, "request")
+  }
+
+  // Update the add new beer method to add points
+  addNewBeer(userId: string, beerDetails: any): Observable<void> {
+    return this.addPoints(userId, "add")
+  }
+
+  // Update challenge completion to add points
+  completeChallenge(userId: string, challengeId: string): Observable<void> {
+    return this.addPoints(userId, "challenge")
+  }
+
+  // ... (rest of the code remains the same)
 }
 

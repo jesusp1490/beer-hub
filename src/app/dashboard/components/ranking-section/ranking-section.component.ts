@@ -1,14 +1,18 @@
 import { Component, Input, OnChanges, SimpleChanges } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { MatCardModule } from "@angular/material/card"
-import { MatProgressSpinnerModule } from "@angular/material/progress-spinner"
-import { MatIconModule } from "@angular/material/icon"
+import { MatProgressBarModule } from "@angular/material/progress-bar"
+import { MatExpansionModule } from "@angular/material/expansion"
 import { UserProfile, UserRank } from "../../../models/user.model"
 
 interface RankInfo {
   name: string
   icon: string
-  sublevels: { name: string; minRatings: number; maxRatings: number }[]
+  levels: Array<{
+    name: string
+    minXP: number
+    maxXP: number
+  }>
 }
 
 @Component({
@@ -16,94 +20,91 @@ interface RankInfo {
   templateUrl: "./ranking-section.component.html",
   styleUrls: ["./ranking-section.component.scss"],
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatProgressSpinnerModule, MatIconModule],
+  imports: [CommonModule, MatCardModule, MatProgressBarModule, MatExpansionModule],
 })
 export class RankingSectionComponent implements OnChanges {
   @Input() userProfile: UserProfile | null = null
   currentRank: UserRank | null = null
   progress = 0
   remainingXP = 0
+
   allRanks: RankInfo[] = [
     {
       name: "Beer Recruit",
       icon: "🍺",
-      sublevels: [
-        { name: "I", minRatings: 0, maxRatings: 20 },
-        { name: "II", minRatings: 21, maxRatings: 40 },
-        { name: "III", minRatings: 41, maxRatings: 60 },
+      levels: [
+        { name: "I", minXP: 0, maxXP: 19 },
+        { name: "II", minXP: 20, maxXP: 39 },
+        { name: "III", minXP: 40, maxXP: 59 },
       ],
     },
     {
       name: "Hop Private",
       icon: "🌿",
-      sublevels: [
-        { name: "I", minRatings: 61, maxRatings: 100 },
-        { name: "II", minRatings: 101, maxRatings: 140 },
-        { name: "III", minRatings: 141, maxRatings: 180 },
+      levels: [
+        { name: "I", minXP: 60, maxXP: 99 },
+        { name: "II", minXP: 100, maxXP: 139 },
+        { name: "III", minXP: 140, maxXP: 179 },
       ],
     },
     {
       name: "Malt Corporal",
       icon: "🌾",
-      sublevels: [
-        { name: "I", minRatings: 181, maxRatings: 250 },
-        { name: "II", minRatings: 251, maxRatings: 320 },
-        { name: "III", minRatings: 321, maxRatings: 400 },
+      levels: [
+        { name: "I", minXP: 180, maxXP: 259 },
+        { name: "II", minXP: 260, maxXP: 339 },
+        { name: "III", minXP: 340, maxXP: 399 },
       ],
     },
     {
       name: "Ale Sergeant",
       icon: "🍺",
-      sublevels: [
-        { name: "I", minRatings: 401, maxRatings: 500 },
-        { name: "II", minRatings: 501, maxRatings: 600 },
-        { name: "III", minRatings: 601, maxRatings: 700 },
+      levels: [
+        { name: "I", minXP: 400, maxXP: 519 },
+        { name: "II", minXP: 520, maxXP: 639 },
+        { name: "III", minXP: 640, maxXP: 699 },
       ],
     },
     {
       name: "Lager Lieutenant",
-      icon: "🛢",
-      sublevels: [
-        { name: "I", minRatings: 701, maxRatings: 850 },
-        { name: "II", minRatings: 851, maxRatings: 1000 },
-        { name: "III", minRatings: 1001, maxRatings: 1200 },
+      icon: "🍻",
+      levels: [
+        { name: "I", minXP: 700, maxXP: 899 },
+        { name: "II", minXP: 900, maxXP: 1099 },
+        { name: "III", minXP: 1100, maxXP: 1199 },
       ],
     },
     {
       name: "Stout Captain",
       icon: "🍻",
-      sublevels: [
-        { name: "I", minRatings: 1201, maxRatings: 1400 },
-        { name: "II", minRatings: 1401, maxRatings: 1600 },
-        { name: "III", minRatings: 1601, maxRatings: 1800 },
+      levels: [
+        { name: "I", minXP: 1200, maxXP: 1499 },
+        { name: "II", minXP: 1500, maxXP: 1699 },
+        { name: "III", minXP: 1700, maxXP: 1799 },
       ],
     },
     {
       name: "Porter Colonel",
-      icon: "🛢",
-      sublevels: [
-        { name: "I", minRatings: 1801, maxRatings: 2000 },
-        { name: "II", minRatings: 2001, maxRatings: 2200 },
-        { name: "III", minRatings: 2201, maxRatings: 2500 },
+      icon: "🏆",
+      levels: [
+        { name: "I", minXP: 1800, maxXP: 2099 },
+        { name: "II", minXP: 2100, maxXP: 2299 },
+        { name: "III", minXP: 2300, maxXP: 2499 },
       ],
     },
     {
       name: "Imperial General",
       icon: "👑",
-      sublevels: [
-        { name: "I", minRatings: 2501, maxRatings: 2800 },
-        { name: "II", minRatings: 2801, maxRatings: 3100 },
-        { name: "III", minRatings: 3101, maxRatings: 3500 },
+      levels: [
+        { name: "I", minXP: 2500, maxXP: 2899 },
+        { name: "II", minXP: 2900, maxXP: 3199 },
+        { name: "III", minXP: 3200, maxXP: 3499 },
       ],
     },
     {
       name: "Grand Brewmaster",
       icon: "🏆",
-      sublevels: [
-        { name: "I", minRatings: 3501, maxRatings: 4000 },
-        { name: "II", minRatings: 4001, maxRatings: 4500 },
-        { name: "III", minRatings: 4501, maxRatings: Number.POSITIVE_INFINITY },
-      ],
+      levels: [{ name: "I", minXP: 3500, maxXP: Number.POSITIVE_INFINITY }],
     },
   ]
 
@@ -115,33 +116,42 @@ export class RankingSectionComponent implements OnChanges {
   }
 
   private calculateProgress(): void {
-    if (this.userProfile && this.currentRank) {
-      const totalRatings = this.userProfile.statistics?.totalBeersRated || 0
-      const currentRankInfo = this.allRanks.find((rank) => rank.name === this.currentRank?.name)
+    if (this.userProfile?.statistics && this.currentRank) {
+      const points = this.userProfile.statistics.points || 0
+      const currentRankInfo = this.getCurrentRankInfo()
 
       if (currentRankInfo) {
-        const currentSublevel = currentRankInfo.sublevels.find((sublevel) => sublevel.name === this.currentRank?.level)
+        const currentLevel = currentRankInfo.levels.find((level) => level.name === this.currentRank?.level)
 
-        if (currentSublevel) {
-          const sublevelProgress = totalRatings - currentSublevel.minRatings
-          const sublevelTotal = currentSublevel.maxRatings - currentSublevel.minRatings
-          this.progress = (sublevelProgress / sublevelTotal) * 100
-          this.remainingXP = currentSublevel.maxRatings - totalRatings
+        if (currentLevel) {
+          const levelProgress = points - currentLevel.minXP
+          const levelTotal = currentLevel.maxXP - currentLevel.minXP
+          this.progress = Math.min((levelProgress / levelTotal) * 100, 100)
+          this.remainingXP = Math.max(currentLevel.maxXP - points, 0)
         }
       }
     }
   }
 
-  getRankStatus(rank: RankInfo): "locked" | "current" | "unlocked" {
-    if (!this.userProfile || !this.currentRank) return "locked"
+  private getCurrentRankInfo(): RankInfo | undefined {
+    return this.allRanks.find((r) => r.name === this.currentRank?.name)
+  }
 
-    const totalRatings = this.userProfile.statistics?.totalBeersRated || 0
+  getRankStatus(rank: RankInfo): "locked" | "current" | "unlocked" {
+    if (!this.userProfile?.statistics || !this.currentRank) return "locked"
+
+    const points = this.userProfile.statistics.points || 0
     const currentRankIndex = this.allRanks.findIndex((r) => r.name === this.currentRank?.name)
     const rankIndex = this.allRanks.findIndex((r) => r.name === rank.name)
 
     if (rankIndex < currentRankIndex) return "unlocked"
     if (rankIndex === currentRankIndex) return "current"
     return "locked"
+  }
+
+  isCurrentLevel(rankName: string, level: string): boolean {
+    if (!this.currentRank) return false
+    return this.currentRank.name === rankName && this.currentRank.level === level
   }
 }
 

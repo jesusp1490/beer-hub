@@ -15,6 +15,7 @@ import { ChangePasswordComponent } from "../change-password/change-password.comp
 import { NewBeerRequestComponent } from "../new-beer-request/new-beer-request.component"
 import { Router } from "@angular/router"
 import { getNames } from "country-list"
+import { RankingSectionComponent } from "../ranking-section/ranking-section.component"
 
 interface ProfileField {
   key: string
@@ -42,6 +43,7 @@ interface ProfileField {
     MatInputModule,
     ChangePasswordComponent,
     NewBeerRequestComponent,
+    RankingSectionComponent,
   ],
 })
 export class ProfileSectionComponent implements OnInit, OnChanges {
