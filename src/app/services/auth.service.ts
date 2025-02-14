@@ -4,6 +4,7 @@ import { AngularFirestore, AngularFirestoreDocument } from "@angular/fire/compat
 import firebase from "firebase/compat/app"
 import { Observable, of } from "rxjs"
 import { switchMap, map, catchError, take } from "rxjs/operators"
+import { Router } from "@angular/router"
 
 export interface User {
   uid: string
@@ -19,11 +20,11 @@ export interface User {
 })
 export class AuthService {
   user$: Observable<User | null>
-  router: any
 
   constructor(
     private afAuth: AngularFireAuth,
     private firestore: AngularFirestore,
+    private router: Router,
   ) {
     this.user$ = this.afAuth.authState.pipe(
       switchMap((user) => {
@@ -41,7 +42,6 @@ export class AuthService {
                     photoURL: firebaseUser.photoURL || user.photoURL,
                   } as User
                 }
-                // If firebaseUser is null, return a default User object
                 return {
                   uid: user.uid,
                   email: user.email,
@@ -52,14 +52,7 @@ export class AuthService {
               }),
               catchError((error) => {
                 console.error("Error fetching user data:", error)
-                // Return a default User object on error
-                return of({
-                  uid: user.uid,
-                  email: user.email,
-                  displayName: user.displayName,
-                  photoURL: user.photoURL,
-                  emailVerified: user.emailVerified,
-                } as User)
+                return of(null)
               }),
             )
         } else {

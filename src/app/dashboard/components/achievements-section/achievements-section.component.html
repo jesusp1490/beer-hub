@@ -1,16 +1,31 @@
-<mat-card>
-  <mat-card-header>
-    <mat-card-title>Recent Achievements</mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <div *ngFor="let achievement of achievements" class="achievement-item">
-      <mat-icon>{{ achievement.icon }}</mat-icon>
-      <div class="achievement-details">
-        <h3>{{ achievement.name }}</h3>
-        <p>{{ achievement.description }}</p>
-        <small>Unlocked: {{ convertTimestamp(achievement.dateUnlocked) | date }}</small>
+<div class="achievements-container">
+  <h2>Achievements</h2>
+  <mat-accordion>
+    <mat-expansion-panel *ngFor="let category of achievementCategories">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <span class="category-icon">{{ category.icon }}</span>
+          {{ category.name }}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <div class="achievements-grid">
+        <mat-card *ngFor="let achievement of getAchievementsByCategory(category.name)" class="achievement-card">
+          <mat-card-header>
+            <div mat-card-avatar class="achievement-icon">{{ achievement.icon }}</div>
+            <mat-card-title>{{ achievement.name }}</mat-card-title>
+            <mat-card-subtitle>Level {{ achievement.currentLevel }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <p>{{ achievement.description }}</p>
+            <mat-progress-bar mode="determinate" [value]="getProgressPercentage(achievement)"></mat-progress-bar>
+            <p class="progress-text">
+              {{ achievement.progress }} / {{ getNextLevelRequirement(achievement) }}
+            </p>
+          </mat-card-content>
+        </mat-card>
       </div>
-    </div>
-  </mat-card-content>
-</mat-card>
+    </mat-expansion-panel>
+  </mat-accordion>
+</div>
 

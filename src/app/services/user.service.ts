@@ -9,12 +9,12 @@ import { Beer } from "../components/beers/beers.interface"
 import {
   UserProfile,
   RatedBeer,
-  Achievement,
   UserRank,
   UserStatistics,
   LeaderboardEntry,
   Reward,
   FavoriteBeer,
+  AchievementProgress,
 } from "../models/user.model"
 import { Timestamp } from "@angular/fire/firestore"
 import { NotificationService } from "./notification.service"
@@ -294,7 +294,7 @@ export class UserService {
     return updatedStats
   }
 
-  checkAndUpdateAchievements(userId: string): Observable<Achievement[]> {
+  checkAndUpdateAchievements(userId: string): Observable<AchievementProgress[]> {
     return this.firestore
       .doc<UserProfile>(`users/${userId}`)
       .valueChanges()
@@ -303,32 +303,24 @@ export class UserService {
         switchMap((user) => {
           if (!user) throw new Error("User not found")
 
-          const newAchievements: Achievement[] = []
+          const newAchievements: AchievementProgress[] = []
           const currentAchievements = user.achievements || []
           const stats = user.statistics || this.initializeStatistics(undefined)
 
-          if (stats.totalBeersRated >= 1 && !currentAchievements.some((a) => a.id === "first_rater")) {
-            newAchievements.push({
-              id: "first_rater",
-              name: "First Rater",
-              description: "Rate your first beer",
-              dateUnlocked: Timestamp.now(),
-              icon: "star",
-            })
-          }
+          // Rating Achievements
+          this.checkRatingAchievements(stats, currentAchievements, newAchievements)
 
-          if (stats.countriesExplored.length >= 3 && !currentAchievements.some((a) => a.id === "beer_explorer")) {
-            newAchievements.push({
-              id: "beer_explorer",
-              name: "Beer Explorer",
-              description: "Rate beers from 3 different countries",
-              dateUnlocked: Timestamp.now(),
-              icon: "public",
-            })
-          }
+          // Beer Type Achievements
+          this.checkBeerTypeAchievements(stats, currentAchievements, newAchievements)
 
-          if (newAchievements.length > 0) {
-            const updatedAchievements = [...currentAchievements, ...newAchievements]
+          // Exploration Achievements
+          this.checkExplorationAchievements(stats, currentAchievements, newAchievements)
+
+          // Special Challenges
+          // Note: Special challenges might need a separate system to track time-limited events
+
+          if (newAchievements.length > 0 || currentAchievements.some((a) => a.updated)) {
+            const updatedAchievements = [...currentAchievements.filter((a) => !a.updated), ...newAchievements]
             return from(
               this.firestore.doc(`users/${userId}`).update({
                 achievements: updatedAchievements,
@@ -337,7 +329,7 @@ export class UserService {
               tap(() => {
                 newAchievements.forEach((achievement) => {
                   this.notificationService.addNotification(
-                    `New achievement unlocked: ${achievement.name}!`,
+                    `Achievement updated: ${achievement.name} - Level ${achievement.currentLevel}!`,
                     "achievement",
                   )
                 })
@@ -349,6 +341,156 @@ export class UserService {
           return of(currentAchievements)
         }),
       )
+  }
+
+  private checkRatingAchievements(
+    stats: UserStatistics,
+    currentAchievements: AchievementProgress[],
+    newAchievements: AchievementProgress[],
+  ) {
+    const ratingAchievements = [
+      {
+        id: "novice_taster",
+        name: "Novice Taster",
+        icon: "🍺",
+        levels: [
+          { level: 1, requirement: 10, rewardXP: 10 },
+          { level: 2, requirement: 50, rewardXP: 25 },
+          { level: 3, requirement: 100, rewardXP: 50 },
+        ],
+      },
+      {
+        id: "expert_taster",
+        name: "Expert Taster",
+        icon: "🍻",
+        levels: [
+          { level: 1, requirement: 200, rewardXP: 50 },
+          { level: 2, requirement: 500, rewardXP: 100 },
+          { level: 3, requirement: 1000, rewardXP: 200 },
+        ],
+      },
+      {
+        id: "beer_sommelier_master",
+        name: "Beer Sommelier Master",
+        icon: "🏆",
+        levels: [
+          { level: 1, requirement: 1500, rewardXP: 300 },
+          { level: 2, requirement: 2000, rewardXP: 400 },
+          { level: 3, requirement: 3000, rewardXP: 500 },
+        ],
+      },
+      // Add other rating achievements here
+    ]
+
+    this.checkAchievementProgress(stats.totalBeersRated, ratingAchievements, currentAchievements, newAchievements)
+  }
+
+  private checkBeerTypeAchievements(
+    stats: UserStatistics,
+    currentAchievements: AchievementProgress[],
+    newAchievements: AchievementProgress[],
+  ) {
+    const beerTypeAchievements = [
+      {
+        id: "stout_lover",
+        name: "Stout Lover",
+        icon: "🍫",
+        levels: [
+          { level: 1, requirement: 10, rewardXP: 10 },
+          { level: 2, requirement: 25, rewardXP: 25 },
+          { level: 3, requirement: 50, rewardXP: 50 },
+        ],
+      },
+      {
+        id: "ipa_king",
+        name: "IPA King",
+        icon: "🌿",
+        levels: [
+          { level: 1, requirement: 10, rewardXP: 10 },
+          { level: 2, requirement: 30, rewardXP: 30 },
+          { level: 3, requirement: 60, rewardXP: 60 },
+        ],
+      },
+      // Add other beer type achievements here
+    ]
+
+    for (const achievement of beerTypeAchievements) {
+      const beerTypeCount = stats.beerTypeStats[achievement.name.toLowerCase().replace(" ", "_")] || 0
+      this.checkAchievementProgress(beerTypeCount, [achievement], currentAchievements, newAchievements)
+    }
+  }
+
+  private checkExplorationAchievements(
+    stats: UserStatistics,
+    currentAchievements: AchievementProgress[],
+    newAchievements: AchievementProgress[],
+  ) {
+    const explorationAchievements = [
+      {
+        id: "beer_explorer",
+        name: "Beer Explorer",
+        icon: "🌍",
+        levels: [
+          { level: 1, requirement: 5, rewardXP: 25 },
+          { level: 2, requirement: 15, rewardXP: 50 },
+          { level: 3, requirement: 30, rewardXP: 100 },
+        ],
+      },
+      // Add other exploration achievements here
+    ]
+
+    this.checkAchievementProgress(
+      stats.uniqueCountriesCount,
+      explorationAchievements,
+      currentAchievements,
+      newAchievements,
+    )
+  }
+
+  private checkAchievementProgress(
+    value: number,
+    achievements: any[],
+    currentAchievements: AchievementProgress[],
+    newAchievements: AchievementProgress[],
+  ) {
+    achievements.forEach((achievement) => {
+      const existingAchievement = currentAchievements.find((a) => a.id === achievement.id)
+      if (!existingAchievement) {
+        const newLevel = this.getAchievementLevel(value, achievement.levels)
+        if (newLevel > 0) {
+          newAchievements.push(this.createAchievement(achievement, newLevel, value))
+        }
+      } else {
+        const newLevel = this.getAchievementLevel(value, achievement.levels)
+        if (newLevel > existingAchievement.currentLevel) {
+          existingAchievement.currentLevel = newLevel
+          existingAchievement.progress = value
+          existingAchievement.updated = true
+        }
+      }
+    })
+  }
+
+  private getAchievementLevel(value: number, levels: { level: number; requirement: number }[]): number {
+    for (let i = levels.length - 1; i >= 0; i--) {
+      if (value >= levels[i].requirement) {
+        return levels[i].level
+      }
+    }
+    return 0
+  }
+
+  private createAchievement(achievement: any, level: number, progress: number): AchievementProgress {
+    return {
+      id: achievement.id,
+      name: achievement.name,
+      description: `${achievement.name} - Level ${level}`,
+      icon: achievement.icon,
+      levels: achievement.levels,
+      currentLevel: level,
+      progress: progress,
+      dateUnlocked: Timestamp.now(),
+    }
   }
 
   updateUserRank(userId: string, currentPoints?: number): Observable<UserRank> {
@@ -661,6 +803,5 @@ export class UserService {
     return this.addPoints(userId, "challenge")
   }
 
-  // ... (rest of the code remains the same)
 }
 

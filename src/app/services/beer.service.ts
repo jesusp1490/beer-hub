@@ -9,7 +9,6 @@ import { AuthService } from "./auth.service"
 import { UserService } from "./user.service"
 import firebase from "firebase/compat/app"
 import { Timestamp } from "@angular/fire/firestore"
-import { RatedBeer } from "../models/user.model"
 
 @Injectable({
   providedIn: "root",
@@ -302,15 +301,17 @@ export class BeerService {
           switchMap(({ beerData }) => {
             // Update user statistics
             const ratedBeer: RatedBeer = {
+              id: this.firestore.createId(),
               beerId,
               rating,
-              review: "", 
+              review: "",
               date: Timestamp.now(),
               country: beerData.countryId,
               beerType: beerData.beerType,
             }
             return this.userService.updateUserStatistics(userId, ratedBeer)
           }),
+          switchMap(() => this.userService.checkAndUpdateAchievements(userId)),
           tap(() => {
             // Update the cached beer data
             const cachedBeers = this.cachedBeers$.value
@@ -324,9 +325,9 @@ export class BeerService {
               this.cachedBeers$.next(cachedBeers)
             }
           }),
+          map(() => undefined), // Map the result to void
         )
       }),
-      map(() => undefined),
       catchError((error) => {
         console.error("Error rating beer:", error)
         throw error
@@ -717,3 +718,14 @@ export class BeerService {
     )
   }
 }
+
+interface RatedBeer {
+  id: string
+  beerId: string
+  rating: number
+  review: string
+  date: Timestamp
+  country: string
+  beerType: string
+}
+

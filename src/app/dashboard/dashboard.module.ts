@@ -8,7 +8,7 @@ import { ProfileSectionComponent } from "./components/profile-section/profile-se
 import { StatisticsComponent } from "./components/statistics/statistics.component"
 import { LeaderboardComponent } from "./components/leaderboard/leaderboard.component"
 import { ChallengesComponent } from "./components/challenges/challenges.component"
-import { AchievementSectionComponent } from "./components/achievements-section/achievements-section.component"
+import { AchievementsSectionComponent } from "./components/achievements-section/achievements-section.component"
 import { RankingSectionComponent } from "./components/ranking-section/ranking-section.component"
 import { ChangePasswordComponent } from "./components/change-password/change-password.component"
 import { EditProfileComponent } from "./components/edit-profile/edit-profile.component"
@@ -24,7 +24,7 @@ import { NewBeerRequestComponent } from "./components/new-beer-request/new-beer-
     StatisticsComponent,
     LeaderboardComponent,
     ChallengesComponent,
-    AchievementSectionComponent,
+    AchievementsSectionComponent,
     RankingSectionComponent,
     ChangePasswordComponent,
     EditProfileComponent,

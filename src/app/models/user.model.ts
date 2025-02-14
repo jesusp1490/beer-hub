@@ -1,4 +1,4 @@
-import type { Timestamp } from "@angular/fire/firestore"
+import { Timestamp } from "@angular/fire/firestore"
 
 export interface UserProfile {
   uid: string
@@ -14,7 +14,7 @@ export interface UserProfile {
   rank: UserRank | null
   favorites?: string[]
   statistics?: UserStatistics
-  achievements: Achievement[]
+  achievements: AchievementProgress[]
   level: number
   challenges?: Challenge[]
   googlePhotoURL?: string | null
@@ -44,8 +44,26 @@ export interface Achievement {
   dateUnlocked: Timestamp
 }
 
+export interface AchievementProgress {
+  id: string
+  name: string
+  description: string
+  icon: string
+  levels: AchievementLevel[]
+  currentLevel: number
+  progress: number
+  dateUnlocked: Timestamp
+  updated?: boolean
+}
+
+export interface AchievementLevel {
+  level: number
+  requirement: number
+  rewardXP: number
+}
+
 export interface UserRank {
-  level: string 
+  level: string
   name: string
   icon?: string
   points: number
@@ -63,6 +81,7 @@ export interface Challenge {
 }
 
 export interface RatedBeer {
+  id: string
   beerId: string
   rating: number
   review?: string
@@ -91,7 +110,7 @@ export interface Reward {
 }
 
 export interface FavoriteBeer {
-  beerId: string
+  id: string
   name: string
   beerLabelUrl?: string
   beerImageUrl?: string

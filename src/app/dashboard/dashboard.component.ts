@@ -13,9 +13,10 @@ import { RankingSectionComponent } from "./components/ranking-section/ranking-se
 import { StatisticsComponent } from "./components/statistics/statistics.component"
 import { LeaderboardComponent } from "./components/leaderboard/leaderboard.component"
 import { ChallengesComponent } from "./components/challenges/challenges.component"
-import { AchievementSectionComponent } from "./components/achievements-section/achievements-section.component"
 import { Timestamp } from "firebase/firestore"
 import { NotificationPanelComponent } from "./components/notification-panel/notification-panel.component"
+import { AchievementsSectionComponent } from "./components/achievements-section/achievements-section.component"
+import { Router } from "@angular/router"
 
 @Component({
   selector: "app-dashboard",
@@ -31,8 +32,9 @@ import { NotificationPanelComponent } from "./components/notification-panel/noti
     StatisticsComponent,
     LeaderboardComponent,
     ChallengesComponent,
-    AchievementSectionComponent,
+    AchievementsSectionComponent,
     NotificationPanelComponent,
+    AchievementsSectionComponent,
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
@@ -44,11 +46,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private authService: AuthService,
     private beerService: BeerService,
+    private router: Router,
   ) {}
 
   ngOnInit() {
-    this.loadUserProfile()
-    this.fixUserRank()
+    this.authService.user$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
+      if (user) {
+        this.loadUserProfile()
+        this.fixUserRank()
+      } else {
+        this.router.navigate(["/"])
+      }
+    })
   }
 
   ngOnDestroy(): void {

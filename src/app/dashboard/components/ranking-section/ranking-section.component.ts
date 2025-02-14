@@ -3,7 +3,7 @@ import { CommonModule } from "@angular/common"
 import { MatCardModule } from "@angular/material/card"
 import { MatProgressBarModule } from "@angular/material/progress-bar"
 import { MatExpansionModule } from "@angular/material/expansion"
-import { UserProfile, UserRank } from "../../../models/user.model"
+import type { UserProfile, UserRank } from "../../../models/user.model"
 
 interface RankInfo {
   name: string
@@ -51,60 +51,64 @@ export class RankingSectionComponent implements OnChanges {
       name: "Malt Corporal",
       icon: "🌾",
       levels: [
-        { name: "I", minXP: 180, maxXP: 259 },
-        { name: "II", minXP: 260, maxXP: 339 },
-        { name: "III", minXP: 340, maxXP: 399 },
+        { name: "I", minXP: 180, maxXP: 249 },
+        { name: "II", minXP: 250, maxXP: 319 },
+        { name: "III", minXP: 320, maxXP: 399 },
       ],
     },
     {
       name: "Ale Sergeant",
       icon: "🍺",
       levels: [
-        { name: "I", minXP: 400, maxXP: 519 },
-        { name: "II", minXP: 520, maxXP: 639 },
-        { name: "III", minXP: 640, maxXP: 699 },
+        { name: "I", minXP: 400, maxXP: 499 },
+        { name: "II", minXP: 500, maxXP: 599 },
+        { name: "III", minXP: 600, maxXP: 699 },
       ],
     },
     {
       name: "Lager Lieutenant",
       icon: "🍻",
       levels: [
-        { name: "I", minXP: 700, maxXP: 899 },
-        { name: "II", minXP: 900, maxXP: 1099 },
-        { name: "III", minXP: 1100, maxXP: 1199 },
+        { name: "I", minXP: 700, maxXP: 849 },
+        { name: "II", minXP: 850, maxXP: 999 },
+        { name: "III", minXP: 1000, maxXP: 1199 },
       ],
     },
     {
       name: "Stout Captain",
       icon: "🍻",
       levels: [
-        { name: "I", minXP: 1200, maxXP: 1499 },
-        { name: "II", minXP: 1500, maxXP: 1699 },
-        { name: "III", minXP: 1700, maxXP: 1799 },
+        { name: "I", minXP: 1200, maxXP: 1399 },
+        { name: "II", minXP: 1400, maxXP: 1599 },
+        { name: "III", minXP: 1600, maxXP: 1799 },
       ],
     },
     {
       name: "Porter Colonel",
       icon: "🏆",
       levels: [
-        { name: "I", minXP: 1800, maxXP: 2099 },
-        { name: "II", minXP: 2100, maxXP: 2299 },
-        { name: "III", minXP: 2300, maxXP: 2499 },
+        { name: "I", minXP: 1800, maxXP: 1999 },
+        { name: "II", minXP: 2000, maxXP: 2199 },
+        { name: "III", minXP: 2200, maxXP: 2499 },
       ],
     },
     {
       name: "Imperial General",
       icon: "👑",
       levels: [
-        { name: "I", minXP: 2500, maxXP: 2899 },
-        { name: "II", minXP: 2900, maxXP: 3199 },
-        { name: "III", minXP: 3200, maxXP: 3499 },
+        { name: "I", minXP: 2500, maxXP: 2799 },
+        { name: "II", minXP: 2800, maxXP: 3099 },
+        { name: "III", minXP: 3100, maxXP: 3499 },
       ],
     },
     {
       name: "Grand Brewmaster",
       icon: "🏆",
-      levels: [{ name: "I", minXP: 3500, maxXP: Number.POSITIVE_INFINITY }],
+      levels: [
+        { name: "I", minXP: 3500, maxXP: 3999 },
+        { name: "II", minXP: 4000, maxXP: 4499 },
+        { name: "III", minXP: 4500, maxXP: Number.POSITIVE_INFINITY },
+      ],
     },
   ]
 
@@ -133,7 +137,7 @@ export class RankingSectionComponent implements OnChanges {
     }
   }
 
-  private getCurrentRankInfo(): RankInfo | undefined {
+  getCurrentRankInfo(): RankInfo | undefined {
     return this.allRanks.find((r) => r.name === this.currentRank?.name)
   }
 

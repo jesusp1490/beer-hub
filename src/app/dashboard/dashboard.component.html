@@ -1,12 +1,8 @@
 <div class="dashboard-container">
   <!-- Left Sidebar -->
   <div class="profile-section">
-    <app-profile-section 
-      [userProfile]="userProfile"
-      (editField)="onEditField($event)"
-      (changePassword)="onChangePassword()"
-      (requestNewBeer)="onRequestNewBeer()"
-      (logout)="onLogout()"
+    <app-profile-section [userProfile]="userProfile" (editField)="onEditField($event)"
+      (changePassword)="onChangePassword()" (requestNewBeer)="onRequestNewBeer()" (logout)="onLogout()"
       (uploadProfilePicture)="onUploadProfilePicture($event)">
     </app-profile-section>
   </div>
@@ -51,8 +47,7 @@
 
       <!-- Achievements -->
       <div class="grid-item achievements">
-        <h2>Achievements</h2>
-        <app-achievement-section [achievements]="userProfile?.achievements || []"></app-achievement-section>
+        <app-achievements-section [userProfile]="userProfile"></app-achievements-section>
       </div>
     </div>
   </div>
@@ -62,4 +57,3 @@
     <app-notification-panel></app-notification-panel>
   </div>
 </div>
-

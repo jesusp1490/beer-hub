@@ -21,7 +21,7 @@
   <mat-expansion-panel-header>
     <mat-panel-title>Rank Progression</mat-panel-title>
   </mat-expansion-panel-header>
-  
+
   <div class="rank-cards">
     <div 
       *ngFor="let rank of allRanks" 
@@ -34,10 +34,10 @@
       <div class="rank-name">{{ rank.name }}</div>
       <div class="rank-levels">
         <span 
-          *ngFor="let level of ['I', 'II', 'III']"
-          [class.active]="isCurrentLevel(rank.name, level)"
+          *ngFor="let level of rank.levels"
+          [class.active]="isCurrentLevel(rank.name, level.name)"
         >
-          {{ level }}
+          {{ level.name }}
         </span>
       </div>
     </div>
