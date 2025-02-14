@@ -1,26 +1,27 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { CommonModule } from '@angular/common';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Router, RouterModule } from '@angular/router';
-import { Timestamp } from '@angular/fire/firestore';
+import { Component, OnInit } from "@angular/core"
+import { FormsModule, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from "@angular/forms"
+import { AngularFireAuth } from "@angular/fire/compat/auth"
+import { AngularFirestore } from "@angular/fire/compat/firestore"
+import { CommonModule } from "@angular/common"
+import { MatInputModule } from "@angular/material/input"
+import { MatButtonModule } from "@angular/material/button"
+import { MatFormFieldModule } from "@angular/material/form-field"
+import { MatDatepickerModule } from "@angular/material/datepicker"
+import { MatNativeDateModule } from "@angular/material/core"
+import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar"
+import { MatIconModule } from "@angular/material/icon"
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner"
+import { Router, RouterModule } from "@angular/router"
+import { Timestamp } from "@angular/fire/firestore"
 
 @Component({
-  selector: 'app-sign-up',
+  selector: "app-sign-up",
   standalone: true,
-  templateUrl: './sign-up.component.html',
-  styleUrls: ['./sign-up.component.scss'],
+  templateUrl: "./sign-up.component.html",
+  styleUrls: ["./sign-up.component.scss"],
   imports: [
     FormsModule,
+    ReactiveFormsModule,
     CommonModule,
     MatInputModule,
     MatButtonModule,
@@ -30,65 +31,101 @@ import { Timestamp } from '@angular/fire/firestore';
     MatSnackBarModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    RouterModule
-  ]
+    RouterModule,
+  ],
 })
-export class SignUpComponent {
-  firstName: string = '';
-  lastName: string = '';
-  username: string = '';
-  email: string = '';
-  password: string = '';
-  country: string = '';
-  dob: Date | null = null;
-  hidePassword: boolean = true;
-  isLoading: boolean = false;
+export class SignUpComponent implements OnInit {
+  signUpForm!: FormGroup
+  hidePassword = true
+  isLoading = false
 
   constructor(
-    private afAuth: AngularFireAuth, 
+    private fb: FormBuilder,
+    private afAuth: AngularFireAuth,
     private firestore: AngularFirestore,
     private snackBar: MatSnackBar,
-    private router: Router
-  ) { }
+    private router: Router,
+  ) {}
+
+  ngOnInit() {
+    this.signUpForm = this.fb.group({
+      firstName: ["", Validators.required],
+      lastName: ["", Validators.required],
+      username: ["", Validators.required],
+      email: ["", [Validators.required, Validators.email]],
+      password: ["", [Validators.required, Validators.minLength(6)]],
+      country: ["", Validators.required],
+      dob: [null, Validators.required],
+    })
+  }
 
   async signUp() {
-    this.isLoading = true;
-    try {
-      const result = await this.afAuth.createUserWithEmailAndPassword(this.email, this.password);
-      const uid = result.user?.uid;
+    this.isLoading = true
+    if (this.signUpForm.valid) {
+      try {
+        const { email, password, firstName, lastName, username, country, dob } = this.signUpForm.value
+        const result = await this.afAuth.createUserWithEmailAndPassword(email, password)
+        const uid = result.user?.uid
 
-      if (uid) {
-        await this.firestore.collection('users').doc(uid).set({
-          firstName: this.firstName,
-          lastName: this.lastName,
-          username: this.username,
-          country: this.country,
-          dob: this.dob ? Timestamp.fromDate(this.dob) : null,
-          email: this.email,
-        });
+        if (uid) {
+          await this.firestore
+            .collection("users")
+            .doc(uid)
+            .set({
+              firstName,
+              lastName,
+              username,
+              country,
+              dob: dob ? Timestamp.fromDate(dob) : null,
+              email,
+              createdAt: Timestamp.now(),
+              photoURL: null,
+              emailVerified: false,
+              rank: { name: "Novice", level: 1, points: 0, progress: 0, pointsToNextRank: 100 },
+              achievements: [],
+              level: 1,
+              progress: 0,
+              statistics: {
+                totalBeersRated: 0,
+                countriesExplored: [],
+                beerTypeStats: {},
+                registrationDate: Timestamp.now(),
+                averageRating: 0,
+                favoriteBrewery: "",
+                points: 0,
+                lastRatingDate: null,
+                uniqueStylesCount: 0,
+                uniqueCountriesCount: 0,
+              },
+            })
 
-        this.showSuccessMessage('Sign Up successful!');
-        this.router.navigate(['/profile']);
+          this.showSuccessMessage("Sign Up successful!")
+          this.router.navigate(["/profile"])
+        }
+      } catch (error) {
+        console.error(`Error: ${(error as any).message}`)
+        this.showErrorMessage(`Registration failed: ${(error as any).message}`)
+      } finally {
+        this.isLoading = false
       }
-    } catch (error) {
-      console.error(`Error: ${(error as any).message}`);
-      this.showErrorMessage(`Registration failed: ${(error as any).message}`);
-    } finally {
-      this.isLoading = false;
+    } else {
+      this.isLoading = false
+      this.showErrorMessage("Please fill all required fields correctly.")
     }
   }
 
   private showSuccessMessage(message: string): void {
-    this.snackBar.open(message, 'Close', {
+    this.snackBar.open(message, "Close", {
       duration: 3000,
-      panelClass: ['success-snackbar']
-    });
+      panelClass: ["success-snackbar"],
+    })
   }
 
   private showErrorMessage(message: string): void {
-    this.snackBar.open(message, 'Close', {
+    this.snackBar.open(message, "Close", {
       duration: 5000,
-      panelClass: ['error-snackbar']
-    });
+      panelClass: ["error-snackbar"],
+    })
   }
 }
+

@@ -1,23 +1,25 @@
-import type { Timestamp } from "firebase/firestore"
+import type { Timestamp } from "@angular/fire/firestore"
 
 export interface UserProfile {
   uid: string
-  email: string
+  email: string | null
   emailVerified: boolean
-  displayName: string
-  username?: string
+  displayName: string | null
+  username: string | null
   firstName?: string
   lastName?: string
-  photoURL?: string
-  country?: string
-  dob?: Timestamp
+  photoURL: string | null
+  country: string | null
+  dob: Timestamp | null
+  rank: UserRank | null
   favorites?: string[]
-  statistics: UserStatistics
+  statistics?: UserStatistics
   achievements: Achievement[]
-  rank: UserRank
+  level: number
   challenges?: Challenge[]
   googlePhotoURL?: string | null
-  bio?: string // Added bio field
+  bio?: string
+  progress: number
 }
 
 export interface UserStatistics {
@@ -26,6 +28,8 @@ export interface UserStatistics {
   beerTypeStats: { [key: string]: number }
   mostActiveDay: { date: string; count: number }
   registrationDate: Timestamp
+  averageRating: number
+  favoriteBrewery: string
   points: number
   lastRatingDate: Timestamp
   uniqueStylesCount: number
@@ -36,7 +40,7 @@ export interface Achievement {
   id: string
   name: string
   description: string
-  icon?: string 
+  icon?: string
   dateUnlocked: Timestamp
 }
 
@@ -46,28 +50,28 @@ export interface UserRank {
   icon?: string
   points: number
   progress: number
+  pointsToNextRank: number
 }
 
 export interface Challenge {
   id: string
   name: string
   description: string
-  progress: number
-  threshold: number
+  imageUrl: string
+  reward: number
   completed: boolean
-  icon?: string
-  reward?: string
 }
 
 export interface RatedBeer {
   beerId: string
   rating: number
   review?: string
-  date?: Timestamp
+  date: Timestamp
+  name?: string
+  beerLabelUrl?: string
+  beerImageUrl?: string
   country?: string
   beerType?: string
-  beerLabelUrl?: string
-  name?: string
 }
 
 export interface LeaderboardEntry {
@@ -76,24 +80,6 @@ export interface LeaderboardEntry {
   photoURL?: string
   rank: UserRank
   points: number
-  country?: string
-}
-
-export interface BeerRequest {
-  name: string
-  description: string
-  createdAt: Timestamp
-  userId: string
-  userEmail: string
-  status?: "pending" | "approved" | "rejected"
-}
-
-export interface Notification {
-  id: string
-  message: string
-  type: string
-  timestamp: Timestamp
-  read: boolean
 }
 
 export interface Reward {
@@ -101,13 +87,13 @@ export interface Reward {
   name: string
   description: string
   imageUrl?: string
-  dateEarned?: Timestamp
+  dateEarned: Timestamp
 }
 
 export interface FavoriteBeer {
   id: string
   name: string
-  beerLabelUrl: string
-  beerImageUrl: string
+  beerLabelUrl?: string
+  beerImageUrl?: string
 }
 

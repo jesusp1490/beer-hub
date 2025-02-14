@@ -304,7 +304,7 @@ export class BeerService {
             const ratedBeer: RatedBeer = {
               beerId,
               rating,
-              review: "", // Add an empty review or remove this line if it's optional
+              review: "", 
               date: Timestamp.now(),
               country: beerData.countryId,
               beerType: beerData.beerType,
@@ -717,4 +717,3 @@ export class BeerService {
     )
   }
 }
-

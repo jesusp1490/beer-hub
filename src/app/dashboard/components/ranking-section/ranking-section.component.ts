@@ -1,8 +1,8 @@
-import { Component, Input, type SimpleChanges } from "@angular/core"
+import { Component, Input, SimpleChanges } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { MatCardModule } from "@angular/material/card"
 import { MatProgressBarModule } from "@angular/material/progress-bar"
-import type { UserProfile, UserRank } from "../../../models/user.model"
+import { UserProfile, UserRank } from "../../../models/user.model"
 
 @Component({
   selector: "app-ranking-section",
@@ -32,6 +32,7 @@ export class RankingSectionComponent {
     }
   }
 
+  // Changed from private to public
   public getNextRankPoints(): number {
     // Implement logic to get the points required for the next rank
     // This is a placeholder implementation

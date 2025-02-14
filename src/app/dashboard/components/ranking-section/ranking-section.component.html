@@ -1,11 +1,12 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title>{{ currentRank?.name }}</mat-card-title>
-    <mat-card-subtitle>Level {{ currentRank?.level }}</mat-card-subtitle>
+    <mat-card-title>Your Rank</mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
+    <h2>{{ currentRank?.name || 'Unranked' }}</h2>
     <p>{{ userProfile?.statistics?.points || 0 }} / {{ getNextRankPoints() }} points</p>
+    <mat-progress-bar [value]="progress"></mat-progress-bar>
+    <p>{{ progress.toFixed(2) }}% to next rank</p>
   </mat-card-content>
 </mat-card>
 

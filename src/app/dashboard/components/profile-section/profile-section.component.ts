@@ -1,97 +1,153 @@
-import { Component, Input, Output, EventEmitter } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
-import { MatButtonModule } from "@angular/material/button";
-import { MatIconModule } from "@angular/material/icon";
-import { MatProgressBarModule } from "@angular/material/progress-bar";
-import { MatCardModule } from "@angular/material/card";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatInputModule } from "@angular/material/input";
-import { UserProfile, UserRank } from "../../../models/user.model";
-import { UserService } from "../../../services/user.service";
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from "@angular/core"
+import { CommonModule } from "@angular/common"
+import { MatButtonModule } from "@angular/material/button"
+import { MatIconModule } from "@angular/material/icon"
+import { MatProgressBarModule } from "@angular/material/progress-bar"
+import { MatDialogModule, MatDialog } from "@angular/material/dialog"
+import { UserProfile } from "../../../models/user.model"
+import { Timestamp } from "firebase/firestore"
+import { ChangePasswordComponent } from "../change-password/change-password.component"
+import { NewBeerRequestComponent } from "../new-beer-request/new-beer-request.component"
+import { Router } from "@angular/router"
+
+interface ProfileField {
+  key: string
+  label: string
+  value: string | null | undefined
+  editable: boolean
+}
 
 @Component({
   selector: "app-profile-section",
-  template: `
-    <div class="profile-container" *ngIf="userProfile">
-      <!-- Previous content remains the same -->
-      <div class="profile-details" *ngIf="!editMode">
-        <p><strong>Username:</strong> {{ userProfile.username }}</p>
-        <p><strong>Country:</strong> {{ userProfile.country }}</p>
-        <p><strong>Joined:</strong> {{ getDateString(userProfile.statistics.registrationDate) }}</p>
-        <p><strong>Total Beers Rated:</strong> {{ userProfile.statistics.totalBeersRated || 0 }}</p>
-      </div>
-      <!-- Rest of the template remains the same -->
-    </div>
-  `,
+  templateUrl: "./profile-section.component.html",
   styleUrls: ["./profile-section.component.scss"],
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
+    MatDialogModule,
+    ChangePasswordComponent,
+    NewBeerRequestComponent,
   ],
 })
-export class ProfileSectionComponent {
-  @Input() userProfile: UserProfile | null = null;
-  @Output() profileUpdated = new EventEmitter<Partial<UserProfile>>();
+export class ProfileSectionComponent implements OnInit, OnChanges {
+  @Input() userProfile: UserProfile | null = null
+  @Output() editField = new EventEmitter<{ field: string; value: string }>()
+  @Output() changePassword = new EventEmitter<void>()
+  @Output() requestNewBeer = new EventEmitter<void>()
+  @Output() logout = new EventEmitter<void>()
+  @Output() uploadProfilePicture = new EventEmitter<File>()
 
-  editMode = false;
-  editedProfile: Partial<UserProfile> = {};
+  profileFields: ProfileField[] = []
+  editingField: string | null = null
 
-  constructor(private userService: UserService) {}
+  constructor(
+    private dialog: MatDialog,
+    private router: Router,
+  ) {}
 
-  updateProfilePicture(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      this.userService.uploadProfilePicture(file).subscribe({
-        next: (url) => {
-          if (this.userProfile) {
-            this.userProfile.photoURL = url;
-            this.profileUpdated.emit({ photoURL: url });
-          }
-        },
-        error: (error) => console.error("Error uploading profile picture:", error),
-      });
+  ngOnInit() {
+    this.updateProfileFields()
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes["userProfile"]) {
+      this.updateProfileFields()
     }
   }
 
-  toggleEditMode(): void {
-    if (this.editMode) {
-      this.saveProfile();
-    } else {
-      this.editedProfile = { ...this.userProfile };
-    }
-    this.editMode = !this.editMode;
-  }
-
-  saveProfile(): void {
+  updateProfileFields() {
     if (this.userProfile) {
-      this.userService.updateUserProfile(this.editedProfile).subscribe({
-        next: () => {
-          this.userProfile = { ...this.userProfile, ...this.editedProfile } as UserProfile;
-          this.profileUpdated.emit(this.editedProfile);
-          this.editMode = false;
+      const fullName =
+        [this.userProfile.firstName, this.userProfile.lastName].filter(Boolean).join(" ") ||
+        this.userProfile.displayName ||
+        "Not set"
+
+      this.profileFields = [
+        { key: "displayName", label: "Full Name", value: fullName, editable: true },
+        { key: "username", label: "Username", value: this.userProfile.username, editable: false },
+        { key: "email", label: "Email", value: this.userProfile.email, editable: true },
+        { key: "country", label: "Country", value: this.userProfile.country, editable: true },
+        { key: "dob", label: "Date of Birth", value: this.convertTimestamp(this.userProfile.dob), editable: true },
+        {
+          key: "joined",
+          label: "Joined",
+          value: this.convertTimestamp(this.userProfile.statistics?.registrationDate),
+          editable: false,
         },
-        error: (error) => console.error("Error updating profile:", error),
-      });
+      ]
+    } else {
+      this.profileFields = []
     }
   }
 
-  getRankProgress(rank: UserRank | undefined | null): number {
-    if (!rank || rank.progress === undefined) return 0;
-    return Math.min(rank.progress * 100, 100);
+  convertTimestamp(timestamp: Timestamp | null | undefined): string | null {
+    if (timestamp instanceof Timestamp) {
+      return timestamp.toDate().toLocaleDateString()
+    } else if (timestamp === null || timestamp === undefined) {
+      return "Not set"
+    } else {
+      return "Invalid date"
+    }
   }
 
-  getDateString(timestamp: any): string {
-    if (timestamp && timestamp.toDate) {
-      return timestamp.toDate().toISOString().split("T")[0];
+  startEditing(field: string): void {
+    this.editingField = field
+  }
+
+  onEditField(field: string, value: string): void {
+    this.editingField = null
+    if (field === "displayName") {
+      // Split the full name into firstName and lastName
+      const [firstName = "", ...lastNameParts] = value.trim().split(" ")
+      const lastName = lastNameParts.join(" ")
+
+      this.editField.emit({ field: "firstName", value: firstName })
+      if (lastName) {
+        this.editField.emit({ field: "lastName", value: lastName })
+      }
+    } else {
+      this.editField.emit({ field, value })
     }
-    return "";
+  }
+
+  onChangePassword(): void {
+    const dialogRef = this.dialog.open(ChangePasswordComponent, {
+      width: "400px",
+      data: { userId: this.userProfile?.uid },
+    })
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.changePassword.emit()
+      }
+    })
+  }
+
+  onRequestNewBeer(): void {
+    const dialogRef = this.dialog.open(NewBeerRequestComponent, {
+      width: "500px",
+    })
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.requestNewBeer.emit()
+      }
+    })
+  }
+
+  onLogout(): void {
+    this.logout.emit()
+    this.router.navigate(["/"])
+  }
+
+  onFileSelected(event: Event): void {
+    const element = event.target as HTMLInputElement
+    if (element.files && element.files.length > 0) {
+      this.uploadProfilePicture.emit(element.files[0])
+    }
   }
 }
+

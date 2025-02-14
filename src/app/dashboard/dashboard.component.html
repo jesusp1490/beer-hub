@@ -1,151 +1,71 @@
 <div class="dashboard-container">
   <!-- Left Sidebar -->
-  <div class="sidebar">
-    <div class="profile-section">
-      <h2>Profile Section</h2>
-      
-      <!-- Profile Picture -->
-      <div class="profile-picture-container">
-        <img [src]="userProfile.photoURL" alt="Profile Picture" class="profile-picture">
-        <button mat-mini-fab color="accent" class="edit-button">
-          <mat-icon>edit</mat-icon>
-        </button>
-      </div>
-
-      <!-- Username and Rank -->
-      <div class="user-info">
-        <h3 class="username">{{ userProfile.username }}</h3>
-        <p class="rank-name">{{ userProfile.rank.name }}</p>
-      </div>
-
-      <!-- Profile Fields -->
-      <div class="profile-fields">
-        <div class="profile-field" *ngFor="let field of [
-          {label: 'Full Name', value: userProfile.fullName},
-          {label: 'Username', value: userProfile.username},
-          {label: 'email', value: userProfile.email},
-          {label: 'country', value: userProfile.country},
-          {label: 'DOB', value: userProfile.dob},
-          {label: 'Joined', value: userProfile.joinedDate}
-        ]">
-          <div class="field-content">
-            <span class="field-label">{{ field.label }}</span>
-            <span class="field-value">{{ field.value }}</span>
-          </div>
-          <button mat-icon-button (click)="onEditField(field.label)">
-            <mat-icon>edit</mat-icon>
-          </button>
-        </div>
-      </div>
-
-      <!-- Rank Progress -->
-      <div class="rank-progress">
-        <div class="rank-info">
-          <span>Level {{ userProfile.rank.level }}</span>
-          <span>{{ userProfile.rank.pointsToNext }} points to next rank</span>
-        </div>
-        <mat-progress-bar
-          mode="determinate"
-          [value]="userProfile.rank.progress"
-          color="accent">
-        </mat-progress-bar>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="profile-actions">
-        <button mat-stroked-button (click)="onChangePassword()">
-          <mat-icon>lock</mat-icon>
-          Change Password
-        </button>
-        <button mat-stroked-button (click)="onRequestNewBeer()">
-          <mat-icon>add</mat-icon>
-          Request New Beer
-        </button>
-        <button mat-stroked-button (click)="onLogout()">
-          <mat-icon>exit_to_app</mat-icon>
-          Logout
-        </button>
-      </div>
-    </div>
+  <div class="profile-section">
+    <app-profile-section 
+      [userProfile]="userProfile"
+      (editField)="onEditField($event)"
+      (changePassword)="onChangePassword()"
+      (requestNewBeer)="onRequestNewBeer()"
+      (logout)="onLogout()"
+      (uploadProfilePicture)="onUploadProfilePicture($event)">
+    </app-profile-section>
+    <app-ranking-section [userProfile]="userProfile"></app-ranking-section>
   </div>
 
   <!-- Main Content -->
   <div class="main-content">
-    <!-- Top Stats -->
+    <!-- Top Stats Bar -->
     <div class="stats-bar">
-      <div class="stat-item">
+      <div class="stat-card">
         <h3>Total Rated Beers:</h3>
-        <span class="stat-value">{{ stats.totalBeers }}</span>
+        <p>{{userStats?.totalBeersRated || 0}}</p>
       </div>
-      <div class="stat-item">
+      <div class="stat-card">
         <h3>Total Countries visited:</h3>
-        <span class="stat-value">{{ stats.totalCountries }}</span>
+        <p>{{userStats?.uniqueCountriesCount || 0}}</p>
       </div>
-      <div class="stat-item">
+      <div class="stat-card">
         <h3>Total beer types:</h3>
-        <span class="stat-value">{{ stats.beerTypes }}</span>
+        <p>{{userStats?.uniqueStylesCount || 0}}</p>
       </div>
     </div>
 
-    <!-- Charts Grid -->
-    <div class="charts-grid">
-      <!-- Statistics Chart -->
-      <div class="chart-card">
-        <h3>Statistics</h3>
-        <div class="chart-container">
-          <canvas #activityChart></canvas>
-        </div>
-      </div>
-
-      <!-- Beer Types Chart -->
-      <div class="chart-card">
-        <h3>Beer Types Distribution</h3>
-        <div class="chart-container">
-          <canvas #beerTypesChart></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom Grid -->
-    <div class="bottom-grid">
-      <!-- Rated Beers -->
-      <div class="card">
-        <h3>Rated Beers</h3>
-        <!-- Add rated beers content -->
-      </div>
-
-      <!-- Favorite Beers -->
-      <div class="card">
-        <h3>Favorite Beers</h3>
-        <!-- Add favorite beers content -->
+    <!-- Grid Layout -->
+    <div class="dashboard-grid">
+      <!-- Statistics Section -->
+      <div class="grid-item statistics">
+        <h2>Statistics</h2>
+        <!-- <app-statistics [userStats]="userStats"></app-statistics> -->
       </div>
 
       <!-- Leaderboard -->
-      <div class="card">
-        <h3>Leaderboard</h3>
-        <!-- Add leaderboard content -->
+      <div class="grid-item leaderboard">
+        <h2>Leaderboard</h2>
+        <app-leaderboard></app-leaderboard>
       </div>
-    </div>
 
-    <!-- Achievements -->
-    <div class="achievements-section">
-      <h3>Achievements</h3>
-      <div class="achievements-scroll">
-        <button mat-icon-button class="scroll-button left">
-          <mat-icon>chevron_left</mat-icon>
-        </button>
-        <div class="achievements-container">
-          <div class="achievement-card" *ngFor="let achievement of achievements">
-            <div class="achievement-icon">{{ achievement.icon }}</div>
-            <h4>{{ achievement.name }}</h4>
-            <p>{{ achievement.description }}</p>
-            <span class="unlock-date">{{ achievement.unlockedDate }}</span>
-          </div>
-        </div>
-        <button mat-icon-button class="scroll-button right">
-          <mat-icon>chevron_right</mat-icon>
-        </button>
+      <!-- Challenges -->
+      <div class="grid-item challenges">
+        <h2>Challenges</h2>
+        <app-challenges></app-challenges>
+      </div>
+
+      <!-- Achievements -->
+      <div class="grid-item achievements">
+        <h2>Achievements</h2>
+        <app-achievement-section [achievements]="userProfile?.achievements || []"></app-achievement-section>
       </div>
     </div>
   </div>
+
+  <!-- Notification Icons -->
+  <div class="notification-icons">
+    <button mat-icon-button>
+      <mat-icon>email</mat-icon>
+    </button>
+    <button mat-icon-button>
+      <mat-icon>notifications</mat-icon>
+    </button>
+  </div>
 </div>
+

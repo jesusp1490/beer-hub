@@ -57,8 +57,7 @@ export class UserService {
                 if (profile) {
                   return {
                     ...profile,
-                    statistics: this.initializeStatistics(profile.statistics),
-                    rank: profile.rank || this.getDefaultRank(),
+                    uid: user.uid,
                   }
                 }
                 return null
@@ -72,6 +71,10 @@ export class UserService {
           return of(null)
         }
       }),
+      catchError((error) => {
+        console.error("Error in auth state:", error)
+        return of(null)
+      }),
     )
   }
 
@@ -82,6 +85,8 @@ export class UserService {
       beerTypeStats: {},
       mostActiveDay: { date: "", count: 0 },
       registrationDate: Timestamp.now(),
+      averageRating: 0,
+      favoriteBrewery: "",
       points: 0,
       lastRatingDate: Timestamp.now(),
       uniqueStylesCount: 0,
@@ -96,6 +101,7 @@ export class UserService {
       points: 0,
       progress: 0,
       name: "Novice",
+      pointsToNextRank: 10,
     }
   }
 
@@ -240,7 +246,7 @@ export class UserService {
         switchMap((user) => {
           if (!user) throw new Error("User not found")
 
-          const updatedStats = this.calculateUpdatedStatistics(user.statistics || {}, newRating)
+          const updatedStats = this.calculateUpdatedStatistics(user.statistics, newRating)
 
           return from(this.firestore.doc(`users/${userId}`).update({ statistics: updatedStats })).pipe(
             switchMap(() => this.updateUserRank(userId, updatedStats.points)),
@@ -250,32 +256,27 @@ export class UserService {
       )
   }
 
-  private calculateUpdatedStatistics(currentStats: UserStatistics, newRating: RatedBeer): UserStatistics {
-    const updatedStats = { ...currentStats }
-    updatedStats.totalBeersRated = (updatedStats.totalBeersRated || 0) + 1
+  private calculateUpdatedStatistics(currentStats: UserStatistics | undefined, newRating: RatedBeer): UserStatistics {
+    const updatedStats: UserStatistics = this.initializeStatistics(currentStats)
+    updatedStats.totalBeersRated += 1
     if (newRating.country) {
-      updatedStats.countriesExplored = Array.from(
-        new Set([...(updatedStats.countriesExplored || []), newRating.country]),
-      )
+      updatedStats.countriesExplored = Array.from(new Set([...updatedStats.countriesExplored, newRating.country]))
     }
     if (newRating.beerType) {
-      updatedStats.beerTypeStats = {
-        ...(updatedStats.beerTypeStats || {}),
-        [newRating.beerType]: ((updatedStats.beerTypeStats || {})[newRating.beerType] || 0) + 1,
-      }
+      updatedStats.beerTypeStats[newRating.beerType] = (updatedStats.beerTypeStats[newRating.beerType] || 0) + 1
     }
 
     const today = new Date().toISOString().split("T")[0]
     if (today === updatedStats.mostActiveDay?.date) {
-      updatedStats.mostActiveDay.count = (updatedStats.mostActiveDay.count || 0) + 1
-    } else if (!updatedStats.mostActiveDay || (updatedStats.mostActiveDay.count || 0) < 1) {
+      updatedStats.mostActiveDay.count += 1
+    } else if (!updatedStats.mostActiveDay || updatedStats.mostActiveDay.count < 1) {
       updatedStats.mostActiveDay = { date: today, count: 1 }
     }
 
-    updatedStats.points = (updatedStats.points || 0) + 1
+    updatedStats.points += 1
     updatedStats.lastRatingDate = Timestamp.now()
-    updatedStats.uniqueStylesCount = Object.keys(updatedStats.beerTypeStats || {}).length
-    updatedStats.uniqueCountriesCount = updatedStats.countriesExplored?.length || 0
+    updatedStats.uniqueStylesCount = Object.keys(updatedStats.beerTypeStats).length
+    updatedStats.uniqueCountriesCount = updatedStats.countriesExplored.length
 
     return updatedStats
   }
@@ -300,7 +301,7 @@ export class UserService {
               name: "First Rater",
               description: "Rate your first beer",
               dateUnlocked: Timestamp.now(),
-              icon: "star", // Add this line
+              icon: "star",
             })
           }
 
@@ -310,7 +311,7 @@ export class UserService {
               name: "Beer Explorer",
               description: "Rate beers from 3 different countries",
               dateUnlocked: Timestamp.now(),
-              icon: "public", // Add this line
+              icon: "public",
             })
           }
 
@@ -353,10 +354,7 @@ export class UserService {
           if (!user.rank || newRank.level !== user.rank.level) {
             return from(this.firestore.doc(`users/${userId}`).update({ rank: newRank })).pipe(
               tap(() => {
-                this.notificationService.addNotification(
-                  `Congratulations! You've reached level ${newRank.level}!`,
-                  "rank",
-                )
+                this.notificationService.addNotification(`Congratulations! You've reached ${newRank.name}!`, "rank")
               }),
               map(() => newRank),
             )
@@ -367,66 +365,150 @@ export class UserService {
       )
   }
 
-  private calculateRank(points: number): UserRank {
-    const levels = [
-      { level: 0, name: "Novice", minPoints: 0, maxPoints: 9 },
-      { level: 1, name: "Beer Recruit", minPoints: 10, maxPoints: 24 },
-      { level: 2, name: "Hop Private", minPoints: 25, maxPoints: 49 },
-      { level: 3, name: "Malt Corporal", minPoints: 50, maxPoints: 99 },
-      { level: 4, name: "Ale Sergeant", minPoints: 100, maxPoints: 199 },
-      { level: 5, name: "Lager Lieutenant", minPoints: 200, maxPoints: Number.POSITIVE_INFINITY },
+  private calculateRank(ratings: number): UserRank {
+    const ranks = [
+      {
+        name: "Beer Recruit",
+        icon: "🍺",
+        levels: [
+          { name: "I", min: 0, max: 20 },
+          { name: "II", min: 21, max: 40 },
+          { name: "III", min: 41, max: 60 },
+        ],
+      },
+      {
+        name: "Hop Private",
+        icon: "🌿",
+        levels: [
+          { name: "I", min: 61, max: 100 },
+          { name: "II", min: 101, max: 140 },
+          { name: "III", min: 141, max: 180 },
+        ],
+      },
+      {
+        name: "Malt Corporal",
+        icon: "🌾",
+        levels: [
+          { name: "I", min: 181, max: 250 },
+          { name: "II", min: 251, max: 320 },
+          { name: "III", min: 321, max: 400 },
+        ],
+      },
+      {
+        name: "Ale Sergeant",
+        icon: "🍺",
+        levels: [
+          { name: "I", min: 401, max: 500 },
+          { name: "II", min: 501, max: 600 },
+          { name: "III", min: 601, max: 700 },
+        ],
+      },
+      {
+        name: "Lager Lieutenant",
+        icon: "🛢",
+        levels: [
+          { name: "I", min: 701, max: 850 },
+          { name: "II", min: 851, max: 1000 },
+          { name: "III", min: 1001, max: 1200 },
+        ],
+      },
+      {
+        name: "Stout Captain",
+        icon: "🍻",
+        levels: [
+          { name: "I", min: 1201, max: 1400 },
+          { name: "II", min: 1401, max: 1600 },
+          { name: "III", min: 1601, max: 1800 },
+        ],
+      },
+      {
+        name: "Porter Colonel",
+        icon: "🛢",
+        levels: [
+          { name: "I", min: 1801, max: 2000 },
+          { name: "II", min: 2001, max: 2200 },
+          { name: "III", min: 2201, max: 2500 },
+        ],
+      },
+      {
+        name: "Imperial General",
+        icon: "👑",
+        levels: [
+          { name: "I", min: 2501, max: 2800 },
+          { name: "II", min: 2801, max: 3100 },
+          { name: "III", min: 3101, max: 3500 },
+        ],
+      },
+      {
+        name: "Grand Brewmaster",
+        icon: "🏆",
+        levels: [
+          { name: "I", min: 3501, max: 4000 },
+          { name: "II", min: 4001, max: 4500 },
+          { name: "III", min: 4501, max: Number.POSITIVE_INFINITY },
+        ],
+      },
     ]
 
-    const currentLevel = levels.find((l) => points >= l.minPoints && points <= l.maxPoints) || levels[levels.length - 1]
-    const progress = (points - currentLevel.minPoints) / (currentLevel.maxPoints - currentLevel.minPoints)
+    let currentRank = ranks[0]
+    let currentLevel = currentRank.levels[0]
+
+    for (const rank of ranks) {
+      for (const level of rank.levels) {
+        if (ratings >= level.min && ratings <= level.max) {
+          currentRank = rank
+          currentLevel = level
+          break
+        }
+      }
+      if (currentRank === rank) break
+    }
+
+    const nextLevel = this.getNextLevel(ranks, currentRank, currentLevel)
+    const progress = (ratings - currentLevel.min) / (currentLevel.max - currentLevel.min)
+    const pointsToNextRank = nextLevel ? nextLevel.min - ratings : 0
 
     return {
-      level: currentLevel.level,
-      name: currentLevel.name,
-      points: points,
-      progress: Math.min(progress, 1),
+      name: `${currentRank.name} ${currentLevel.name}`,
+      icon: currentRank.icon,
+      level: Number.parseInt(currentLevel.name.replace("I", "1").replace("II", "2").replace("III", "3")),
+      progress: progress,
+      pointsToNextRank: pointsToNextRank,
+      points: ratings,
     }
   }
 
-  getLeaderboard(type: "global" | "country" = "global", limit = 10): Observable<LeaderboardEntry[]> {
-    const query = this.firestore.collection<UserProfile>("users", (ref) =>
-      ref.orderBy("statistics.points", "desc").limit(limit),
-    )
+  private getNextLevel(ranks: any[], currentRank: any, currentLevel: any): any {
+    const currentRankIndex = ranks.indexOf(currentRank)
+    const currentLevelIndex = currentRank.levels.indexOf(currentLevel)
 
-    if (type === "country") {
-      return this.authService.user$.pipe(
-        switchMap((user) => {
-          if (!user || !user.country) throw new Error("User not authenticated or country not set")
-          return this.firestore
-            .collection<UserProfile>("users", (ref) =>
-              ref.where("country", "==", user.country).orderBy("statistics.points", "desc").limit(limit),
-            )
-            .valueChanges()
-            .pipe(
-              map((users) =>
-                users.map((user) => ({
-                  userId: user.uid,
-                  displayName: user.displayName,
-                  photoURL: user.photoURL,
-                  rank: user.rank,
-                  points: user.statistics.points,
-                })),
-              ),
-            )
-        }),
-      )
+    if (currentLevelIndex < currentRank.levels.length - 1) {
+      return currentRank.levels[currentLevelIndex + 1]
+    } else if (currentRankIndex < ranks.length - 1) {
+      return ranks[currentRankIndex + 1].levels[0]
     }
+    return null
+  }
 
-    return query.valueChanges().pipe(
-      map((users) =>
-        users.map((user) => ({
-          userId: user.uid,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          rank: user.rank,
-          points: user.statistics.points,
-        })),
-      ),
+  getLeaderboard(): Observable<LeaderboardEntry[]> {
+    return this.authService.user$.pipe(
+      switchMap((user) => {
+        if (!user) {
+          return of([])
+        }
+        const query = this.firestore.collection("users", (ref) => ref.orderBy("statistics.points", "desc").limit(10))
+        return query.valueChanges({ idField: "userId" }).pipe(
+          map((users) =>
+            users.map((user: any) => ({
+              userId: user.userId,
+              displayName: user.displayName || "Anonymous",
+              photoURL: user.photoURL,
+              rank: this.calculateRank(user.statistics?.points || 0),
+              points: user.statistics?.points || 0,
+            })),
+          ),
+        )
+      }),
     )
   }
 

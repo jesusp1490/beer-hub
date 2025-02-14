@@ -1,31 +1,32 @@
 import { Component, Input, OnChanges, ViewChild, ElementRef } from "@angular/core"
 import { CommonModule } from "@angular/common"
-import { MatCardModule } from "@angular/material/card"
-import { Chart, ChartConfiguration } from "chart.js/auto"
-import { UserProfile } from "../../../models/user.model"
+import { Chart, ChartConfiguration, registerables } from "chart.js"
+import { UserStatistics } from "../../../models/user.model"
+
+Chart.register(...registerables)
 
 @Component({
   selector: "app-statistics",
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: "./statistics.component.html",
   styleUrls: ["./statistics.component.scss"],
-  standalone: true,
-  imports: [CommonModule, MatCardModule],
 })
 export class StatisticsComponent implements OnChanges {
-  @Input() userProfile: UserProfile | null = null
+  @Input() userStats: UserStatistics | null = null
   @ViewChild("beerStylesChart") beerStylesChartRef!: ElementRef
 
   beerStylesChart: Chart | null = null
 
   ngOnChanges(): void {
-    if (this.userProfile && this.beerStylesChartRef) {
+    if (this.userStats && this.beerStylesChartRef) {
       this.createBeerStylesChart()
     }
   }
 
   private createBeerStylesChart(): void {
     const ctx = this.beerStylesChartRef.nativeElement.getContext("2d")
-    const data = this.userProfile?.statistics?.beerTypeStats || {}
+    const data = this.userStats?.beerTypeStats || {}
 
     const config: ChartConfiguration = {
       type: "bar",

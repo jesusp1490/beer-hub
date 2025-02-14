@@ -1,29 +1,25 @@
 import { Injectable } from "@angular/core"
-import { MatSnackBar } from "@angular/material/snack-bar"
-import { Observable, BehaviorSubject } from "rxjs"
-import { Notification } from "../models/user.model"
-import { Timestamp } from "firebase/firestore"
+import { BehaviorSubject, Observable } from "rxjs"
+
+export interface Notification {
+  id: string
+  message: string
+  type: string
+  read: boolean
+  createdAt: Date
+}
 
 @Injectable({
   providedIn: "root",
 })
 export class NotificationService {
-  private notifications = new BehaviorSubject<Notification[]>([])
+  private notifications: Notification[] = []
+  private notificationsSubject = new BehaviorSubject<Notification[]>([])
 
-  constructor(private snackBar: MatSnackBar) {}
+  constructor() {}
 
-  showSuccess(message: string): void {
-    this.snackBar.open(message, "Close", {
-      duration: 3000,
-      panelClass: ["success-snackbar"],
-    })
-  }
-
-  showError(message: string): void {
-    this.snackBar.open(message, "Close", {
-      duration: 5000,
-      panelClass: ["error-snackbar"],
-    })
+  getNotifications(): Observable<Notification[]> {
+    return this.notificationsSubject.asObservable()
   }
 
   addNotification(message: string, type: string): void {
@@ -31,28 +27,36 @@ export class NotificationService {
       id: Date.now().toString(),
       message,
       type,
-      timestamp: Timestamp.now(),
       read: false,
+      createdAt: new Date(),
     }
-
-    const current = this.notifications.value
-    this.notifications.next([notification, ...current])
-  }
-
-  getNotifications(): Observable<Notification[]> {
-    return this.notifications.asObservable()
+    this.notifications.push(notification)
+    this.notificationsSubject.next([...this.notifications])
   }
 
   markAsRead(notificationId: string): void {
-    const current = this.notifications.value
-    const updated = current.map((notification) =>
+    this.notifications = this.notifications.map((notification) =>
       notification.id === notificationId ? { ...notification, read: true } : notification,
     )
-    this.notifications.next(updated)
+    this.notificationsSubject.next([...this.notifications])
   }
 
-  clearNotifications(): void {
-    this.notifications.next([])
+  removeNotification(notificationId: string): void {
+    this.notifications = this.notifications.filter((notification) => notification.id !== notificationId)
+    this.notificationsSubject.next([...this.notifications])
+  }
+
+  clearAllNotifications(): void {
+    this.notifications = []
+    this.notificationsSubject.next([])
+  }
+
+  showSuccess(message: string): void {
+    this.addNotification(message, "success")
+  }
+
+  showError(message: string): void {
+    this.addNotification(message, "error")
   }
 }
 

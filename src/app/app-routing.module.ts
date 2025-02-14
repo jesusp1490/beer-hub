@@ -9,8 +9,9 @@ import { AboutComponent } from "./components/about/about.component"
 import { ContactComponent } from "./components/contact/contact.component"
 import { SignUpComponent } from "./components/sign-up/sign-up.component"
 import { LogInComponent } from "./components/log-in/log-in.component"
-import { AuthGuard } from "./guards/auth.guard"
 import { ForgotPasswordComponent } from "./components/forgot-password/forgot-password.component"
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: "", redirectTo: "/home", pathMatch: "full" },
@@ -30,11 +31,7 @@ export const routes: Routes = [
   { path: "signup", component: SignUpComponent },
   { path: "login", component: LogInComponent },
   { path: "forgot-password", component: ForgotPasswordComponent },
-  {
-    path: "dashboard",
-    loadChildren: () => import("./dashboard/dashboard.module").then((m) => m.DashboardModule),
-    canActivate: [AuthGuard],
-  },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: "**", redirectTo: "/home" },
 ]
 
@@ -43,4 +40,3 @@ export const routes: Routes = [
   exports: [RouterModule],
 })
 export class AppRoutingModule {}
-

@@ -1,5 +1,10 @@
 import { Component, OnInit } from "@angular/core"
-import { FormBuilder, FormGroup, Validators } from "@angular/forms"
+import { CommonModule } from "@angular/common"
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from "@angular/forms"
+import { MatDialogModule } from "@angular/material/dialog"
+import { MatFormFieldModule } from "@angular/material/form-field"
+import { MatInputModule } from "@angular/material/input"
+import { MatButtonModule } from "@angular/material/button"
 import { UserService } from "../../../services/user.service"
 import { UserProfile } from "../../../models/user.model"
 import { Router } from "@angular/router"
@@ -7,6 +12,8 @@ import { NotificationService } from "../../../services/notification.service"
 
 @Component({
   selector: "app-edit-profile",
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule],
   templateUrl: "./edit-profile.component.html",
   styleUrls: ["./edit-profile.component.scss"],
 })

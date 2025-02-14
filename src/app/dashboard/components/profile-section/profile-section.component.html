@@ -1,42 +1,79 @@
-<div class="profile-container" *ngIf="userProfile">
-  <div class="profile-header">
-    <div class="profile-picture-container">
-      <img [src]="userProfile.photoURL || '/assets/default-avatar.png'" alt="Profile Picture" class="profile-picture">
-      <button mat-mini-fab color="primary" class="edit-picture-button" (click)="fileInput.click()">
-        <mat-icon>edit</mat-icon>
-      </button>
-      <input #fileInput type="file" (change)="updateProfilePicture($event)" style="display: none;">
+<div class="profile-section-container">
+  <!-- Profile Picture and User Info -->
+  <div class="profile-picture-container">
+    <div class="profile-picture">
+      <img [src]="userProfile?.photoURL || 'assets/default-avatar.png'" alt="Profile Picture">
     </div>
-    <div class="profile-info">
-      <h2>{{ userProfile.displayName }}</h2>
-      <p>{{ userProfile.email }}</p>
-      <button mat-stroked-button color="primary" (click)="toggleEditMode()">
-        {{ editMode ? 'Save Profile' : 'Edit Profile' }}
-      </button>
+    <button class="edit-picture-button" (click)="fileInput.click()">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <input
+      #fileInput
+      type="file"
+      hidden
+      accept="image/*"
+      (change)="onFileSelected($event)"
+    >
+  </div>
+
+  <div class="user-info">
+    <h2 class="username">{{ userProfile?.username || 'Username' }}</h2>
+    <p class="rank-name">{{ userProfile?.rank?.name || 'Hop Private' }}</p>
+  </div>
+
+  <!-- Profile Fields -->
+  <div class="profile-fields">
+    <div *ngFor="let field of profileFields" class="profile-field">
+      <div class="field-content" [class.editing]="editingField === field.key">
+        <div class="field-label">{{ field.label }}</div>
+        <div class="field-value" *ngIf="editingField !== field.key">
+          {{ field.value || 'Not set' }}
+          <button *ngIf="field.editable" mat-icon-button (click)="startEditing(field.key)">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </div>
+        <div class="field-edit" *ngIf="editingField === field.key">
+          <input
+            #editInput
+            [value]="field.value || ''"
+            (keyup.enter)="onEditField(field.key, editInput.value)"
+            (blur)="onEditField(field.key, editInput.value)"
+          >
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="profile-details" *ngIf="!editMode">
-    <p><strong>Username:</strong> {{ userProfile.username }}</p>
-    <p><strong>Country:</strong> {{ userProfile.country }}</p>
-    <p><strong>Joined:</strong> {{ getDateString(userProfile.statistics?.registrationDate) }}</p>
-    <p><strong>Total Beers Rated:</strong> {{ userProfile.statistics?.totalBeersRated || 0 }}</p>
+  <!-- Rank Card -->
+  <div class="rank-card">
+    <img [src]="userProfile?.rank?.icon || 'assets/ranks/novice.png'" alt="Rank Icon">
+    <div class="rank-info">
+      <h3>{{ userProfile?.rank?.name || 'Hop Private' }}</h3>
+      <p>Level {{ userProfile?.rank?.level || 2 }}</p>
+    </div>
+    <mat-progress-bar
+      mode="determinate"
+      [value]="35"
+    ></mat-progress-bar>
+    <p class="progress-text">
+      35 / 100 points
+    </p>
   </div>
 
-  <div class="profile-edit" *ngIf="editMode">
-    <mat-form-field appearance="outline">
-      <mat-label>Username</mat-label>
-      <input matInput [(ngModel)]="editedProfile.username" name="username">
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>Country</mat-label>
-      <input matInput [(ngModel)]="editedProfile.country" name="country">
-    </mat-form-field>
-  </div>
-
-  <div class="rank-info" *ngIf="userProfile.rank">
-    <h3>Current Rank: {{ userProfile.rank.name }}</h3>
-    <mat-progress-bar mode="determinate" [value]="getRankProgress(userProfile.rank)"></mat-progress-bar>
-    <p>{{ userProfile.rank.points }} / {{ userProfile.rank.points + 100 }} points to next rank</p>
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <button mat-button (click)="onChangePassword()">
+      <mat-icon>lock</mat-icon>
+      Change Password
+    </button>
+    <button mat-button (click)="onRequestNewBeer()">
+      <mat-icon>add</mat-icon>
+      Request New Beer
+    </button>
+    <button mat-button (click)="onLogout()">
+      <mat-icon>logout</mat-icon>
+      Logout
+    </button>
   </div>
 </div>
+

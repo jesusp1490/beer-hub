@@ -5,22 +5,22 @@
   <div class="signup-card">
     <h2>Create an Account</h2>
     <p class="subtitle">Join our community of beer enthusiasts</p>
-    <form (ngSubmit)="signUp()" #signupForm="ngForm">
+    <form [formGroup]="signUpForm" (ngSubmit)="signUp()">
       <div class="form-row">
         <mat-form-field appearance="fill">
           <mat-label>First Name</mat-label>
-          <input matInput type="text" [(ngModel)]="firstName" name="firstName" required #firstNameInput="ngModel">
+          <input matInput formControlName="firstName" required>
           <mat-icon matSuffix>person</mat-icon>
-          <mat-error *ngIf="firstNameInput.invalid && (firstNameInput.dirty || firstNameInput.touched)">
+          <mat-error *ngIf="signUpForm.get('firstName')?.invalid && (signUpForm.get('firstName')?.dirty || signUpForm.get('firstName')?.touched)">
             First name is required
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="fill">
           <mat-label>Last Name</mat-label>
-          <input matInput type="text" [(ngModel)]="lastName" name="lastName" required #lastNameInput="ngModel">
+          <input matInput formControlName="lastName" required>
           <mat-icon matSuffix>person</mat-icon>
-          <mat-error *ngIf="lastNameInput.invalid && (lastNameInput.dirty || lastNameInput.touched)">
+          <mat-error *ngIf="signUpForm.get('lastName')?.invalid && (signUpForm.get('lastName')?.dirty || signUpForm.get('lastName')?.touched)">
             Last name is required
           </mat-error>
         </mat-form-field>
@@ -29,18 +29,18 @@
       <div class="form-row">
         <mat-form-field appearance="fill">
           <mat-label>Username</mat-label>
-          <input matInput type="text" [(ngModel)]="username" name="username" required #usernameInput="ngModel">
+          <input matInput formControlName="username" required>
           <mat-icon matSuffix>account_circle</mat-icon>
-          <mat-error *ngIf="usernameInput.invalid && (usernameInput.dirty || usernameInput.touched)">
+          <mat-error *ngIf="signUpForm.get('username')?.invalid && (signUpForm.get('username')?.dirty || signUpForm.get('username')?.touched)">
             Username is required
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="fill">
           <mat-label>Email</mat-label>
-          <input matInput type="email" [(ngModel)]="email" name="email" required email #emailInput="ngModel">
+          <input matInput formControlName="email" required type="email">
           <mat-icon matSuffix>email</mat-icon>
-          <mat-error *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)">
+          <mat-error *ngIf="signUpForm.get('email')?.invalid && (signUpForm.get('email')?.dirty || signUpForm.get('email')?.touched)">
             Please enter a valid email address
           </mat-error>
         </mat-form-field>
@@ -49,20 +49,20 @@
       <div class="form-row">
         <mat-form-field appearance="fill">
           <mat-label>Password</mat-label>
-          <input matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="password" name="password" required #passwordInput="ngModel">
+          <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'" required>
           <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
             <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
           </button>
-          <mat-error *ngIf="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)">
-            Password is required
+          <mat-error *ngIf="signUpForm.get('password')?.invalid && (signUpForm.get('password')?.dirty || signUpForm.get('password')?.touched)">
+            Password is required and must be at least 6 characters long
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="fill">
           <mat-label>Country</mat-label>
-          <input matInput type="text" [(ngModel)]="country" name="country" required #countryInput="ngModel">
+          <input matInput formControlName="country" required>
           <mat-icon matSuffix>public</mat-icon>
-          <mat-error *ngIf="countryInput.invalid && (countryInput.dirty || countryInput.touched)">
+          <mat-error *ngIf="signUpForm.get('country')?.invalid && (signUpForm.get('country')?.dirty || signUpForm.get('country')?.touched)">
             Country is required
           </mat-error>
         </mat-form-field>
@@ -71,16 +71,16 @@
       <div class="form-row">
         <mat-form-field appearance="fill">
           <mat-label>Date of Birth</mat-label>
-          <input matInput [matDatepicker]="picker" [(ngModel)]="dob" name="dob" required #dobInput="ngModel">
+          <input matInput [matDatepicker]="picker" formControlName="dob" required>
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
-          <mat-error *ngIf="dobInput.invalid && (dobInput.dirty || dobInput.touched)">
+          <mat-error *ngIf="signUpForm.get('dob')?.invalid && (signUpForm.get('dob')?.dirty || signUpForm.get('dob')?.touched)">
             Date of birth is required
           </mat-error>
         </mat-form-field>
       </div>
 
-      <button mat-raised-button color="primary" type="submit" [disabled]="!signupForm.form.valid || isLoading">
+      <button mat-raised-button color="primary" type="submit" [disabled]="!signUpForm.valid || isLoading">
         <ng-container *ngIf="!isLoading">Sign Up</ng-container>
         <mat-spinner *ngIf="isLoading" diameter="24" class="spinner"></mat-spinner>
       </button>
@@ -88,3 +88,4 @@
     <p class="login-link">Already have an account? <a routerLink="/login">Log in</a></p>
   </div>
 </div>
+

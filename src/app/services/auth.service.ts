@@ -19,6 +19,7 @@ export interface User {
 })
 export class AuthService {
   user$: Observable<User | null>
+  router: any
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -152,10 +153,9 @@ export class AuthService {
   async signOut(): Promise<void> {
     try {
       await this.afAuth.signOut()
-      localStorage.clear()
+      await this.router.navigate(["/"])
     } catch (error) {
-      console.error("Error in signOut:", error)
-      throw error
+      console.error("Error signing out:", error)
     }
   }
 

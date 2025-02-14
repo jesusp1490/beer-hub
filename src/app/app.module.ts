@@ -33,6 +33,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner"
 import { AngularFireModule } from "@angular/fire/compat"
 import { AngularFireAuthModule } from "@angular/fire/compat/auth"
 import { AngularFirestoreModule } from "@angular/fire/compat/firestore"
+import { DashboardModule } from "./dashboard/dashboard.module"
 
 // Environment
 import { environment } from "../environments/environment"
@@ -45,6 +46,7 @@ import { CountryComponent } from "./components/country/country.component"
 import { FilterSearchComponent } from "./components/filters-search/filters-search.component"
 import { ForgotPasswordComponent } from "./components/forgot-password/forgot-password.component"
 import { LanguageSwitcherComponent } from "./components/language-switcher/language-switcher.component"
+import { DashboardComponent } from "./dashboard/dashboard.component"
 
 // Services
 import { AuthService } from "./services/auth.service"
@@ -78,6 +80,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     AppRoutingModule,
     SharedModule,
     BeersModule,
+    DashboardModule,
+    DashboardComponent,
     TranslateModule.forRoot({
       defaultLanguage: "en",
       loader: {

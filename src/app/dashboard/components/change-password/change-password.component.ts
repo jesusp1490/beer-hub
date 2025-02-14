@@ -1,12 +1,25 @@
-import { Component } from "@angular/core"
-import { FormBuilder, FormGroup, Validators } from "@angular/forms"
-import { MatDialogRef } from "@angular/material/dialog"
-import { AuthService } from "../../../services/auth.service"
+import { Component } from "@angular/core";
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from "@angular/forms";
+import { MatDialogRef, MatDialogModule } from "@angular/material/dialog";
+import { MatButtonModule } from "@angular/material/button";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
+import { CommonModule } from "@angular/common";
+import { AuthService } from "../../../services/auth.service";
 
 @Component({
   selector: "app-change-password",
   templateUrl: "./change-password.component.html",
   styleUrls: ["./change-password.component.scss"],
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDialogModule
+  ]
 })
 export class ChangePasswordComponent {
   changePasswordForm: FormGroup
