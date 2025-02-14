@@ -45,7 +45,7 @@ export interface Achievement {
 }
 
 export interface UserRank {
-  level: number
+  level: string 
   name: string
   icon?: string
   points: number
@@ -91,7 +91,7 @@ export interface Reward {
 }
 
 export interface FavoriteBeer {
-  id: string
+  beerId: string
   name: string
   beerLabelUrl?: string
   beerImageUrl?: string

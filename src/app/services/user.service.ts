@@ -97,7 +97,7 @@ export class UserService {
 
   private getDefaultRank(): UserRank {
     return {
-      level: 0,
+      level: "I",
       points: 0,
       progress: 0,
       name: "Novice",
@@ -174,6 +174,7 @@ export class UserService {
                       .pipe(
                         map((beer) => ({
                           id: favorite.id,
+                          beerId: favorite.id, // Add this line
                           name: beer?.name || "Unknown Beer",
                           beerLabelUrl: beer?.beerLabelUrl || "",
                           beerImageUrl: beer?.beerImageUrl || "",
@@ -294,7 +295,6 @@ export class UserService {
           const currentAchievements = user.achievements || []
           const stats = user.statistics || this.initializeStatistics(undefined)
 
-          // Check for new achievements
           if (stats.totalBeersRated >= 1 && !currentAchievements.some((a) => a.id === "first_rater")) {
             newAchievements.push({
               id: "first_rater",
@@ -471,7 +471,7 @@ export class UserService {
     return {
       name: `${currentRank.name} ${currentLevel.name}`,
       icon: currentRank.icon,
-      level: Number.parseInt(currentLevel.name.replace("I", "1").replace("II", "2").replace("III", "3")),
+      level: currentLevel.name,
       progress: progress,
       pointsToNextRank: pointsToNextRank,
       points: ratings,
@@ -519,8 +519,6 @@ export class UserService {
   }
 
   shareAchievement(userId: string, achievementId: string): Promise<void> {
-    // Implement social media sharing logic here
-    // This is a placeholder function
     console.log(`Sharing achievement ${achievementId} for user ${userId}`)
     return Promise.resolve()
   }

@@ -1,29 +1,111 @@
 .ranking-section {
+    background-color: #2A2A2A;
+    color: #FFFFFF;
+}
+
+.current-rank {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    .rank-icon {
+        font-size: 3rem;
+        margin-right: 1rem;
+    }
+
     .rank-info {
+        h2 {
+            margin: 0;
+            color: #FFA500;
+        }
+
+        p {
+            margin: 0;
+            color: #A0A0A0;
+        }
+    }
+}
+
+.progress-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+
+    .progress-circle {
+        ::ng-deep circle {
+            stroke: #FFA500;
+        }
+    }
+
+    .progress-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+}
+
+.remaining-xp {
+    text-align: center;
+    margin-top: 0.5rem;
+    color: #A0A0A0;
+}
+
+.all-ranks {
+    margin-top: 2rem;
+
+    h3 {
+        color: #FFA500;
+        margin-bottom: 1rem;
+    }
+
+    .rank-list {
         display: flex;
-        align-items: center;
-        margin-top: 1rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
 
-        .rank-icon {
-            font-size: 3rem;
-            margin-right: 1rem;
+        .rank-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.5rem;
+            border-radius: 4px;
+            background-color: #3A3A3A;
+            width: calc(20% - 0.5rem);
+            transition: all 0.3s ease;
+
+            &.locked {
+                opacity: 0.5;
+                filter: grayscale(100%);
+            }
+
+            &.current {
+                background-color: #FFA500;
+                color: #2A2A2A;
+            }
+
+            &.unlocked {
+                background-color: #4A4A4A;
+            }
+
+            .rank-icon {
+                font-size: 1.5rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .rank-name {
+                font-size: 0.8rem;
+                text-align: center;
+            }
         }
+    }
+}
 
-        .rank-details {
-            flex-grow: 1;
-
-            h4 {
-                margin-bottom: 0.5rem;
-            }
-
-            mat-progress-bar {
-                margin-bottom: 0.5rem;
-            }
-
-            p {
-                font-size: 0.9rem;
-                color: #666;
-            }
-        }
+@media (max-width: 768px) {
+    .all-ranks .rank-list .rank-item {
+        width: calc(33.33% - 0.5rem);
     }
 }

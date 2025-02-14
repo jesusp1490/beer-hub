@@ -9,7 +9,6 @@
       (logout)="onLogout()"
       (uploadProfilePicture)="onUploadProfilePicture($event)">
     </app-profile-section>
-    <app-ranking-section [userProfile]="userProfile"></app-ranking-section>
   </div>
 
   <!-- Main Content -->
@@ -17,15 +16,15 @@
     <!-- Top Stats Bar -->
     <div class="stats-bar">
       <div class="stat-card">
-        <h3>Total Rated Beers:</h3>
+        <h3>Total Rated Beers</h3>
         <p>{{userStats?.totalBeersRated || 0}}</p>
       </div>
       <div class="stat-card">
-        <h3>Total Countries visited:</h3>
+        <h3>Countries Explored</h3>
         <p>{{userStats?.uniqueCountriesCount || 0}}</p>
       </div>
       <div class="stat-card">
-        <h3>Total beer types:</h3>
+        <h3>Beer Types</h3>
         <p>{{userStats?.uniqueStylesCount || 0}}</p>
       </div>
     </div>
@@ -60,12 +59,7 @@
 
   <!-- Notification Icons -->
   <div class="notification-icons">
-    <button mat-icon-button>
-      <mat-icon>email</mat-icon>
-    </button>
-    <button mat-icon-button>
-      <mat-icon>notifications</mat-icon>
-    </button>
+    <app-notification-panel></app-notification-panel>
   </div>
 </div>
 

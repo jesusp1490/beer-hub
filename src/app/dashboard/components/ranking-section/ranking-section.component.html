@@ -1,12 +1,36 @@
-<mat-card>
+<mat-card class="ranking-section">
   <mat-card-header>
     <mat-card-title>Your Rank</mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    <h2>{{ currentRank?.name || 'Unranked' }}</h2>
-    <p>{{ userProfile?.statistics?.points || 0 }} / {{ getNextRankPoints() }} points</p>
-    <mat-progress-bar [value]="progress"></mat-progress-bar>
-    <p>{{ progress.toFixed(2) }}% to next rank</p>
+    <div class="current-rank" *ngIf="currentRank">
+      <div class="rank-icon">{{ currentRank.icon }}</div>
+      <div class="rank-info">
+        <h2>{{ currentRank.name }} {{ currentRank.level }}</h2>
+        <p>{{ userProfile?.statistics?.totalBeersRated || 0 }} beers rated</p>
+      </div>
+    </div>
+    <div class="progress-container">
+      <mat-progress-spinner
+        class="progress-circle"
+        [value]="progress"
+        [diameter]="100"
+        [strokeWidth]="10"
+        mode="determinate"
+      ></mat-progress-spinner>
+      <span class="progress-text">{{ progress.toFixed(0) }}%</span>
+    </div>
+    <p class="remaining-xp">{{ remainingXP }} XP to reach next level</p>
+
+    <div class="all-ranks">
+      <h3>Rank Progression</h3>
+      <div class="rank-list">
+        <div *ngFor="let rank of allRanks" class="rank-item" [ngClass]="getRankStatus(rank)">
+          <span class="rank-icon">{{ rank.icon }}</span>
+          <span class="rank-name">{{ rank.name }}</span>
+        </div>
+      </div>
+    </div>
   </mat-card-content>
 </mat-card>
 

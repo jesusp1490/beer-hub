@@ -31,8 +31,8 @@
 
     .profile-picture {
         position: relative;
-        width: 120px;
-        height: 120px;
+        width: 130px;
+        height: 130px;
         border-radius: 50%;
         overflow: hidden;
 
@@ -46,7 +46,7 @@
     .edit-picture-button {
         position: absolute;
         bottom: 0;
-        right: calc(50% - 75px);
+        left: 160px;
         background-color: #FFA500;
         border: none;
         border-radius: 50%;

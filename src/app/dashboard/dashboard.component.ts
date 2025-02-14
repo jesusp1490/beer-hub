@@ -15,6 +15,7 @@ import { LeaderboardComponent } from "./components/leaderboard/leaderboard.compo
 import { ChallengesComponent } from "./components/challenges/challenges.component"
 import { AchievementSectionComponent } from "./components/achievements-section/achievements-section.component"
 import { Timestamp } from "firebase/firestore"
+import { NotificationPanelComponent } from "./components/notification-panel/notification-panel.component"
 
 @Component({
   selector: "app-dashboard",
@@ -31,6 +32,7 @@ import { Timestamp } from "firebase/firestore"
     LeaderboardComponent,
     ChallengesComponent,
     AchievementSectionComponent,
+    NotificationPanelComponent,
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
