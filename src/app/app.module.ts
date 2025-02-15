@@ -33,7 +33,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner"
 import { AngularFireModule } from "@angular/fire/compat"
 import { AngularFireAuthModule } from "@angular/fire/compat/auth"
 import { AngularFirestoreModule } from "@angular/fire/compat/firestore"
-import { DashboardModule } from "./dashboard/dashboard.module"
+// import { DashboardModule } from "./dashboard/dashboard.module"
 
 // Environment
 import { environment } from "../environments/environment"
@@ -80,7 +80,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AppRoutingModule,
     SharedModule,
     BeersModule,
-    DashboardModule,
+    // DashboardModule,
     DashboardComponent,
     TranslateModule.forRoot({
       defaultLanguage: "en",

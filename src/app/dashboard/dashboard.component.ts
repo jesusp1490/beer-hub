@@ -32,7 +32,6 @@ import { Router } from "@angular/router"
     StatisticsComponent,
     LeaderboardComponent,
     ChallengesComponent,
-    AchievementsSectionComponent,
     NotificationPanelComponent,
     AchievementsSectionComponent,
   ],

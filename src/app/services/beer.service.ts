@@ -217,7 +217,7 @@ export class BeerService {
       )
   }
 
-  rateBeer(beerId: string, rating: number): Observable<void> {
+  rateBeer(beerId: string, rating: number, review?: string): Observable<void> {
     return this.authService.user$.pipe(
       take(1),
       switchMap((user) => {
@@ -298,33 +298,7 @@ export class BeerService {
             return { averageRating, ratingsCount, beerData }
           }),
         ).pipe(
-          switchMap(({ beerData }) => {
-            // Update user statistics
-            const ratedBeer: RatedBeer = {
-              id: this.firestore.createId(),
-              beerId,
-              rating,
-              review: "",
-              date: Timestamp.now(),
-              country: beerData.countryId,
-              beerType: beerData.beerType,
-            }
-            return this.userService.updateUserStatistics(userId, ratedBeer)
-          }),
-          switchMap(() => this.userService.checkAndUpdateAchievements(userId)),
-          tap(() => {
-            // Update the cached beer data
-            const cachedBeers = this.cachedBeers$.value
-            const updatedBeerIndex = cachedBeers.findIndex((beer) => beer.id === beerId)
-            if (updatedBeerIndex !== -1) {
-              cachedBeers[updatedBeerIndex] = {
-                ...cachedBeers[updatedBeerIndex],
-                averageRating: cachedBeers[updatedBeerIndex].averageRating,
-                ratingsCount: (cachedBeers[updatedBeerIndex].ratingsCount || 0) + 1,
-              }
-              this.cachedBeers$.next(cachedBeers)
-            }
-          }),
+          switchMap(() => this.userService.rateBeer(userId, beerId, rating, review)),
           map(() => undefined), // Map the result to void
         )
       }),

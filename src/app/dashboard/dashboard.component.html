@@ -47,7 +47,7 @@
 
       <!-- Achievements -->
       <div class="grid-item achievements">
-        <app-achievements-section [userProfile]="userProfile"></app-achievements-section>
+        <app-achievements-section [userProfile]="userProfile!" *ngIf="userProfile"></app-achievements-section>
       </div>
     </div>
   </div>

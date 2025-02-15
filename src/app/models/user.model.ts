@@ -14,12 +14,14 @@ export interface UserProfile {
   rank: UserRank | null
   favorites?: string[]
   statistics?: UserStatistics
-  achievements: AchievementProgress[]
+  achievements?: Record<string, UserAchievement>;
+  rewards?: Reward[];
   level: number
   challenges?: Challenge[]
   googlePhotoURL?: string | null
   bio?: string
   progress: number
+  ratedBeers?: RatedBeer[];
 }
 
 export interface UserStatistics {
@@ -34,26 +36,44 @@ export interface UserStatistics {
   lastRatingDate: Timestamp
   uniqueStylesCount: number
   uniqueCountriesCount: number
+  totalReviews?: number;
+  totalReviewLikes?: number;
+  ratedBeers?: RatedBeer[];
+}
+
+export interface UserAchievement {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: string;
+  levels: {
+    level: number;
+    icon: string;
+    description: string;
+  }[];
+  currentLevel: number;
+  progress: number;
+  completed: boolean;
+  currentLevelDetails?: {
+    level: number;
+    icon: string;
+    description: string;
+  };
+  dateUnlocked?: Timestamp | null;
 }
 
 export interface Achievement {
-  id: string
-  name: string
-  description: string
-  icon?: string
-  dateUnlocked: Timestamp
-}
-
-export interface AchievementProgress {
-  id: string
-  name: string
-  description: string
-  icon: string
-  levels: AchievementLevel[]
-  currentLevel: number
-  progress: number
-  dateUnlocked: Timestamp
-  updated?: boolean
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: string;
+  levels: {
+    level: number;
+    icon: string;
+    description: string;
+  }[];
 }
 
 export interface AchievementLevel {
@@ -115,4 +135,3 @@ export interface FavoriteBeer {
   beerLabelUrl?: string
   beerImageUrl?: string
 }
-

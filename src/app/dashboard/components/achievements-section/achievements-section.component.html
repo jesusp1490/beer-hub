@@ -1,31 +1,38 @@
 <div class="achievements-container">
-  <h2>Achievements</h2>
-  <mat-accordion>
-    <mat-expansion-panel *ngFor="let category of achievementCategories">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          <span class="category-icon">{{ category.icon }}</span>
-          {{ category.name }}
-        </mat-panel-title>
-      </mat-expansion-panel-header>
+  <h2 class="section-title">Achievements</h2>
+  <mat-form-field appearance="outline" class="category-filter">
+    <mat-label>Filter by Category</mat-label>
+    <mat-select [(ngModel)]="selectedCategory">
+      <mat-option value="All">All</mat-option>
+      <mat-option value="Rating">Rating</mat-option>
+      <mat-option value="Exploration">Exploration</mat-option>
+      <mat-option value="Beer Type">Beer Type</mat-option>
+    </mat-select>
+  </mat-form-field>
 
-      <div class="achievements-grid">
-        <mat-card *ngFor="let achievement of getAchievementsByCategory(category.name)" class="achievement-card">
-          <mat-card-header>
-            <div mat-card-avatar class="achievement-icon">{{ achievement.icon }}</div>
-            <mat-card-title>{{ achievement.name }}</mat-card-title>
-            <mat-card-subtitle>Level {{ achievement.currentLevel }}</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <p>{{ achievement.description }}</p>
-            <mat-progress-bar mode="determinate" [value]="getProgressPercentage(achievement)"></mat-progress-bar>
-            <p class="progress-text">
-              {{ achievement.progress }} / {{ getNextLevelRequirement(achievement) }}
-            </p>
-          </mat-card-content>
-        </mat-card>
+  <div class="achievements-grid">
+    <ng-container *ngFor="let achievement of combinedAchievements$ | async">
+      <div class="achievement-card" 
+           [class.completed]="achievement.completed"
+           [class.in-progress]="achievement.currentLevel > 0 && !achievement.completed"
+           *ngIf="filterAchievements([achievement]).length > 0">
+        <div class="achievement-icon" [matTooltip]="achievement.description">
+          <span class="icon" [innerHTML]="getIcon(getCurrentLevelDetails(achievement).icon)"></span>
+        </div>
+        <div class="achievement-info">
+          <h3>{{ achievement.name }}</h3>
+          <p class="level">Level {{ achievement.currentLevel || 0 }}</p>
+          <mat-progress-bar 
+            mode="determinate" 
+            [value]="calculateProgress(achievement)"
+            [color]="achievement.completed ? 'accent' : 'primary'">
+          </mat-progress-bar>
+          <p class="description">{{ getCurrentLevelDetails(achievement).description }}</p>
+          <p class="next-level" *ngIf="getNextLevelDetails(achievement) as nextLevel">
+            Next: {{ nextLevel.description }}
+          </p>
+        </div>
       </div>
-    </mat-expansion-panel>
-  </mat-accordion>
+    </ng-container>
+  </div>
 </div>
-

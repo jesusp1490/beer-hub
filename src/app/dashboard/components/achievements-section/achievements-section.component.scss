@@ -1,85 +1,111 @@
 .achievements-container {
-    padding: 1rem;
-
-    h2 {
-        color: #FFA500;
-        margin-bottom: 1rem;
-    }
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
 }
 
-.category-icon {
-    margin-right: 0.5rem;
-    font-size: 1.2em;
+.section-title {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.category-filter {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto 2rem;
+    display: block;
 }
 
 .achievements-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
 }
 
 .achievement-card {
-    background-color: #2A2A2A;
-    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 
-    .mat-card-header {
-        align-items: center;
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     }
 
-    .achievement-icon {
-        font-size: 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: rgba(255, 165, 0, 0.2);
-        border-radius: 50%;
-        width: 48px;
-        height: 48px;
+    &.completed {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.2));
+        border-color: rgba(255, 215, 0, 0.3);
     }
 
-    .mat-card-title {
-        font-size: 1rem;
-        margin-bottom: 0.25rem;
-    }
-
-    .mat-card-subtitle {
-        color: #FFA500;
-    }
-
-    .mat-card-content {
-        p {
-            margin-bottom: 0.5rem;
-        }
-    }
-
-    .progress-text {
-        text-align: right;
-        font-size: 0.8rem;
-        color: #A0A0A0;
-        margin-top: 0.25rem;
+    &.in-progress {
+        background: linear-gradient(135deg, rgba(100, 149, 237, 0.1), rgba(100, 149, 237, 0.2));
+        border-color: rgba(100, 149, 237, 0.3);
     }
 }
 
+.achievement-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    .icon {
+        font-size: 2.5rem;
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.achievement-info {
+    text-align: center;
+
+    h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+        color: #fff;
+    }
+
+    .level {
+        font-size: 1rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 0.5rem;
+    }
+
+    .description {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin: 0.5rem 0;
+    }
+
+    .next-level {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+        font-style: italic;
+        margin-top: 0.5rem;
+    }
+}
+
+mat-progress-bar {
+    margin: 1rem 0;
+    height: 6px;
+    border-radius: 3px;
+}
+
 ::ng-deep {
-    .mat-expansion-panel {
-        background-color: #1E1E1E !important;
-        color: #FFFFFF !important;
-    }
-
-    .mat-expansion-panel-header {
-        background-color: #2A2A2A !important;
-    }
-
-    .mat-expansion-panel-header-title {
-        color: #FFFFFF !important;
-    }
-
     .mat-progress-bar-fill::after {
-        background-color: #FFA500;
+        background-color: #4CAF50;
     }
 
-    .mat-progress-bar-buffer {
-        background-color: rgba(255, 165, 0, 0.2);
+    .completed .mat-progress-bar-fill::after {
+        background-color: #FFD700;
     }
 }
