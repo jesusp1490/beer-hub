@@ -106,6 +106,20 @@ export class UserService {
       uniqueCountriesCount: 0,
       totalReviews: 0,
       totalReviewLikes: 0,
+      newBeerRequests: 0,
+      detailedReviews: 0,
+      reputationPoints: 0,
+      continentsExplored: [],
+      europeanCountriesExplored: [],
+      northAmericanCountriesExplored: [],
+      southAmericanCountriesExplored: [],
+      asianBeersRated: 0,
+      africanBeersRated: 0,
+      oceaniaBeersRated: 0,
+      highAltitudeCountriesExplored: [],
+      rareBeersRated: 0,
+      highHopBeersRated: 0,
+      craftBeersRated: 0,
     }
     return statistics ? { ...defaultStats, ...statistics } : defaultStats
   }
@@ -297,7 +311,13 @@ export class UserService {
     return updatedStats
   }
 
-  rateBeer(userId: string, beerId: string, rating: number, review?: string): Observable<void> {
+  rateBeer(
+    userId: string,
+    beerId: string,
+    rating: number,
+    review: string | undefined,
+    beerType: string,
+  ): Observable<void> {
     return this.addPoints(userId, "rate").pipe(
       switchMap(() => {
         if (review && review.length >= 50) {
@@ -313,7 +333,7 @@ export class UserService {
           review: review || "",
           date: Timestamp.now(),
           country: "",
-          beerType: "",
+          beerType: beerType,
         }
         return this.updateUserStatistics(userId, ratedBeer)
       }),
@@ -348,8 +368,81 @@ export class UserService {
         { name: "III", minXP: 40, maxXP: 59 },
       ],
     },
-    // ... (other rank definitions)
+    {
+      name: "Hop Private",
+      icon: "🌿",
+      levels: [
+        { name: "I", minXP: 60, maxXP: 99 },
+        { name: "II", minXP: 100, maxXP: 139 },
+        { name: "III", minXP: 140, maxXP: 179 },
+      ],
+    },
+    {
+      name: "Malt Corporal",
+      icon: "🌾",
+      levels: [
+        { name: "I", minXP: 180, maxXP: 249 },
+        { name: "II", minXP: 250, maxXP: 319 },
+        { name: "III", minXP: 320, maxXP: 399 },
+      ],
+    },
+    {
+      name: "Ale Sergeant",
+      icon: "🍺",
+      levels: [
+        { name: "I", minXP: 400, maxXP: 499 },
+        { name: "II", minXP: 500, maxXP: 599 },
+        { name: "III", minXP: 600, maxXP: 699 },
+      ],
+    },
+    {
+      name: "Lager Lieutenant",
+      icon: "🍻",
+      levels: [
+        { name: "I", minXP: 700, maxXP: 849 },
+        { name: "II", minXP: 850, maxXP: 999 },
+        { name: "III", minXP: 1000, maxXP: 1199 },
+      ],
+    },
+    {
+      name: "Stout Captain",
+      icon: "🍻",
+      levels: [
+        { name: "I", minXP: 1200, maxXP: 1399 },
+        { name: "II", minXP: 1400, maxXP: 1599 },
+        { name: "III", minXP: 1600, maxXP: 1799 },
+      ],
+    },
+    {
+      name: "Porter Colonel",
+      icon: "🏆",
+      levels: [
+        { name: "I", minXP: 1800, maxXP: 1999 },
+        { name: "II", minXP: 2000, maxXP: 2199 },
+        { name: "III", minXP: 2200, maxXP: 2499 },
+      ],
+    },
+    {
+      name: "Imperial General",
+      icon: "👑",
+      levels: [
+        { name: "I", minXP: 2500, maxXP: 2799 },
+        { name: "II", minXP: 2800, maxXP: 3099 },
+        { name: "III", minXP: 3100, maxXP: 3499 },
+      ],
+    },
+    {
+      name: "Grand Brewmaster",
+      icon: "🏆",
+      levels: [
+        { name: "I", minXP: 3500, maxXP: 3999 },
+        { name: "II", minXP: 4000, maxXP: 4499 },
+        { name: "III", minXP: 4500, maxXP: Number.POSITIVE_INFINITY },
+      ],
+    },
   ]
+
+
 
   private calculateRank(points: number): UserRank {
     let currentRank: RankDefinition | undefined
@@ -485,6 +578,7 @@ export class UserService {
   addPoints(
     userId: string,
     action: "rate" | "request" | "add" | "review" | "challenge" | "achievement",
+    customPoints?: number,
     level?: "bronze" | "silver" | "gold",
   ): Observable<void> {
     const pointsMap = {
@@ -496,7 +590,7 @@ export class UserService {
       achievement: level === "bronze" ? 10 : level === "silver" ? 25 : 50,
     }
 
-    const points = pointsMap[action]
+    const points = customPoints !== undefined ? customPoints : pointsMap[action]
 
     return this.firestore
       .doc<UserProfile>(`users/${userId}`)
@@ -524,6 +618,96 @@ export class UserService {
           )
         }),
       )
+  }
+
+  removeBeerRating(userId: string, beerId: string): Observable<void> {
+    return this.firestore
+      .doc<UserProfile>(`users/${userId}`)
+      .valueChanges()
+      .pipe(
+        take(1),
+        switchMap((user) => {
+          if (!user) throw new Error("User not found")
+
+          const ratedBeers = user.ratedBeers || []
+          const ratingToRemove = ratedBeers.find((rb) => rb.beerId === beerId)
+
+          if (!ratingToRemove) {
+            console.log("Rating not found")
+            return of(undefined)
+          }
+
+          const updatedRatedBeers = ratedBeers.filter((rb) => rb.beerId !== beerId)
+          const pointsToDeduct = this.calculatePointsForRating(ratingToRemove)
+
+          const updatedStats = this.calculateUpdatedStatisticsAfterRemoval(
+            user.statistics || this.initializeStatistics(undefined),
+            ratingToRemove,
+          )
+          updatedStats.points = Math.max(0, (updatedStats.points || 0) - pointsToDeduct)
+
+          return from(
+            this.firestore.doc(`users/${userId}`).update({
+              ratedBeers: updatedRatedBeers,
+              statistics: updatedStats,
+            }),
+          ).pipe(
+            switchMap(() => this.updateUserRank(userId, updatedStats.points)),
+            switchMap(() => this.achievementService.updateAchievements(userId)),
+          )
+        }),
+      )
+  }
+
+  private calculatePointsForRating(rating: Partial<RatedBeer>): number {
+    let points = 1 // Base point for rating
+    if (rating.review && rating.review.length >= 50) {
+      points += 2 // Additional points for review
+    }
+    return points
+  }
+
+  private calculateUpdatedStatisticsAfterRemoval(
+    currentStats: UserStatistics,
+    removedRating: RatedBeer,
+  ): UserStatistics {
+    const updatedStats = { ...currentStats }
+    updatedStats.totalBeersRated = Math.max(0, (updatedStats.totalBeersRated || 0) - 1)
+
+    // Update other statistics as needed
+    if (removedRating.country) {
+      const countryCount = updatedStats.countriesExplored.filter((c) => c === removedRating.country).length
+      if (countryCount === 1) {
+        updatedStats.countriesExplored = updatedStats.countriesExplored.filter((c) => c !== removedRating.country)
+        updatedStats.uniqueCountriesCount = Math.max(0, (updatedStats.uniqueCountriesCount || 0) - 1)
+      }
+    }
+
+    if (removedRating.beerType) {
+      updatedStats.beerTypeStats[removedRating.beerType] = Math.max(
+        0,
+        (updatedStats.beerTypeStats[removedRating.beerType] || 0) - 1,
+      )
+      if (updatedStats.beerTypeStats[removedRating.beerType] === 0) {
+        delete updatedStats.beerTypeStats[removedRating.beerType]
+        updatedStats.uniqueStylesCount = Math.max(0, (updatedStats.uniqueStylesCount || 0) - 1)
+      }
+    }
+
+    if (updatedStats.totalReviews !== undefined) {
+      updatedStats.totalReviews = Math.max(0, updatedStats.totalReviews - 1)
+    }
+
+    // Recalculate average rating
+    const totalRatings = updatedStats.totalBeersRated || 0
+    if (totalRatings > 0) {
+      const totalRatingSum = (currentStats.averageRating || 0) * (totalRatings + 1) - removedRating.rating
+      updatedStats.averageRating = totalRatingSum / totalRatings
+    } else {
+      updatedStats.averageRating = 0
+    }
+
+    return updatedStats
   }
 }
 

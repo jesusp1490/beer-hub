@@ -1,4 +1,4 @@
-import { Timestamp } from "@angular/fire/firestore"
+import type { Timestamp } from "@angular/fire/firestore"
 
 export interface UserProfile {
   uid: string
@@ -14,14 +14,14 @@ export interface UserProfile {
   rank: UserRank | null
   favorites?: string[]
   statistics?: UserStatistics
-  achievements?: Record<string, UserAchievement>;
-  rewards?: Reward[];
+  achievements?: Record<string, UserAchievement>
+  rewards?: Reward[]
   level: number
   challenges?: Challenge[]
   googlePhotoURL?: string | null
   bio?: string
   progress: number
-  ratedBeers?: RatedBeer[];
+  ratedBeers?: RatedBeer[]
 }
 
 export interface UserStatistics {
@@ -36,44 +36,58 @@ export interface UserStatistics {
   lastRatingDate: Timestamp
   uniqueStylesCount: number
   uniqueCountriesCount: number
-  totalReviews?: number;
-  totalReviewLikes?: number;
-  ratedBeers?: RatedBeer[];
+  totalReviews?: number
+  totalReviewLikes?: number
+  ratedBeers?: RatedBeer[]
+  newBeerRequests: number
+  detailedReviews: number
+  reputationPoints: number
+  continentsExplored: string[]
+  europeanCountriesExplored: string[]
+  northAmericanCountriesExplored: string[]
+  southAmericanCountriesExplored: string[]
+  asianBeersRated: number
+  africanBeersRated: number
+  oceaniaBeersRated: number
+  highAltitudeCountriesExplored: string[]
+  rareBeersRated: number
+  highHopBeersRated: number
+  craftBeersRated: number
 }
 
 export interface UserAchievement {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
+  id: string
+  name: string
+  description: string
+  icon: string
+  category: string
   levels: {
-    level: number;
-    icon: string;
-    description: string;
-  }[];
-  currentLevel: number;
-  progress: number;
-  completed: boolean;
+    level: number
+    icon: string
+    description: string
+  }[]
+  currentLevel: number
+  progress: number
+  completed: boolean
   currentLevelDetails?: {
-    level: number;
-    icon: string;
-    description: string;
-  };
-  dateUnlocked?: Timestamp | null;
+    level: number
+    icon: string
+    description: string
+  }
+  dateUnlocked?: Timestamp | null
 }
 
 export interface Achievement {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
+  id: string
+  name: string
+  description: string
+  icon: string
+  category: string
   levels: {
-    level: number;
-    icon: string;
-    description: string;
-  }[];
+    level: number
+    icon: string
+    description: string
+  }[]
 }
 
 export interface AchievementLevel {
@@ -116,7 +130,7 @@ export interface RatedBeer {
 export interface LeaderboardEntry {
   userId: string
   displayName: string
-  photoURL?: string
+  photoURL: string
   rank: UserRank
   points: number
 }
@@ -125,13 +139,16 @@ export interface Reward {
   id: string
   name: string
   description: string
-  imageUrl?: string
+  icon: string
   dateEarned: Timestamp
+  type: string
 }
 
 export interface FavoriteBeer {
   id: string
+  beerId: string
   name: string
   beerLabelUrl?: string
   beerImageUrl?: string
 }
+

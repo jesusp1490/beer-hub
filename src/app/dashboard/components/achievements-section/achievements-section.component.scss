@@ -1,12 +1,16 @@
+@import 'src/styles/_variables.scss';
+
 .achievements-container {
+    font-family: $font-family-primary;
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
 }
 
 .section-title {
+    font-family: $font-family-primary;
     font-size: 2.5rem;
-    color: #333;
+    color: $color-secondary;
     margin-bottom: 1.5rem;
     text-align: center;
 }
@@ -25,6 +29,7 @@
 }
 
 .achievement-card {
+    font-family: $font-family-primary;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 1.5rem;
@@ -66,8 +71,10 @@
 
 .achievement-info {
     text-align: center;
+    font-family: $font-family-primary;
 
     h3 {
+        font-family: $font-family-primary;
         font-size: 1.25rem;
         margin-bottom: 0.5rem;
         color: #fff;

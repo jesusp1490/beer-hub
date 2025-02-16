@@ -1,3 +1,4 @@
+@import 'src/styles/_variables.scss';
 .current-rank-card {
     background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
     border-radius: 12px;
@@ -15,7 +16,9 @@
         }
 
         .rank-info {
+            font-family: $font-family-primary;
             h3 {
+                font-family: $font-family-primary;
                 margin: 0;
                 color: #FFA500;
                 font-size: 1.25rem;
@@ -30,6 +33,7 @@
     }
 
     .progress-info {
+        font-family: $font-family-primary;
         mat-progress-bar {
             margin-bottom: 0.5rem;
             height: 4px;
@@ -44,6 +48,7 @@
         }
 
         .progress-text {
+            font-family: $font-family-primary;
             margin: 0;
             color: #a0a0a0;
             font-size: 0.75rem;
@@ -67,6 +72,7 @@
 }
 
 .rank-cards {
+    font-family: $font-family-primary;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 1rem;
