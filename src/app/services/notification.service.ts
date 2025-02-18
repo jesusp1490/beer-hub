@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core"
-import { BehaviorSubject, Observable } from "rxjs"
+import { BehaviorSubject } from "rxjs"
 
 export interface Notification {
   id: string
   message: string
-  type: string
+  type: "success" | "error" | "info" | "achievement" | "rank"
   read: boolean
   createdAt: Date
 }
@@ -13,16 +13,16 @@ export interface Notification {
   providedIn: "root",
 })
 export class NotificationService {
-  private notifications: Notification[] = []
   private notificationsSubject = new BehaviorSubject<Notification[]>([])
+  private notifications: Notification[] = []
 
   constructor() {}
 
-  getNotifications(): Observable<Notification[]> {
+  getNotifications() {
     return this.notificationsSubject.asObservable()
   }
 
-  addNotification(message: string, type: string): void {
+  addNotification(message: string, type: Notification["type"]): void {
     const notification: Notification = {
       id: Date.now().toString(),
       message,
@@ -34,29 +34,38 @@ export class NotificationService {
     this.notificationsSubject.next([...this.notifications])
   }
 
-  markAsRead(notificationId: string): void {
-    this.notifications = this.notifications.map((notification) =>
-      notification.id === notificationId ? { ...notification, read: true } : notification,
-    )
-    this.notificationsSubject.next([...this.notifications])
-  }
-
-  removeNotification(notificationId: string): void {
-    this.notifications = this.notifications.filter((notification) => notification.id !== notificationId)
-    this.notificationsSubject.next([...this.notifications])
-  }
-
-  clearAllNotifications(): void {
-    this.notifications = []
-    this.notificationsSubject.next([])
-  }
-
   showSuccess(message: string): void {
     this.addNotification(message, "success")
   }
 
   showError(message: string): void {
     this.addNotification(message, "error")
+  }
+
+  showAchievementNotification(message: string): void {
+    this.addNotification(message, "achievement")
+  }
+
+  showRankNotification(message: string): void {
+    this.addNotification(message, "rank")
+  }
+
+  markAsRead(notificationId: string): void {
+    const updatedNotifications = this.notifications.map((notification) =>
+      notification.id === notificationId ? { ...notification, read: true } : notification,
+    )
+    this.notifications = updatedNotifications
+    this.notificationsSubject.next(this.notifications)
+  }
+
+  removeNotification(notificationId: string): void {
+    this.notifications = this.notifications.filter((notification) => notification.id !== notificationId)
+    this.notificationsSubject.next(this.notifications)
+  }
+
+  clearAllNotifications(): void {
+    this.notifications = []
+    this.notificationsSubject.next(this.notifications)
   }
 }
 

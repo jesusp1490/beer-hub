@@ -1,38 +1,32 @@
-<div class="achievements-container">
-  <h2 class="section-title">Achievements</h2>
-  <mat-form-field appearance="outline" class="category-filter">
-    <mat-label>Filter by Category</mat-label>
-    <mat-select [(ngModel)]="selectedCategory">
-      <mat-option value="All">All</mat-option>
-      <mat-option value="Rating">Rating</mat-option>
-      <mat-option value="Exploration">Exploration</mat-option>
-      <mat-option value="Beer Type">Beer Type</mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <div class="achievements-grid">
-    <ng-container *ngFor="let achievement of combinedAchievements$ | async">
-      <div class="achievement-card" 
-           [class.completed]="achievement.completed"
-           [class.in-progress]="achievement.currentLevel > 0 && !achievement.completed"
-           *ngIf="filterAchievements([achievement]).length > 0">
-        <div class="achievement-icon" [matTooltip]="achievement.description">
-          <span class="icon" [innerHTML]="getIcon(getCurrentLevelDetails(achievement).icon)"></span>
-        </div>
-        <div class="achievement-info">
-          <h3>{{ achievement.name }}</h3>
-          <p class="level">Level {{ achievement.currentLevel || 0 }}</p>
-          <mat-progress-bar 
-            mode="determinate" 
-            [value]="calculateProgress(achievement)"
-            [color]="achievement.completed ? 'accent' : 'primary'">
-          </mat-progress-bar>
-          <p class="description">{{ getCurrentLevelDetails(achievement).description }}</p>
-          <p class="next-level" *ngIf="getNextLevelDetails(achievement) as nextLevel">
-            Next: {{ nextLevel.description }}
-          </p>
-        </div>
+<button (click)="toggleAllAchievements()" class="mb-4 px-4 py-2 bg-blue-500 text-white rounded">
+  {{ showAllAchievements ? 'Show Unlocked' : 'Show All' }}
+</button>
+<div *ngFor="let achievement of filterAchievements(combinedAchievements$ | async)" 
+     class="achievement-card p-4 rounded-lg shadow-md mb-4"
+     [ngClass]="getAchievementLevelClass(achievement)">
+  <div class="flex items-center justify-between mb-2">
+    <h3 class="text-lg font-semibold">{{ achievement.name }}</h3>
+    <span class="text-2xl">{{ achievement.icon }}</span>
+  </div>
+  <p class="text-sm mb-2">{{ getAchievementDescription(achievement) }}</p>
+  <div class="relative pt-1">
+    <div class="flex mb-2 items-center justify-between">
+      <div>
+        <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-teal-600 bg-teal-200">
+          Level {{ achievement.currentLevel }}
+        </span>
       </div>
-    </ng-container>
+      <div class="text-right">
+        <span class="text-xs font-semibold inline-block text-teal-600">
+          {{ calculateProgress(achievement) | number:'1.0-0' }}%
+        </span>
+      </div>
+    </div>
+    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-teal-200">
+      <div [style.width.%]="calculateProgress(achievement)" 
+           class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-teal-500">
+      </div>
+    </div>
   </div>
 </div>
+

@@ -6,7 +6,7 @@ import { MatMenuModule } from "@angular/material/menu"
 import { MatButtonModule } from "@angular/material/button"
 import { MatDividerModule } from "@angular/material/divider"
 import { NotificationService, Notification } from "../../../services/notification.service"
-import { Subscription } from "rxjs" // Import Subscription
+import { Subscription } from "rxjs"
 
 @Component({
   selector: "app-notification-panel",
@@ -18,7 +18,7 @@ import { Subscription } from "rxjs" // Import Subscription
 export class NotificationPanelComponent implements OnInit, OnDestroy {
   notifications: Notification[] = []
   unreadCount = 0
-  private subscription: Subscription = new Subscription() // Initialize subscription
+  private subscription: Subscription = new Subscription()
 
   constructor(private notificationService: NotificationService) {}
 

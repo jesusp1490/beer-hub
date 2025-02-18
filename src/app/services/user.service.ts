@@ -118,8 +118,9 @@ export class UserService {
       oceaniaBeersRated: 0,
       highAltitudeCountriesExplored: [],
       rareBeersRated: 0,
-      highHopBeersRated: 0,
       craftBeersRated: 0,
+      highHopBeersRated: 0,
+      totalBadgesEarned: 0,
     }
     return statistics ? { ...defaultStats, ...statistics } : defaultStats
   }
@@ -291,6 +292,7 @@ export class UserService {
     updatedStats.totalBeersRated += 1
     if (newRating.country) {
       updatedStats.countriesExplored = Array.from(new Set([...updatedStats.countriesExplored, newRating.country]))
+      this.updateContinentStatistics(updatedStats, newRating.country)
     }
     if (newRating.beerType) {
       updatedStats.beerTypeStats[newRating.beerType] = (updatedStats.beerTypeStats[newRating.beerType] || 0) + 1
@@ -317,6 +319,7 @@ export class UserService {
     rating: number,
     review: string | undefined,
     beerType: string,
+    country: string,
   ): Observable<void> {
     return this.addPoints(userId, "rate").pipe(
       switchMap(() => {
@@ -332,7 +335,7 @@ export class UserService {
           rating,
           review: review || "",
           date: Timestamp.now(),
-          country: "",
+          country: country,
           beerType: beerType,
         }
         return this.updateUserStatistics(userId, ratedBeer)
@@ -441,8 +444,6 @@ export class UserService {
       ],
     },
   ]
-
-
 
   private calculateRank(points: number): UserRank {
     let currentRank: RankDefinition | undefined
@@ -681,6 +682,7 @@ export class UserService {
         updatedStats.countriesExplored = updatedStats.countriesExplored.filter((c) => c !== removedRating.country)
         updatedStats.uniqueCountriesCount = Math.max(0, (updatedStats.uniqueCountriesCount || 0) - 1)
       }
+      this.updateContinentStatistics(updatedStats, removedRating.country)
     }
 
     if (removedRating.beerType) {
@@ -708,6 +710,59 @@ export class UserService {
     }
 
     return updatedStats
+  }
+
+  private updateContinentStatistics(stats: UserStatistics, country: string): void {
+    const continents: { [key: string]: string[] } = {
+      Europe: ["Germany", "France", "Italy", "Spain", "UK"],
+      NorthAmerica: ["USA", "Canada", "Mexico"],
+      SouthAmerica: ["Brazil", "Argentina", "Colombia"],
+      Asia: ["China", "Japan", "India"],
+      Africa: ["Egypt", "Nigeria", "South Africa"],
+      Oceania: ["Australia", "New Zealand"],
+    }
+
+    for (const [continent, countries] of Object.entries(continents)) {
+      if (countries.includes(country)) {
+        stats.continentsExplored = Array.from(new Set([...stats.continentsExplored, continent]))
+        break
+      }
+    }
+  }
+
+  private isHighAltitudeCountry(country: string): boolean {
+    const highAltitudeCountries = ["Bolivia", "Peru", "Nepal", "Bhutan"] // Add more high-altitude countries
+    return highAltitudeCountries.includes(country)
+  }
+
+  private isRareBeer(beerId: string): boolean {
+    // Implement logic to check if a beer is rare based on beerId
+    // This might involve fetching data from a database or external API
+    return false // Replace with actual logic
+  }
+
+  private isCraftBeer(beerId: string): boolean {
+    // Implement logic to check if a beer is craft based on beerId
+    // This might involve fetching data from a database or external API
+    return false // Replace with actual logic
+  }
+
+  private isHighHopBeer(beerId: string): boolean {
+    // Implement logic to check if a beer is high hop based on beerId
+    // This might involve fetching data from a database or external API
+    return false // Replace with actual logic
+  }
+
+  private checkNewlyUnlockedAchievements(oldAchievements: UserAchievement[], newAchievements: UserAchievement[]): void {
+    newAchievements.forEach((newAchievement) => {
+      const oldAchievement = oldAchievements.find((a) => a.id === newAchievement.id)
+      if (!oldAchievement || newAchievement.currentLevel > oldAchievement.currentLevel) {
+        this.notificationService.addNotification(
+          `Achievement Unlocked: ${newAchievement.name} (Level ${newAchievement.currentLevel})`,
+          "achievement",
+        )
+      }
+    })
   }
 }
 

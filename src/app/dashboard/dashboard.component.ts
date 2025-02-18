@@ -160,4 +160,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
         },
       })
   }
+
+  removeBeerRating(beerId: string): void {
+    this.userService
+      .getCurrentUser()
+      .pipe(
+        take(1),
+        switchMap((user) => {
+          if (user) {
+            return this.userService.removeBeerRating(user.uid, beerId)
+          }
+          throw new Error("User not found")
+        }),
+      )
+      .subscribe({
+        next: () => {
+          console.log("Beer rating removed successfully")
+          this.loadUserProfile() // Refresh user data
+        },
+        error: (error) => {
+          console.error("Error removing beer rating:", error)
+        },
+      })
+  }
 }
+

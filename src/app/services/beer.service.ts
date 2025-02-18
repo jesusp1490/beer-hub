@@ -255,7 +255,7 @@ export class BeerService {
               beerId,
               rating,
               ratedAt: firebase.firestore.FieldValue.serverTimestamp(),
-              beerType: beerData.beerType, // Include the beer type
+              beerType: beerData.beerType,
             })
 
             // Recalculate total ratings and average
@@ -299,7 +299,9 @@ export class BeerService {
             return { averageRating, ratingsCount, beerData }
           }),
         ).pipe(
-          switchMap(({ beerData }) => this.userService.rateBeer(userId, beerId, rating, review, beerData.beerType)),
+          switchMap(({ beerData }) =>
+            this.userService.rateBeer(userId, beerId, rating, review, beerData.beerType, beerData.countryId),
+          ),
           map(() => undefined),
         )
       }),

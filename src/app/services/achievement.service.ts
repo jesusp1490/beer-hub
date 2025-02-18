@@ -20,7 +20,8 @@ export class AchievementService {
           return of(undefined)
         }
         const updatedAchievements = this.calculateAchievements(userProfile)
-        return this.saveAchievements(userId, updatedAchievements)
+        const unlockedAchievements = updatedAchievements.filter((a) => a.currentLevel > 0)
+        return this.saveAchievements(userId, unlockedAchievements)
       }),
     )
   }
@@ -139,25 +140,33 @@ export class AchievementService {
     const beerTypeStats = stats.beerTypeStats || {}
 
     // Stout Lover
-    const stoutsRated = beerTypeStats["Stout"] || 0
+    const stoutsRated = Object.entries(beerTypeStats)
+      .filter(([type]) => this.matchBeerType("STOUT", type))
+      .reduce((sum, [, count]) => sum + count, 0)
     if (stoutsRated >= 10) {
       achievements.push(this.createAchievement("stout_lover", "Stout Lover", stoutsRated, [10, 25, 50]))
     }
 
     // IPA King
-    const ipasRated = beerTypeStats["IPA"] || 0
+    const ipasRated = Object.entries(beerTypeStats)
+      .filter(([type]) => this.matchBeerType("IPA", type))
+      .reduce((sum, [, count]) => sum + count, 0)
     if (ipasRated >= 10) {
       achievements.push(this.createAchievement("ipa_king", "IPA King", ipasRated, [10, 30, 60]))
     }
 
     // Lager Enthusiast
-    const lagersRated = beerTypeStats["Lager"] || 0
+    const lagersRated = Object.entries(beerTypeStats)
+      .filter(([type]) => this.matchBeerType("LAGER", type))
+      .reduce((sum, [, count]) => sum + count, 0)
     if (lagersRated >= 20) {
       achievements.push(this.createAchievement("lager_enthusiast", "Lager Enthusiast", lagersRated, [20, 50, 100]))
     }
 
     // Porter Collector
-    const portersRated = beerTypeStats["Porter"] || 0
+    const portersRated = Object.entries(beerTypeStats)
+      .filter(([type]) => this.matchBeerType("PORTER", type))
+      .reduce((sum, [, count]) => sum + count, 0)
     if (portersRated >= 10) {
       achievements.push(this.createAchievement("porter_collector", "Porter Collector", portersRated, [10, 25, 50]))
     }
@@ -169,7 +178,9 @@ export class AchievementService {
     }
 
     // Sour Adventurer
-    const sourBeers = beerTypeStats["Sour"] || 0
+    const sourBeers = Object.entries(beerTypeStats)
+      .filter(([type]) => this.matchBeerType("SOUR", type))
+      .reduce((sum, [, count]) => sum + count, 0)
     if (sourBeers >= 5) {
       achievements.push(this.createAchievement("sour_adventurer", "Sour Adventurer", sourBeers, [5, 15, 30]))
     }
@@ -183,7 +194,9 @@ export class AchievementService {
     }
 
     // Bock Admirer
-    const bocksRated = beerTypeStats["Bock"] || 0
+    const bocksRated = Object.entries(beerTypeStats)
+      .filter(([type]) => this.matchBeerType("BOCK", type))
+      .reduce((sum, [, count]) => sum + count, 0)
     if (bocksRated >= 5) {
       achievements.push(this.createAchievement("bock_admirer", "Bock Admirer", bocksRated, [5, 15, 30]))
     }
@@ -276,13 +289,15 @@ export class AchievementService {
     return {
       id,
       name,
-      description: `${name} achievement`,
+      description: `${name}: Rate ${levels[currentLevel - 1]} ${this.getAchievementCategory(id).toLowerCase()}`,
       icon: this.getAchievementIcon(id),
       category: this.getAchievementCategory(id),
       levels: levels.map((req, index) => ({
         level: index + 1,
         icon: this.getAchievementIcon(id),
-        description: `Reach ${req} to unlock level ${index + 1}`,
+        description: `Rate ${req} ${this.getAchievementCategory(id).toLowerCase()} to unlock level ${index + 1}`,
+        requirement: req,
+        rewardXP: (index + 1) * 10, // Add a simple rewardXP calculation
       })),
       currentLevel,
       progress,
@@ -405,6 +420,7 @@ export class AchievementService {
       rareBeersRated: 0,
       highHopBeersRated: 0,
       craftBeersRated: 0,
+      totalBadgesEarned: 0,
     }
   }
 
@@ -412,6 +428,27 @@ export class AchievementService {
     return Object.entries(beerTypeStats)
       .filter(([beerType]) => beerType.toLowerCase().includes(category.toLowerCase()))
       .reduce((sum, [, count]) => sum + count, 0)
+  }
+
+  private matchBeerType(achievementType: string, userBeerType: string): boolean {
+    const normalizedAchievementType = achievementType.toUpperCase().replace(/\s+/g, "")
+    const normalizedUserBeerType = userBeerType.toUpperCase().replace(/\s+/g, "")
+
+    const typeMap: { [key: string]: string[] } = {
+      LAGER: ["LAGER", "PILSNER", "BOCK", "HAPPOSHU"],
+      ALE: ["ALE", "PALEALE", "AMBERALE", "TMAVÉ", "IPA"],
+      STOUT: ["STOUT", "PORTER"],
+      WHEAT: ["WHEAT", "HEFEWEIZEN", "WITBIER"],
+      SOUR: ["SOUR", "LAMBIC", "GOSE"],
+    }
+
+    for (const [key, values] of Object.entries(typeMap)) {
+      if (normalizedAchievementType.includes(key)) {
+        return values.some((v) => normalizedUserBeerType.includes(v))
+      }
+    }
+
+    return normalizedAchievementType === normalizedUserBeerType
   }
 }
 

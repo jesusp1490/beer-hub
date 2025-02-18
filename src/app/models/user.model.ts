@@ -1,4 +1,4 @@
-import type { Timestamp } from "@angular/fire/firestore"
+import { Timestamp } from "@angular/fire/firestore"
 
 export interface UserProfile {
   uid: string
@@ -22,6 +22,22 @@ export interface UserProfile {
   bio?: string
   progress: number
   ratedBeers?: RatedBeer[]
+  settings?: UserSettings
+  notifications?: UserNotifications
+}
+
+export interface UserSettings {
+  darkMode: boolean
+  emailNotifications: boolean
+  pushNotifications: boolean
+  language: string
+}
+
+export interface UserNotifications {
+  newBeerAdded: boolean
+  newChallenge: boolean
+  newReward: boolean
+  weeklySummary: boolean
 }
 
 export interface UserStatistics {
@@ -36,9 +52,8 @@ export interface UserStatistics {
   lastRatingDate: Timestamp
   uniqueStylesCount: number
   uniqueCountriesCount: number
-  totalReviews?: number
-  totalReviewLikes?: number
-  ratedBeers?: RatedBeer[]
+  totalReviews: number
+  totalReviewLikes: number
   newBeerRequests: number
   detailedReviews: number
   reputationPoints: number
@@ -51,8 +66,9 @@ export interface UserStatistics {
   oceaniaBeersRated: number
   highAltitudeCountriesExplored: string[]
   rareBeersRated: number
-  highHopBeersRated: number
   craftBeersRated: number
+  highHopBeersRated: number
+  totalBadgesEarned: number
 }
 
 export interface UserAchievement {
@@ -61,20 +77,19 @@ export interface UserAchievement {
   description: string
   icon: string
   category: string
-  levels: {
-    level: number
-    icon: string
-    description: string
-  }[]
+  levels: AchievementLevel[]
   currentLevel: number
   progress: number
   completed: boolean
-  currentLevelDetails?: {
-    level: number
-    icon: string
-    description: string
-  }
   dateUnlocked?: Timestamp | null
+}
+
+export interface AchievementLevel {
+  level: number
+  requirement: number
+  rewardXP: number
+  icon: string
+  description: string
 }
 
 export interface Achievement {
@@ -83,17 +98,7 @@ export interface Achievement {
   description: string
   icon: string
   category: string
-  levels: {
-    level: number
-    icon: string
-    description: string
-  }[]
-}
-
-export interface AchievementLevel {
-  level: number
-  requirement: number
-  rewardXP: number
+  levels: AchievementLevel[]
 }
 
 export interface UserRank {

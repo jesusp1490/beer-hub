@@ -1,5 +1,6 @@
-import { Component, type OnInit, Input } from "@angular/core"
+import { Component, OnInit, Input } from "@angular/core"
 import { Observable } from "rxjs"
+import { map } from "rxjs/operators"
 import { UserProfile } from "../../../models/user.model"
 import { AchievementService } from "../../../services/achievement.service"
 import { CombinedAchievement } from "./achievement.interface"
@@ -22,6 +23,7 @@ export class AchievementsSectionComponent implements OnInit {
   @Input() userProfile!: UserProfile
   combinedAchievements$!: Observable<CombinedAchievement[]>
   selectedCategory = "All"
+  showAllAchievements = false
 
   constructor(
     private achievementService: AchievementService,
@@ -29,21 +31,30 @@ export class AchievementsSectionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.combinedAchievements$ = this.achievementService.getCombinedAchievements(this.userProfile.uid)
+    this.combinedAchievements$ = this.achievementService
+      .getCombinedAchievements(this.userProfile.uid)
+      .pipe(map((achievements) => achievements || []))
   }
 
-  filterAchievements(achievements: CombinedAchievement[]): CombinedAchievement[] {
-    if (this.selectedCategory === "All") {
-      return achievements
+  filterAchievements(achievements: CombinedAchievement[] | null): CombinedAchievement[] {
+    if (!achievements) return []
+    let filteredAchievements = achievements
+    if (this.selectedCategory !== "All") {
+      filteredAchievements = filteredAchievements.filter((a) => a.category === this.selectedCategory)
     }
-    return achievements.filter((a) => a.category === this.selectedCategory)
+    if (!this.showAllAchievements) {
+      filteredAchievements = filteredAchievements.filter((a) => a.currentLevel > 0)
+    }
+    return filteredAchievements
   }
 
   getCurrentLevelDetails(achievement: CombinedAchievement): { level: number; icon: string; description: string } {
     return achievement.currentLevelDetails || achievement.levels[0]
   }
 
-  getNextLevelDetails(achievement: CombinedAchievement): { level: number; icon: string; description: string } | null {
+  getNextLevelDetails(
+    achievement: CombinedAchievement,
+  ): { level: number; icon: string; description: string; requirement: number } | null {
     const nextLevel = (achievement.currentLevel || 0) + 1
     return achievement.levels.find((l) => l.level === nextLevel) || null
   }
@@ -53,7 +64,44 @@ export class AchievementsSectionComponent implements OnInit {
   }
 
   calculateProgress(achievement: CombinedAchievement): number {
-    return this.achievementService.getProgressPercentage(achievement)
+    const currentLevelRequirement =
+      achievement.levels.find((l) => l.level === achievement.currentLevel)?.requirement || 0
+    const nextLevelRequirement = this.getNextLevelRequirement(achievement)
+    const progress = achievement.progress - currentLevelRequirement
+    const total = nextLevelRequirement - currentLevelRequirement
+    return total > 0 ? (progress / total) * 100 : 0
+  }
+
+  getNextLevelRequirement(achievement: CombinedAchievement): number {
+    const nextLevel = (achievement.currentLevel || 0) + 1
+    return achievement.levels.find((l) => l.level === nextLevel)?.requirement || 0
+  }
+
+  getAchievementDescription(achievement: CombinedAchievement): string {
+    return achievement.description || "No description available"
+  }
+
+  getAchievementLevelClass(achievement: CombinedAchievement): string {
+    const level = achievement.currentLevel || 0
+    if (level === 1) return "bronze"
+    if (level === 2) return "silver"
+    if (level === 3) return "gold"
+    return ""
+  }
+
+  getProgressText(achievement: CombinedAchievement): string {
+    const currentLevel = achievement.currentLevel || 0
+    const currentLevelDetails = achievement.levels.find((l) => l.level === currentLevel)
+    const nextLevelDetails = this.getNextLevelDetails(achievement)
+
+    if (currentLevelDetails && nextLevelDetails) {
+      return `${achievement.progress}/${nextLevelDetails.requirement}`
+    }
+    return `${achievement.progress}/${currentLevelDetails?.requirement || 0}`
+  }
+
+  toggleAllAchievements(): void {
+    this.showAllAchievements = !this.showAllAchievements
   }
 }
 
