@@ -1,4 +1,4 @@
-import { Timestamp } from "@angular/fire/firestore"
+import type { Timestamp } from "@angular/fire/firestore"
 
 export interface UserProfile {
   uid: string

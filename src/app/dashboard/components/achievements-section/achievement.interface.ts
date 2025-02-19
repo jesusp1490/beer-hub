@@ -24,6 +24,7 @@ export interface UserAchievement extends Achievement {
 }
 
 export interface CombinedAchievement extends Achievement, UserAchievement {
+  category: string;
   currentLevelDetails?: Achievement["levels"][number] & { requirement: number }
 }
 

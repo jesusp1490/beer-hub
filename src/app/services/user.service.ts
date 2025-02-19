@@ -714,8 +714,8 @@ export class UserService {
 
   private updateContinentStatistics(stats: UserStatistics, country: string): void {
     const continents: { [key: string]: string[] } = {
-      Europe: ["Germany", "France", "Italy", "Spain", "UK"],
-      NorthAmerica: ["USA", "Canada", "Mexico"],
+      Europe: ["Czechia", "Germany", "France", "Italy", "Spain", "United Kingdom", ],
+      NorthAmerica: ["United States of America", "Canada", "Mexico"],
       SouthAmerica: ["Brazil", "Argentina", "Colombia"],
       Asia: ["China", "Japan", "India"],
       Africa: ["Egypt", "Nigeria", "South Africa"],
