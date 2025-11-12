@@ -142,9 +142,10 @@ export class FilterSearchComponent implements OnInit {
       name: 'Wheat and Others',
       types: [
         'AMERICAN WHEAT',
+        'ALTBIER',
         'HOPPY WHEAT BEER',
         'HEFEWEIZEN',
-        'KÖLSH',
+        'KÖLSCH',
         'KRISTALLWEIZEN',
         'LICHTENHAINER',
         'WEISSBIER',
