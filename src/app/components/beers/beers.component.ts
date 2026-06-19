@@ -67,22 +67,29 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private loadBrandData(brandId: string): void {
+    // FIX: this subscription previously had no takeUntil(this.unsubscribe$),
+    // unlike every other subscription in this component. Each brand visited
+    // left behind a live Firestore listener that never closed — over a
+    // session of browsing several brands, that's one leaked listener per
+    // brand. Also switched to the observer-object subscribe syntax (the
+    // positional next/error callback form is deprecated in current RxJS).
     this.firestore
       .collection<Brand>("brands")
       .doc(brandId)
       .valueChanges()
-      .subscribe(
-        (brand) => {
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (brand) => {
           if (brand) {
             this.brandName = brand.name
           } else {
             console.error("Brand not found")
           }
         },
-        (error) => {
+        error: (error) => {
           console.error("Error loading brand data:", error)
         },
-      )
+      })
   }
 
   private loadBeers(brandId: string): void {
@@ -91,19 +98,19 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
       .collection<Beer>("beers", (ref) => ref.where("brandId", "==", brandId))
       .valueChanges({ idField: "id" })
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(
-        (beers) => {
+      .subscribe({
+        next: (beers) => {
           this.beers = beers
           this.isLoading = false
           setTimeout(() => {
             this.initSwiper()
           }, 0)
         },
-        (error) => {
+        error: (error) => {
           console.error("Error loading beers:", error)
           this.isLoading = false
         },
-      )
+      })
   }
 
   private initSwiper(): void {
@@ -118,8 +125,7 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
       this.swiper = new Swiper(this.swiperContainer.nativeElement, {
         modules: [Navigation, Pagination],
         slidesPerView: slidesPerView,
-        spaceBetween: 80, 
-        // centeredSlides: true,
+        spaceBetween: 80,
         loop: totalSlides > 5,
         loopAdditionalSlides: 5,
         pagination: {
@@ -174,4 +180,3 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
     this.location.back()
   }
 }
-

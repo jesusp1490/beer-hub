@@ -21,6 +21,15 @@ export interface User {
 export class AuthService {
   user$: Observable<User | null>
 
+  // NOTE: this is a client-side-only soft limiter for UX (e.g. disabling a
+  // sign-in button briefly after repeated failures). It resets on page
+  // refresh and is trivially bypassable, so it is NOT a security control.
+  // Real brute-force protection belongs server-side (Firebase Auth's built-in
+  // abuse protections, or App Check / a Cloud Function with persisted state).
+  private lastAttempt = 0
+  private attemptLimit = 3
+  private readonly COOLDOWN_TIME = 60000 // 1 minute
+
   constructor(
     private afAuth: AngularFireAuth,
     private firestore: AngularFirestore,
@@ -177,7 +186,6 @@ export class AuthService {
       ...additionalData,
     })
 
-    // If the user signed in with Google and has a profile picture, store it separately
     if (user.providerData[0]?.providerId === "google.com" && user.photoURL) {
       userData["googlePhotoURL"] = user.photoURL
     }
@@ -195,22 +203,21 @@ export class AuthService {
     )
   }
 
-  private async refreshToken(): Promise<string | null> {
-    const user = await this.afAuth.currentUser
-    if (user) {
-      const token = await user.getIdToken(true)
-      localStorage.setItem("authToken", token)
-      return token
-    }
-    return null
-  }
-
+  // FIX: previously this manually cached the ID token in localStorage and
+  // refreshed it by hand. Firebase Auth already manages token lifecycle
+  // internally (caching + automatic refresh), and localStorage is more
+  // exposed to XSS than Firebase's own internal storage. We now just ask
+  // Firebase for a token directly — `getIdToken()` returns the cached token
+  // if still valid, or refreshes it transparently if not.
   async getAuthToken(): Promise<string | null> {
-    const token = localStorage.getItem("authToken")
-    if (!token) {
-      return this.refreshToken()
+    const user = await this.afAuth.currentUser
+    if (!user) return null
+    try {
+      return await user.getIdToken()
+    } catch (error) {
+      console.error("Error getting auth token:", error)
+      return null
     }
-    return token
   }
 
   async sendPasswordResetEmail(email: string): Promise<void> {
@@ -248,6 +255,10 @@ export class AuthService {
     })
   }
 
+  // FIX: this now also updates Firestore via updateUserData so the profile
+  // doc and the Auth login email stay in sync (see the corresponding fix in
+  // profile-section/dashboard for routing the "email" field through here
+  // instead of a generic Firestore field update).
   async updateEmail(newEmail: string): Promise<void> {
     const user = await this.afAuth.currentUser
     if (user) {
@@ -277,8 +288,4 @@ export class AuthService {
       throw new Error("No authenticated user found")
     }
   }
-  private lastAttempt = 0
-  private attemptLimit = 3
-  private readonly COOLDOWN_TIME = 60000 // 1 minute
 }
-

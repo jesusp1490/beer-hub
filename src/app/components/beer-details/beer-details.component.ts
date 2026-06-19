@@ -80,18 +80,25 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log("BeerDetailsComponent: Initializing component")
     this.authService.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user) => {
       this.userId = user ? user.uid : null
-      console.log("BeerDetailsComponent: Current user ID:", this.userId)
       if (this.beer) {
         this.updateUserRating()
       }
     })
 
     this.route.paramMap.pipe(takeUntil(this.unsubscribe$)).subscribe((params) => {
-      const beerId = params.get("id")
-      console.log("BeerDetailsComponent: Route params - Beer ID:", beerId)
+      // FIX: this previously only read params.get("id"), which works for the
+      // "beers/:id" and "beer/:id" routes but would silently fail for the
+      // nested "country/:country/brands/:brandId/beers/:beerId" route, which
+      // uses a different param name. That nested route isn't currently
+      // linked to from anywhere in the app (selectBrand/selectBeer both go
+      // through the "id"-based routes), but if it's ever used directly —
+      // a shared link, a future feature, a typo'd route somewhere — this
+      // would have shown "Beer Not Found" for a beer that actually exists.
+      // Reading both param names makes this component correct regardless
+      // of which route matched.
+      const beerId = params.get("id") ?? params.get("beerId")
       if (beerId) {
         this.loadBeerData(beerId)
       } else {
@@ -102,14 +109,12 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    console.log("BeerDetailsComponent: Destroying component")
     this.unsubscribe$.next()
     this.unsubscribe$.complete()
   }
 
   private loadBeerData(beerId: string): void {
     this.isLoading = true
-    console.log("BeerDetailsComponent: Fetching beer details for ID:", beerId)
     this.beerService
       .getBeerDetails(beerId)
       .pipe(
@@ -121,10 +126,8 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
         }),
       )
       .subscribe((beer) => {
-        console.log("BeerDetailsComponent: Received beer data:", beer)
         if (beer) {
           this.beer = beer
-          console.log("BeerDetailsComponent: Beer data set:", this.beer)
           this.updateUserRating()
           this.loadAdditionalData()
           this.preloadImages()
@@ -138,105 +141,88 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
 
   private handleBeerNotFound(): void {
     this.isLoading = false
-    // You can add additional logic here, such as displaying an error message
     console.error("BeerDetailsComponent: Beer not found")
   }
 
   private updateUserRating(): void {
-    console.log("BeerDetailsComponent: Updating user rating")
     if (this.userId && this.beer) {
       this.beerService
         .getUserRating(this.beer.id)
         .pipe(takeUntil(this.unsubscribe$))
         .subscribe((rating) => {
           this.userRating = rating
-          console.log("BeerDetailsComponent: User rating updated:", this.userRating)
         })
     }
   }
 
   rateBeer(rating: number): void {
-    console.log("BeerDetailsComponent: Attempting to rate beer:", rating)
     if (!this.userId || !this.beer) {
-      console.log("BeerDetailsComponent: User not logged in or beer not loaded, showing register modal")
       this.showRegisterModal = true
       return
     }
 
-    this.beerService.rateBeer(this.beer.id, rating).subscribe(
-      () => {
-        console.log("BeerDetailsComponent: Beer rated successfully")
+    this.beerService.rateBeer(this.beer.id, rating).subscribe({
+      next: () => {
         this.userRating = rating
         this.loadBeerData(this.beer!.id)
       },
-      (error) => {
+      error: (error) => {
         console.error("BeerDetailsComponent: Error updating rating: ", error)
       },
-    )
+    })
   }
 
   deleteRating(): void {
-    console.log("BeerDetailsComponent: Attempting to delete rating")
     if (!this.userId || !this.beer) {
-      console.log("BeerDetailsComponent: User not logged in or beer not loaded, cannot delete rating")
       return
     }
 
-    this.beerService.deleteUserRating(this.beer.id).subscribe(
-      () => {
-        console.log("BeerDetailsComponent: Rating deleted successfully")
+    this.beerService.deleteUserRating(this.beer.id).subscribe({
+      next: () => {
         this.userRating = null
         this.loadBeerData(this.beer!.id)
       },
-      (error) => {
+      error: (error) => {
         console.error("BeerDetailsComponent: Error deleting rating: ", error)
       },
-    )
+    })
   }
 
   toggleFavorite(): void {
-    console.log("BeerDetailsComponent: Attempting to toggle favorite")
     if (!this.userId) {
-      console.log("BeerDetailsComponent: User not logged in, showing register modal")
       this.showRegisterModal = true
       return
     }
 
     if (!this.beer) {
-      console.log("BeerDetailsComponent: Beer not loaded, cannot toggle favorite")
       return
     }
 
     this.beerService
       .toggleFavorite(this.beer.id)
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(
-        (isFavorite) => {
-          console.log("BeerDetailsComponent: Favorite toggled successfully:", isFavorite)
+      .subscribe({
+        next: (isFavorite) => {
           this.favoriteIconUrl = isFavorite
             ? "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-crown.webp?alt=media&token=d52cdf3b-f0b6-4432-a921-7a16bfd62803"
             : "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-corwn.webp?alt=media&token=50ff92d3-eb61-44eb-9e99-fd3b9f460e4b"
         },
-        (error) => {
+        error: (error) => {
           console.error("BeerDetailsComponent: Error toggling favorite: ", error)
         },
-      )
+      })
   }
 
   closeRegisterModal(): void {
-    console.log("BeerDetailsComponent: Closing register modal")
     this.showRegisterModal = false
   }
 
   goToRegister(): void {
-    console.log("BeerDetailsComponent: Navigating to register page")
     this.router.navigate(["/signup"])
   }
 
   private preloadImages(): void {
-    console.log("BeerDetailsComponent: Preloading images")
     if (!this.beer) {
-      console.log("BeerDetailsComponent: No beer data, skipping image preload")
       this.isLoading = false
       return
     }
@@ -249,8 +235,6 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
       ...this.beer.ingredients.map((ing) => ing.ingImageUrl),
     ].filter((url) => url)
 
-    console.log("BeerDetailsComponent: Images to preload:", imagesToLoad)
-
     const imageLoadPromises = imagesToLoad.map((url) => {
       return new Promise<void>((resolve) => {
         const img = new Image()
@@ -262,6 +246,7 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
 
     forkJoin(imageLoadPromises)
       .pipe(
+        takeUntil(this.unsubscribe$),
         catchError((error) => {
           console.error("BeerDetailsComponent: Error preloading images:", error)
           return of(null)
@@ -275,7 +260,6 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
   }
 
   private triggerAnimations(): void {
-    console.log("BeerDetailsComponent: Triggering animations")
     const delay = 200
     setTimeout(() => (this.animationState.beerImageUrl = true), delay)
     setTimeout(() => (this.animationState.beerName = true), delay * 2)
@@ -295,7 +279,6 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
       return
     }
 
-    console.log("BeerDetailsComponent: Loading additional data for beer:", this.beer.id)
     forkJoin({
       brand: this.beerService.getBrandDetails(this.beer.brandId),
       country: this.beerService.getCountryDetails(this.beer.countryId),
@@ -308,9 +291,8 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
           return of({ brand: null, country: null, isFavorite: false })
         }),
       )
-      .subscribe(
-        ({ brand, country, isFavorite }) => {
-          console.log("BeerDetailsComponent: Additional data loaded:", { brand, country, isFavorite })
+      .subscribe({
+        next: ({ brand, country, isFavorite }) => {
           if (brand) {
             this.brandName = brand.name
             this.brandLogoUrl = brand.logoUrl
@@ -324,7 +306,7 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
             ? "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-crown.webp?alt=media&token=d52cdf3b-f0b6-4432-a921-7a16bfd62803"
             : "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-corwn.webp?alt=media&token=50ff92d3-eb61-44eb-9e99-fd3b9f460e4b"
         },
-        (error) => console.error("BeerDetailsComponent: Error in subscribe of loadAdditionalData:", error),
-      )
+        error: (error) => console.error("BeerDetailsComponent: Error in subscribe of loadAdditionalData:", error),
+      })
   }
 }

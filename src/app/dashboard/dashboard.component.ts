@@ -5,7 +5,7 @@ import { MatButtonModule } from "@angular/material/button"
 import { UserService } from "../services/user.service"
 import { AuthService } from "../services/auth.service"
 import { BeerService } from "../services/beer.service"
-import { UserStatistics, UserProfile } from "../models/user.model"
+import { UserStatistics, UserProfile, RatedBeer, FavoriteBeer } from "../models/user.model"
 import { Subject, of } from "rxjs"
 import { takeUntil, take, switchMap } from "rxjs/operators"
 import { ProfileSectionComponent } from "./components/profile-section/profile-section.component"
@@ -16,6 +16,7 @@ import { ChallengesComponent } from "./components/challenges/challenges.componen
 import { Timestamp } from "firebase/firestore"
 import { NotificationPanelComponent } from "./components/notification-panel/notification-panel.component"
 import { AchievementsSectionComponent } from "./components/achievements-section/achievements-section.component"
+import { RatedFavoriteBeersComponent } from "./components/rated-favorite-beers/rated-favorite-beers.component"
 import { Router } from "@angular/router"
 
 @Component({
@@ -34,11 +35,18 @@ import { Router } from "@angular/router"
     ChallengesComponent,
     NotificationPanelComponent,
     AchievementsSectionComponent,
+    RatedFavoriteBeersComponent,
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   userProfile: UserProfile | null = null
   userStats: UserStatistics | null = null
+
+  // NEW: backing data for the rated/favorite beers section.
+  ratedBeers: RatedBeer[] | null = null
+  favoriteBeers: FavoriteBeer[] | null = null
+  beersLoading = false
+
   private destroy$ = new Subject<void>()
 
   constructor(
@@ -51,8 +59,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.authService.user$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
       if (user) {
+        // NOTE: fixUserRank()/recalculateUserPoints() is intentionally NOT
+        // called here on every load — see the earlier fix. Points/rank are
+        // now maintained correctly at the source via transactions.
         this.loadUserProfile()
-        this.fixUserRank()
+        this.loadRatedAndFavoriteBeers()
       } else {
         this.router.navigate(["/"])
       }
@@ -72,7 +83,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         next: (profile) => {
           this.userProfile = profile
           this.userStats = profile?.statistics || null
-          console.log("User profile loaded:", profile)
         },
         error: (error) => {
           console.error("Error loading user profile:", error)
@@ -82,64 +92,85 @@ export class DashboardComponent implements OnInit, OnDestroy {
       })
   }
 
-  private fixUserRank(): void {
+  // NEW: loads both lists using the already-batched UserService methods
+  // (getUserRatedBeers / getUserFavoriteBeers — see user.service.ts fixes).
+  private loadRatedAndFavoriteBeers(): void {
+    this.beersLoading = true
+
     this.userService
-      .getCurrentUser()
-      .pipe(
-        take(1),
-        switchMap((user) => {
-          if (user?.uid) {
-            return this.userService.recalculateUserPoints(user.uid)
-          }
-          return of(null)
-        }),
-      )
+      .getUserRatedBeers()
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => {
-          console.log("User rank recalculated")
-          this.loadUserProfile()
+        next: (ratedBeers) => {
+          this.ratedBeers = ratedBeers
+          this.beersLoading = false
         },
         error: (error) => {
-          console.error("Error recalculating user rank:", error)
+          console.error("Error loading rated beers:", error)
+          this.ratedBeers = []
+          this.beersLoading = false
+        },
+      })
+
+    this.userService
+      .getUserFavoriteBeers()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (favoriteBeers) => {
+          this.favoriteBeers = favoriteBeers
+        },
+        error: (error) => {
+          console.error("Error loading favorite beers:", error)
+          this.favoriteBeers = []
         },
       })
   }
 
   onEditField(event: { field: string; value: string | Date }): void {
-    if (this.userProfile) {
-      const updatedProfile: Partial<UserProfile> = { ...this.userProfile }
+    if (!this.userProfile) return
 
-      if (event.field === "dob") {
-        updatedProfile.dob = Timestamp.fromDate(event.value as Date)
-      } else if (event.field === "firstName" || event.field === "lastName") {
-        updatedProfile[event.field] = event.value as string
-      } else {
-        ;(updatedProfile as any)[event.field] = event.value
-      }
-
-      this.userService
-        .updateUserProfile(updatedProfile)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => {
-            console.log(`Field ${event.field} updated successfully`)
-            this.loadUserProfile()
-          },
-          error: (error) => {
-            console.error(`Error updating ${event.field}:`, error)
-          },
+    if (event.field === "email") {
+      this.authService
+        .updateEmail(event.value as string)
+        .then(() => this.loadUserProfile())
+        .catch((error) => {
+          console.error("Error updating email:", error)
+          // TODO: surface this to the user — updateEmail can fail if Firebase
+          // requires recent re-authentication before an email change. This
+          // currently fails silently from the UI's perspective.
         })
+      return
     }
+
+    const updatedProfile: Partial<UserProfile> = { ...this.userProfile }
+
+    if (event.field === "dob") {
+      updatedProfile.dob = Timestamp.fromDate(event.value as Date)
+    } else if (event.field === "firstName" || event.field === "lastName") {
+      updatedProfile[event.field] = event.value as string
+    } else {
+      ;(updatedProfile as any)[event.field] = event.value
+    }
+
+    this.userService
+      .updateUserProfile(updatedProfile)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.loadUserProfile()
+        },
+        error: (error) => {
+          console.error(`Error updating ${event.field}:`, error)
+        },
+      })
   }
 
   onChangePassword(): void {
-    console.log("Changing password")
-    // Implement password change logic here
+    // Handled via the change-password dialog opened in ProfileSectionComponent.
   }
 
   onRequestNewBeer(): void {
-    console.log("Requesting new beer")
-    // Implement new beer request logic here
+    // Handled via the new-beer-request dialog opened in ProfileSectionComponent.
   }
 
   onLogout(): void {
@@ -151,8 +182,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .uploadProfilePicture(file)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (url) => {
-          console.log("Profile picture uploaded:", url)
+        next: () => {
           this.loadUserProfile()
         },
         error: (error) => {
@@ -172,16 +202,33 @@ export class DashboardComponent implements OnInit, OnDestroy {
           }
           throw new Error("User not found")
         }),
+        takeUntil(this.destroy$),
       )
       .subscribe({
         next: () => {
-          console.log("Beer rating removed successfully")
-          this.loadUserProfile() // Refresh user data
+          this.loadUserProfile()
+          this.loadRatedAndFavoriteBeers()
         },
         error: (error) => {
           console.error("Error removing beer rating:", error)
         },
       })
   }
-}
 
+  // NEW: handler for the "remove favorite" action emitted by
+  // RatedFavoriteBeersComponent. Reuses BeerService.toggleFavorite, which
+  // already handles add/remove (calling it on an existing favorite removes it).
+  removeFavoriteBeer(beerId: string): void {
+    this.beerService
+      .toggleFavorite(beerId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.loadRatedAndFavoriteBeers()
+        },
+        error: (error) => {
+          console.error("Error removing favorite:", error)
+        },
+      })
+  }
+}

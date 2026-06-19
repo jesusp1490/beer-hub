@@ -25,12 +25,22 @@
       </div>
     </div>
 
+    <!-- NEW: Rated / Favorite Beers Section -->
+    <div class="grid-item rated-favorite-beers">
+      <app-rated-favorite-beers
+        [ratedBeers]="ratedBeers"
+        [favoriteBeers]="favoriteBeers"
+        [loading]="beersLoading"
+        (removeRating)="removeBeerRating($event)"
+        (removeFavorite)="removeFavoriteBeer($event)"
+      ></app-rated-favorite-beers>
+    </div>
+
     <!-- Grid Layout -->
     <div class="dashboard-grid">
       <!-- Statistics Section -->
       <div class="grid-item statistics">
-        <h2>Statistics</h2>
-        <!-- <app-statistics [userStats]="userStats"></app-statistics> -->
+        <app-statistics [userStats]="userStats"></app-statistics>
       </div>
 
       <!-- Leaderboard -->

@@ -44,22 +44,22 @@ module.exports = { addBeer, addBeers };
 
 // Example usage
 const newBeer = {
-    name: "Solera Reserva",
-    brandId: "Solera",
-    beerType: "DARK LAGER", 
-    ABV: 6.0,
-    IBU: "N/A",    
+    name: "Hazy Juicy",
+    brandId: "Tovar",
+    beerType: "NEIPA", 
+    ABV: 6.5,
+    IBU: 40,    
     averageRating: 0,
-    description: "Solera Reserva is a sophisticated premium lager offering a deep amber-dark colour and beige foam. It presents toasted and caramelised malt tones, with delicate notes of oak and vanilla. On the palate it is balanced between sweet malt character and a gentle final bitterness, making it a refined choice for the more discerning consumer.",
-    beerImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2FSolera-Reserva-botella.webp?alt=media&token=5b89b174-0e81-454c-bdae-0223611f2bc9",
-    beerLabelUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Flabels%2FSolera-Reserva-label.webp?alt=media&token=d7464ea3-2284-41cd-b71c-201e15ea8e00",
+    description: "An explosion of citrus hop flavors and aromas that will make you discover the juiciest side of beer. Hazy, juicy, fruity, and refreshing.",
+    beerImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2FTovar-HazyJuicy-botella.webp?alt=media&token=d4bb9405-3d39-4a4d-8f45-c6cfa03dbcbb",
+    beerLabelUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Flabels%2FTovar-HazyJuicy-label.webp?alt=media&token=1edc9ac2-44f1-4773-af29-e8d223e5e2a8",
     ingredients: [
         { name: "Water", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fwater.webp?alt=media&token=d2625213-033e-4772-8984-0f1370da5d55" },
         { name: "Barley Malt", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fbarley-malt.webp?alt=media&token=42c79a9b-cd07-4106-8bfe-e3d7913aefc0" },
         // { name: "Pilsen Malt", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2FMalt.webp?alt=media&token=9dbb92de-7512-4f8e-b99f-6095475e5790" },
-        { name: "Toasted Malt", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Foatmeal.webp?alt=media&token=5f389bbc-fea7-474d-b1e7-bae6d844e9e8" },
+        // { name: "Oat Malt", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Foatmeal.webp?alt=media&token=5f389bbc-fea7-474d-b1e7-bae6d844e9e8" },
         // { name: "Czech Malt", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fpilsner-malt.webp?alt=media&token=3e2c8ffc-2a03-4fc0-b257-842a3e391c58" },
-        // { name: "Wheat Malt", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fwheat.webp?alt=media&token=84a0bb8d-bc55-4683-9620-59d21f69799d" },
+        { name: "Wheat Malt", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fwheat.webp?alt=media&token=84a0bb8d-bc55-4683-9620-59d21f69799d" },
         // { name: "Maize", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fcorn.webp?alt=media&token=adc4faba-02f1-4327-88b3-4ce654ea62be" },
         // { name: "Barley", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fbarley.webp?alt=media&token=0f62c03e-9fb8-404d-b74b-da816e3e73fe" },
         { name: "Hops", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fhop.webp?alt=media&token=bd73980b-21b4-4d57-911f-4d5a8400ea55"},
@@ -101,6 +101,7 @@ const newBeer = {
         // { name: "Figs", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Ffigs.webp?alt=media&token=78af8604-eef8-46e0-a012-9f40458443b2" },
         // { name: "Ginger", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fginger.webp?alt=media&token=ee17db67-783d-4c08-bdd9-ebb6dc92f026" },
         // { name: "Gooseberries", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fgooseberries.webp?alt=media&token=ea37f9c9-9ba1-49dd-b3c5-af1683454c10" },
+        // { name: "Grains", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fgrains.webp?alt=media&token=f7286d14-c68b-423a-9eaa-cfbd96d84544" },
         // { name: "Grapefruit", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fgrapefruit.webp?alt=media&token=dadfc578-ac7d-4bc5-a57d-77efddd51e85" },
         // { name: "Grapes", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fgrapes.webp?alt=media&token=47acb60e-0351-487f-a090-d76f5fde6be6" },
         // { name: "Guava", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fguava.webp?alt=media&token=1e9d3a4b-64e9-46c9-8bf0-bdba25b8a1c3" },
@@ -137,7 +138,7 @@ const newBeer = {
         // { name: "Soursop", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2FSoursop.webp?alt=media&token=f407a167-26d3-45aa-9115-b56251e7ae8e" },
         // { name: "Soy Protein", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fsoy.webp?alt=media&token=73b8394b-7cbe-4529-927b-601525e7cf20" },
         // { name: "Spices", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fspices.webp?alt=media&token=0112b887-e6db-4426-93a2-927c49c2b3f2" },
-        { name: "Stabilizer", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fother.webp?alt=media&token=036d01b0-8d1f-4b3b-851a-5ea4c0c9ea5c" },
+        // { name: "Stabilizer", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fother.webp?alt=media&token=036d01b0-8d1f-4b3b-851a-5ea4c0c9ea5c" },
         // { name: "Starch", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fstarch.webp?alt=media&token=87ff0374-0c66-49ec-a7df-f1cb6ffd101e" },
         // { name: "Stawberry", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2Fstrawberry.webp?alt=media&token=07f5c6dc-a31d-4917-b52a-af3503d92287" },
         // { name: "Sugar", ingImageUrl: "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fbeers%2Fingredients%2FSugar.webp?alt=media&token=33eedab3-e4fa-4de4-bc48-8022f2fd42bf" },
@@ -154,12 +155,12 @@ const newBeer = {
         // { name: "", ingImageUrl: "" },
     ],
     countryId: "Venezuela", 
-    id: "Solera-Reserva",
-    web: "https://empresaspolar.com/nuestras-marcas/solera",
+    id: "Tovar-HazyJuicy",
+    web: "https://drive.google.com/file/d/1pA7yWYl6R8uGp3EC4yJrXNC2GjlxeZ1e/view",
 };
 
 // Generate a custom ID (you can use any method you prefer to generate IDs)
-const customId = 'Solera-Reserva';
+const customId = 'Tovar-HazyJuicy';
 
 // Add the beer with the custom ID
 addBeer(newBeer, customId).then(() => process.exit());

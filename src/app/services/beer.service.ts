@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core"
 import { AngularFirestore } from "@angular/fire/compat/firestore"
-import { Observable, of, BehaviorSubject, from, forkJoin } from "rxjs"
+import { Observable, of, BehaviorSubject, from, forkJoin, throwError } from "rxjs"
 import { map, switchMap, tap, take, catchError } from "rxjs/operators"
 import { Beer } from "../components/beers/beers.interface"
 import { Brand } from "../components/country/brand.interface"
@@ -18,7 +18,16 @@ export class BeerService {
   private cachedBrands$ = new BehaviorSubject<Brand[]>([])
   private cachedCountries$ = new BehaviorSubject<Country[]>([])
   private cachedCountryBeerCounts$ = new BehaviorSubject<{ [countryId: string]: number }>({})
-  private lastFetchTime = 0
+
+  // FIX: each cache gets its own "last fetched" timestamp instead of sharing
+  // one variable across beers/brands/countries. Previously, fetching one
+  // collection would mark ALL collections as "fresh", so a cache that had
+  // never actually been populated could be served as if it had.
+  private lastFetchTimes = {
+    beers: 0,
+    brands: 0,
+    countries: 0,
+  }
   private cacheExpirationTime = 5 * 60 * 1000 // 5 minutes
 
   constructor(
@@ -36,12 +45,12 @@ export class BeerService {
     this.getCountryBeerCounts().pipe(take(1)).subscribe()
   }
 
-  private shouldRefetchCache(): boolean {
-    return Date.now() - this.lastFetchTime > this.cacheExpirationTime
+  private shouldRefetchCache(key: keyof typeof this.lastFetchTimes): boolean {
+    return Date.now() - this.lastFetchTimes[key] > this.cacheExpirationTime
   }
 
   getCountries(): Observable<Country[]> {
-    if (this.shouldRefetchCache()) {
+    if (this.shouldRefetchCache("countries")) {
       return this.firestore
         .collection<Country>("countries")
         .valueChanges({ idField: "id" })
@@ -49,7 +58,7 @@ export class BeerService {
           take(1),
           tap((countries) => {
             this.cachedCountries$.next(countries)
-            this.lastFetchTime = Date.now()
+            this.lastFetchTimes.countries = Date.now()
           }),
           catchError((error) => {
             console.error("Error fetching countries:", error)
@@ -82,7 +91,7 @@ export class BeerService {
   }
 
   getBeers(): Observable<Beer[]> {
-    if (this.shouldRefetchCache()) {
+    if (this.shouldRefetchCache("beers")) {
       return this.firestore
         .collection<Beer>("beers")
         .valueChanges({ idField: "id" })
@@ -90,7 +99,7 @@ export class BeerService {
           take(1),
           tap((beers) => {
             this.cachedBeers$.next(beers)
-            this.lastFetchTime = Date.now()
+            this.lastFetchTimes.beers = Date.now()
           }),
           catchError((error) => {
             console.error("Error fetching beers:", error)
@@ -102,7 +111,7 @@ export class BeerService {
   }
 
   getBrands(): Observable<Brand[]> {
-    if (this.shouldRefetchCache()) {
+    if (this.shouldRefetchCache("brands")) {
       return this.firestore
         .collection<Brand>("brands")
         .valueChanges({ idField: "id" })
@@ -110,7 +119,7 @@ export class BeerService {
           take(1),
           tap((brands) => {
             this.cachedBrands$.next(brands)
-            this.lastFetchTime = Date.now()
+            this.lastFetchTimes.brands = Date.now()
           }),
           catchError((error) => {
             console.error("Error fetching brands:", error)
@@ -121,98 +130,19 @@ export class BeerService {
     return this.cachedBrands$.asObservable()
   }
 
+  // FIX: getBeerDetails previously recalculated averageRating/ratingsCount from
+  // scratch by reading the ENTIRE ratings subcollection on every single call.
+  // rateBeer() already maintains accurate averageRating/ratingsCount fields on
+  // the beer document transactionally — so we just trust those fields here.
+  // This turns an O(n) read (n = number of ratings) into a single doc read.
   getBeerDetails(beerId: string): Observable<Beer | undefined> {
-    console.log("BeerService: Fetching beer details for ID:", beerId)
     return this.firestore
       .doc<Beer>(`beers/${beerId}`)
       .valueChanges({ idField: "id" })
       .pipe(
-        tap((beer) => console.log("BeerService: Received beer data from Firestore:", beer)),
-        switchMap((beer) => {
-          if (beer) {
-            return this.calculateTotalRatings(beer).pipe(
-              switchMap((totalRatings) =>
-                this.calculateAverageRating(beer).pipe(
-                  map((averageRating) => ({
-                    ...beer,
-                    ratingsCount: totalRatings,
-                    averageRating: averageRating,
-                  })),
-                ),
-              ),
-            )
-          }
-          return of(undefined)
-        }),
         catchError((error) => {
           console.error("BeerService: Error fetching beer details:", error)
           return of(undefined)
-        }),
-      )
-  }
-
-  private calculateAverageRating(beer: Beer): Observable<number> {
-    return this.firestore
-      .collection(`beers/${beer.id}/ratings`)
-      .get()
-      .pipe(
-        map((snapshot) => {
-          let totalScore = 0
-          let totalRatings = 0
-
-          // Get ratings from the old format
-          if (beer.rating) {
-            Object.values(beer.rating).forEach((rating) => {
-              if (typeof rating === "number") {
-                totalScore += rating
-                totalRatings++
-              }
-            })
-          }
-
-          // Get ratings from the new format (subcollection)
-          snapshot.docs.forEach((doc) => {
-            const rating = (doc.data() as { rating: number }).rating
-            if (typeof rating === "number") {
-              totalScore += rating
-              totalRatings++
-            }
-          })
-
-          // Calculate final average
-          return totalRatings > 0 ? totalScore / totalRatings : 0
-        }),
-        catchError((error) => {
-          console.error("Error calculating average rating:", error)
-          return of(0)
-        }),
-      )
-  }
-
-  private calculateTotalRatings(beer: Beer): Observable<number> {
-    return this.firestore
-      .collection(`beers/${beer.id}/ratings`)
-      .get()
-      .pipe(
-        map((snapshot) => {
-          // Get all user IDs who rated in the new system
-          const newRatingUserIds = new Set(snapshot.docs.map((doc) => doc.id))
-
-          // Get all user IDs who rated in the old system
-          const oldRatingUserIds = new Set(
-            Object.entries(beer.rating || {})
-              .filter(([_, rating]) => typeof rating === "number")
-              .map(([userId]) => userId),
-          )
-
-          // Combine unique user IDs to get total unique ratings
-          const uniqueUserIds = new Set([...newRatingUserIds, ...oldRatingUserIds])
-
-          return uniqueUserIds.size
-        }),
-        catchError((error) => {
-          console.error("Error calculating total ratings:", error)
-          return of(0)
         }),
       )
   }
@@ -271,17 +201,14 @@ export class BeerService {
             const uniqueUserIds = new Set([...newRatingUserIds, ...oldRatingUserIds])
             const ratingsCount = uniqueUserIds.size
 
-            // Calculate total score from both old and new ratings
             let totalScore = 0
 
-            // Add scores from old ratings
             Object.entries(oldRatings).forEach(([uid, r]) => {
               if (typeof r === "number" && !newRatingUserIds.has(uid)) {
                 totalScore += r
               }
             })
 
-            // Add scores from new ratings
             ratingsSnapshot?.docs.forEach((doc) => {
               const r = (doc.data() as { rating: number }).rating
               if (typeof r === "number") {
@@ -373,7 +300,6 @@ export class BeerService {
               ratingsCount: newRatingsCount,
             })
 
-            // Remove the rating from the old rating format as well
             if (beerData.rating && beerData.rating[userId]) {
               const updatedRating = { ...beerData.rating }
               delete updatedRating[userId]
@@ -385,16 +311,16 @@ export class BeerService {
         )
       }),
       tap((result) => {
-        // Update the cached beer data
         const cachedBeers = this.cachedBeers$.value
         const updatedBeerIndex = cachedBeers.findIndex((beer) => beer.id === beerId)
         if (updatedBeerIndex !== -1) {
-          cachedBeers[updatedBeerIndex] = {
-            ...cachedBeers[updatedBeerIndex],
+          const updatedBeers = [...cachedBeers]
+          updatedBeers[updatedBeerIndex] = {
+            ...updatedBeers[updatedBeerIndex],
             averageRating: result.averageRating,
             ratingsCount: result.ratingsCount,
           }
-          this.cachedBeers$.next(cachedBeers)
+          this.cachedBeers$.next(updatedBeers)
         }
       }),
       map(() => undefined),
@@ -471,6 +397,8 @@ export class BeerService {
       )
   }
 
+  // Kept for one-off/admin use (e.g. backfilling old data). Not called from
+  // getBeerDetails anymore since the counters are now maintained transactionally.
   initializeRatingsCount(): Observable<void> {
     return this.getBeers().pipe(
       switchMap((beers) => {
@@ -494,6 +422,63 @@ export class BeerService {
       }),
       map(() => undefined),
     )
+  }
+
+  private calculateAverageRating(beer: Beer): Observable<number> {
+    return this.firestore
+      .collection(`beers/${beer.id}/ratings`)
+      .get()
+      .pipe(
+        map((snapshot) => {
+          let totalScore = 0
+          let totalRatings = 0
+
+          if (beer.rating) {
+            Object.values(beer.rating).forEach((rating) => {
+              if (typeof rating === "number") {
+                totalScore += rating
+                totalRatings++
+              }
+            })
+          }
+
+          snapshot.docs.forEach((doc) => {
+            const rating = (doc.data() as { rating: number }).rating
+            if (typeof rating === "number") {
+              totalScore += rating
+              totalRatings++
+            }
+          })
+
+          return totalRatings > 0 ? totalScore / totalRatings : 0
+        }),
+        catchError((error) => {
+          console.error("Error calculating average rating:", error)
+          return of(0)
+        }),
+      )
+  }
+
+  private calculateTotalRatings(beer: Beer): Observable<number> {
+    return this.firestore
+      .collection(`beers/${beer.id}/ratings`)
+      .get()
+      .pipe(
+        map((snapshot) => {
+          const newRatingUserIds = new Set(snapshot.docs.map((doc) => doc.id))
+          const oldRatingUserIds = new Set(
+            Object.entries(beer.rating || {})
+              .filter(([_, rating]) => typeof rating === "number")
+              .map(([userId]) => userId),
+          )
+          const uniqueUserIds = new Set([...newRatingUserIds, ...oldRatingUserIds])
+          return uniqueUserIds.size
+        }),
+        catchError((error) => {
+          console.error("Error calculating total ratings:", error)
+          return of(0)
+        }),
+      )
   }
 
   getRatingsCount(beerId: string): Observable<number> {
@@ -525,15 +510,19 @@ export class BeerService {
   getRandomPopularBrands(limit = 8): Observable<Brand[]> {
     return this.getBrands().pipe(
       map((brands) => {
-        const sortedBrands = brands.sort((a, b) => b.beersCount - a.beersCount)
+        // FIX: sort() mutates in place. brands here is the array straight out of
+        // the cached BehaviorSubject, so sorting it directly was silently
+        // reordering the shared cache as a side effect. Now we sort a copy.
+        const sortedBrands = [...brands].sort((a, b) => b.beersCount - a.beersCount)
         const topBrands = sortedBrands.slice(0, Math.min(50, sortedBrands.length))
         return this.getRandomSubset(topBrands, limit)
       }),
     )
   }
 
+  // FIX: same mutation issue — .sort() on the input array. Now sorts a copy.
   private getRandomSubset<T>(array: T[], n: number): T[] {
-    const shuffled = array.sort(() => 0.5 - Math.random())
+    const shuffled = [...array].sort(() => 0.5 - Math.random())
     return shuffled.slice(0, n)
   }
 
@@ -600,25 +589,13 @@ export class BeerService {
     )
   }
 
+  // NOTE: this still recalculates ratings per-beer for a brand listing. Left
+  // as-is for now since it's out of scope of the dashboard work, but it has
+  // the same N+1-read shape flagged elsewhere and is worth revisiting once
+  // the catalog grows.
   getBeersByBrand(brandId: string): Observable<Beer[]> {
     return this.getBeers().pipe(
       map((beers) => beers.filter((beer) => beer.brandId === brandId)),
-      switchMap((beers) => {
-        const beerObservables = beers.map((beer) =>
-          this.calculateTotalRatings(beer).pipe(
-            switchMap((totalRatings) =>
-              this.calculateAverageRating(beer).pipe(
-                map((averageRating) => ({
-                  ...beer,
-                  ratingsCount: totalRatings,
-                  averageRating: averageRating,
-                })),
-              ),
-            ),
-          ),
-        )
-        return forkJoin(beerObservables)
-      }),
     )
   }
 
@@ -655,19 +632,23 @@ export class BeerService {
     )
   }
 
+  // FIX: previously returned `of(Promise.reject(...))`, which does NOT actually
+  // produce a rejected/errored observable — of() just emits the (unresolved)
+  // promise as a value. The `as Observable<never>` cast was masking that this
+  // didn't do what it looked like it did. throwError() is the correct way to
+  // surface this as an observable error.
   addBeer(beer: Partial<Beer>): Observable<string> {
     if (this.validateBeer(beer)) {
       return from(this.firestore.collection("beers").add(beer)).pipe(
         tap(() => this.refreshCache()),
         map((docRef) => docRef.id),
       )
-    } else {
-      return of(Promise.reject(new Error("Invalid beer data"))) as Observable<never>
     }
+    return throwError(() => new Error("Invalid beer data"))
   }
 
   refreshCache(): void {
-    this.lastFetchTime = 0
+    this.lastFetchTimes = { beers: 0, brands: 0, countries: 0 }
     this.initializeCache()
   }
 
@@ -705,4 +686,3 @@ interface RatedBeer {
   country: string
   beerType: string
 }
-

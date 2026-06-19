@@ -16,6 +16,7 @@ import {
   UserAchievement,
 } from "../models/user.model"
 import { Timestamp, arrayUnion } from "@angular/fire/firestore"
+import firebase from "firebase/compat/app"
 import { NotificationService } from "./notification.service"
 import { AchievementService } from "./achievement.service"
 
@@ -184,43 +185,47 @@ export class UserService {
       )
   }
 
+  // FIX: previously fired one Firestore read PER favorited beer (N+1 reads).
+  // Firestore's `in` query lets us fetch up to 30 documents by ID in a single
+  // query, so we batch favorite IDs into chunks of 30 instead. For a typical
+  // dashboard (a handful to a few dozen favorites) this turns N reads into 1-2.
   getUserFavoriteBeers(): Observable<FavoriteBeer[]> {
     return this.authService.user$.pipe(
       switchMap((user) => {
-        if (user) {
-          return this.firestore
-            .collection(`users/${user.uid}/favorites`)
-            .valueChanges({ idField: "id" })
-            .pipe(
-              switchMap((favorites: any[]) => {
-                if (favorites.length === 0) {
-                  return of([])
-                }
-                return combineLatest(
-                  favorites.map((favorite) =>
-                    this.firestore
-                      .doc<Beer>(`beers/${favorite.id}`)
-                      .valueChanges()
-                      .pipe(
-                        map((beer) => ({
-                          id: favorite.id,
-                          beerId: favorite.id,
-                          name: beer?.name || "Unknown Beer",
-                          beerLabelUrl: beer?.beerLabelUrl || "",
-                          beerImageUrl: beer?.beerImageUrl || "",
-                        })),
-                      ),
-                  ),
-                )
-              }),
-            )
-        } else {
+        if (!user) {
           return of([])
         }
+        return this.firestore
+          .collection(`users/${user.uid}/favorites`)
+          .valueChanges({ idField: "id" })
+          .pipe(
+            switchMap((favorites: any[]) => {
+              if (favorites.length === 0) {
+                return of([])
+              }
+              const beerIds = favorites.map((f) => f.id)
+              return this.getBeersByIds(beerIds).pipe(
+                map((beers) => {
+                  const beerMap = new Map(beers.map((b) => [b.id, b]))
+                  return favorites.map((favorite) => {
+                    const beer = beerMap.get(favorite.id)
+                    return {
+                      id: favorite.id,
+                      beerId: favorite.id,
+                      name: beer?.name || "Unknown Beer",
+                      beerLabelUrl: beer?.beerLabelUrl || "",
+                      beerImageUrl: beer?.beerImageUrl || "",
+                    }
+                  })
+                }),
+              )
+            }),
+          )
       }),
     )
   }
 
+  // FIX: same N+1 problem as getUserFavoriteBeers — batched via getBeersByIds.
   getUserRatedBeers(): Observable<RatedBeer[]> {
     return this.authService.user$.pipe(
       switchMap((user) => {
@@ -235,28 +240,50 @@ export class UserService {
               if (ratings.length === 0) {
                 return of([])
               }
-              return forkJoin(
-                ratings.map((rating) =>
-                  this.firestore
-                    .doc<Beer>(`beers/${rating.id}`)
-                    .valueChanges()
-                    .pipe(
-                      take(1),
-                      map((beer) => ({
-                        ...rating,
-                        name: beer?.name || "Unknown Beer",
-                        beerLabelUrl: beer?.beerLabelUrl || "",
-                        beerImageUrl: beer?.beerImageUrl || "",
-                        country: beer?.countryId || "",
-                        beerType: beer?.beerType || "",
-                      })),
-                    ),
-                ),
+              const beerIds = ratings.map((r) => r.id)
+              return this.getBeersByIds(beerIds).pipe(
+                map((beers) => {
+                  const beerMap = new Map(beers.map((b) => [b.id, b]))
+                  return ratings.map((rating) => {
+                    const beer = beerMap.get(rating.id)
+                    return {
+                      ...rating,
+                      name: beer?.name || "Unknown Beer",
+                      beerLabelUrl: beer?.beerLabelUrl || "",
+                      beerImageUrl: beer?.beerImageUrl || "",
+                      country: beer?.countryId || "",
+                      beerType: beer?.beerType || "",
+                    }
+                  })
+                }),
               )
             }),
           )
       }),
     )
+  }
+
+  // Fetches beer docs by ID in batches of 30 (Firestore's max for `in` queries)
+  // and combines the results. Falls back to an empty array for an empty input.
+  private getBeersByIds(beerIds: string[]): Observable<Beer[]> {
+    if (beerIds.length === 0) {
+      return of([])
+    }
+
+    const chunkSize = 30
+    const chunks: string[][] = []
+    for (let i = 0; i < beerIds.length; i += chunkSize) {
+      chunks.push(beerIds.slice(i, i + chunkSize))
+    }
+
+    const chunkQueries = chunks.map((chunk) =>
+      this.firestore
+        .collection<Beer>("beers", (ref) => ref.where(firebase.firestore.FieldPath.documentId(), "in", chunk))
+        .valueChanges({ idField: "id" })
+        .pipe(take(1)),
+    )
+
+    return forkJoin(chunkQueries).pipe(map((results) => results.flat()))
   }
 
   calculatePoints(user: UserProfile): number {
@@ -268,23 +295,31 @@ export class UserService {
     return points
   }
 
+  // FIX: previously this read the user doc, computed updated stats in JS, then
+  // wrote it back with a plain .update() — a classic read-then-write race.
+  // If two rating actions happen close together (e.g. rating a beer while an
+  // achievement check is also updating the doc), the second write could
+  // silently overwrite the first based on stale data. Wrapping the whole
+  // read+compute+write in a Firestore transaction guarantees the read and
+  // write are atomic relative to other writes to the same document.
   updateUserStatistics(userId: string, newRating: RatedBeer): Observable<void> {
-    return this.firestore
-      .doc<UserProfile>(`users/${userId}`)
-      .valueChanges()
-      .pipe(
-        take(1),
-        switchMap((user) => {
-          if (!user) throw new Error("User not found")
+    const userRef = this.firestore.doc(`users/${userId}`).ref
 
-          const updatedStats = this.calculateUpdatedStatistics(user.statistics, newRating)
+    return from(
+      this.firestore.firestore.runTransaction(async (transaction) => {
+        const userDoc = await transaction.get(userRef)
+        if (!userDoc.exists) throw new Error("User not found")
 
-          return from(this.firestore.doc(`users/${userId}`).update({ statistics: updatedStats })).pipe(
-            switchMap(() => this.updateUserRank(userId, updatedStats.points)),
-            map(() => {}),
-          )
-        }),
-      )
+        const user = userDoc.data() as UserProfile
+        const updatedStats = this.calculateUpdatedStatistics(user.statistics, newRating)
+
+        transaction.update(userRef, { statistics: updatedStats })
+        return updatedStats
+      }),
+    ).pipe(
+      switchMap((updatedStats) => this.updateUserRank(userId, updatedStats.points)),
+      map(() => undefined),
+    )
   }
 
   private calculateUpdatedStatistics(currentStats: UserStatistics | undefined, newRating: RatedBeer): UserStatistics {
@@ -478,30 +513,37 @@ export class UserService {
     }
   }
 
+  // FIX: wrapped in a transaction so the rank read+write is atomic relative to
+  // other concurrent writes on the same user doc (e.g. addPoints firing at the
+  // same time). Previously this used valueChanges().pipe(take(1)) followed by
+  // a separate .update() call — also a read-then-write race.
   updateUserRank(userId: string, currentPoints?: number): Observable<UserRank> {
-    return this.firestore
-      .doc<UserProfile>(`users/${userId}`)
-      .valueChanges()
-      .pipe(
-        take(1),
-        switchMap((user) => {
-          if (!user) throw new Error("User not found")
+    const userRef = this.firestore.doc(`users/${userId}`).ref
 
-          const points = currentPoints !== undefined ? currentPoints : user.statistics?.points || 0
-          const newRank: UserRank = this.calculateRank(points)
+    return from(
+      this.firestore.firestore.runTransaction(async (transaction) => {
+        const userDoc = await transaction.get(userRef)
+        if (!userDoc.exists) throw new Error("User not found")
 
-          if (!user.rank || newRank.level !== user.rank.level) {
-            return from(this.firestore.doc(`users/${userId}`).update({ rank: newRank })).pipe(
-              tap(() => {
-                this.notificationService.addNotification(`Congratulations! You've reached ${newRank.name}!`, "rank")
-              }),
-              map(() => newRank),
-            )
-          }
+        const user = userDoc.data() as UserProfile
+        const points = currentPoints !== undefined ? currentPoints : user.statistics?.points || 0
+        const newRank: UserRank = this.calculateRank(points)
+        const rankChanged = !user.rank || newRank.level !== user.rank.level
 
-          return of(newRank)
-        }),
-      )
+        if (rankChanged) {
+          transaction.update(userRef, { rank: newRank })
+        }
+
+        return { newRank, rankChanged }
+      }),
+    ).pipe(
+      tap(({ newRank, rankChanged }) => {
+        if (rankChanged) {
+          this.notificationService.addNotification(`Congratulations! You've reached ${newRank.name}!`, "rank")
+        }
+      }),
+      map(({ newRank }) => newRank),
+    )
   }
 
   getLeaderboard(): Observable<LeaderboardEntry[]> {
@@ -537,45 +579,42 @@ export class UserService {
     return Promise.resolve()
   }
 
+  // FIX: wrapped in a transaction — previously read-then-wrote the user doc
+  // outside a transaction, same race risk as addPoints/updateUserStatistics.
   recalculateUserPoints(userId: string): Observable<void> {
-    return this.firestore
-      .doc<UserProfile>(`users/${userId}`)
-      .valueChanges()
-      .pipe(
-        take(1),
-        switchMap((user) => {
-          if (!user) throw new Error("User not found")
+    const userRef = this.firestore.doc(`users/${userId}`).ref
 
-          let totalPoints = 0
+    return from(
+      this.firestore.firestore.runTransaction(async (transaction) => {
+        const userDoc = await transaction.get(userRef)
+        if (!userDoc.exists) throw new Error("User not found")
 
-          totalPoints += user.statistics?.totalBeersRated || 0
+        const user = userDoc.data() as UserProfile
+        let totalPoints = 0
+        totalPoints += user.statistics?.totalBeersRated || 0
 
-          if (user.achievements) {
-            Object.values(user.achievements as Record<string, UserAchievement>).forEach((achievement) => {
-              if (achievement.currentLevel === 1) totalPoints += 10
-              if (achievement.currentLevel === 2) totalPoints += 25
-              if (achievement.currentLevel === 3) totalPoints += 50
-            })
-          }
+        if (user.achievements) {
+          Object.values(user.achievements as Record<string, UserAchievement>).forEach((achievement) => {
+            if (achievement.currentLevel === 1) totalPoints += 10
+            if (achievement.currentLevel === 2) totalPoints += 25
+            if (achievement.currentLevel === 3) totalPoints += 50
+          })
+        }
 
-          const updatedStats: UserStatistics = {
-            ...(user.statistics || this.initializeStatistics(undefined)),
-            points: totalPoints,
-          }
+        const updatedStats: UserStatistics = {
+          ...(user.statistics || this.initializeStatistics(undefined)),
+          points: totalPoints,
+        }
+        const newRank = this.calculateRank(totalPoints)
 
-          const newRank = this.calculateRank(totalPoints)
-
-          return from(
-            this.firestore.doc(`users/${userId}`).update({
-              statistics: updatedStats,
-              rank: newRank,
-            }),
-          )
-        }),
-        map(() => undefined),
-      )
+        transaction.update(userRef, { statistics: updatedStats, rank: newRank })
+      }),
+    )
   }
 
+  // FIX: wrapped in a transaction for the same reason as above. This is the
+  // method called every time a user rates a beer, requests a beer, etc., so
+  // it's also the one most likely to race against a concurrent action.
   addPoints(
     userId: string,
     action: "rate" | "request" | "add" | "review" | "challenge" | "achievement",
@@ -592,78 +631,73 @@ export class UserService {
     }
 
     const points = customPoints !== undefined ? customPoints : pointsMap[action]
+    const userRef = this.firestore.doc(`users/${userId}`).ref
 
-    return this.firestore
-      .doc<UserProfile>(`users/${userId}`)
-      .valueChanges()
-      .pipe(
-        take(1),
-        switchMap((user) => {
-          if (!user) throw new Error("User not found")
+    return from(
+      this.firestore.firestore.runTransaction(async (transaction) => {
+        const userDoc = await transaction.get(userRef)
+        if (!userDoc.exists) throw new Error("User not found")
 
-          const currentPoints = user.statistics?.points || 0
-          const newPoints = currentPoints + points
+        const user = userDoc.data() as UserProfile
+        const currentPoints = user.statistics?.points || 0
+        const newPoints = currentPoints + points
 
-          const updatedStats: UserStatistics = {
-            ...(user.statistics || this.initializeStatistics(undefined)),
-            points: newPoints,
-          }
+        const updatedStats: UserStatistics = {
+          ...(user.statistics || this.initializeStatistics(undefined)),
+          points: newPoints,
+        }
+        const newRank = this.calculateRank(newPoints)
 
-          const newRank = this.calculateRank(newPoints)
-
-          return from(
-            this.firestore.doc(`users/${userId}`).update({
-              statistics: updatedStats,
-              rank: newRank,
-            }),
-          )
-        }),
-      )
+        transaction.update(userRef, { statistics: updatedStats, rank: newRank })
+      }),
+    )
   }
 
+  // FIX: wrapped in a transaction — same race as the others.
   removeBeerRating(userId: string, beerId: string): Observable<void> {
-    return this.firestore
-      .doc<UserProfile>(`users/${userId}`)
-      .valueChanges()
-      .pipe(
-        take(1),
-        switchMap((user) => {
-          if (!user) throw new Error("User not found")
+    const userRef = this.firestore.doc(`users/${userId}`).ref
 
-          const ratedBeers = user.ratedBeers || []
-          const ratingToRemove = ratedBeers.find((rb) => rb.beerId === beerId)
+    return from(
+      this.firestore.firestore.runTransaction(async (transaction) => {
+        const userDoc = await transaction.get(userRef)
+        if (!userDoc.exists) throw new Error("User not found")
 
-          if (!ratingToRemove) {
-            console.log("Rating not found")
-            return of(undefined)
-          }
+        const user = userDoc.data() as UserProfile
+        const ratedBeers = user.ratedBeers || []
+        const ratingToRemove = ratedBeers.find((rb) => rb.beerId === beerId)
 
-          const updatedRatedBeers = ratedBeers.filter((rb) => rb.beerId !== beerId)
-          const pointsToDeduct = this.calculatePointsForRating(ratingToRemove)
+        if (!ratingToRemove) {
+          console.log("Rating not found")
+          return { statsPoints: user.statistics?.points || 0 }
+        }
 
-          const updatedStats = this.calculateUpdatedStatisticsAfterRemoval(
-            user.statistics || this.initializeStatistics(undefined),
-            ratingToRemove,
-          )
-          updatedStats.points = Math.max(0, (updatedStats.points || 0) - pointsToDeduct)
+        const updatedRatedBeers = ratedBeers.filter((rb) => rb.beerId !== beerId)
+        const pointsToDeduct = this.calculatePointsForRating(ratingToRemove)
 
-          return from(
-            this.firestore.doc(`users/${userId}`).update({
-              ratedBeers: updatedRatedBeers,
-              statistics: updatedStats,
-            }),
-          ).pipe(
-            switchMap(() => this.updateUserRank(userId, updatedStats.points)),
-            switchMap(() => this.achievementService.updateAchievements(userId)),
-          )
-        }),
-      )
+        const updatedStats = this.calculateUpdatedStatisticsAfterRemoval(
+          user.statistics || this.initializeStatistics(undefined),
+          ratingToRemove,
+        )
+        updatedStats.points = Math.max(0, (updatedStats.points || 0) - pointsToDeduct)
+
+        transaction.update(userRef, {
+          ratedBeers: updatedRatedBeers,
+          statistics: updatedStats,
+        })
+
+        return { statsPoints: updatedStats.points }
+      }),
+    ).pipe(
+      switchMap(({ statsPoints }) => this.updateUserRank(userId, statsPoints)),
+      switchMap(() => this.achievementService.updateAchievements(userId)),
+      map(() => undefined),
+    )
   }
 
   private calculatePointsForRating(rating: Partial<RatedBeer>): number {
-    let points = 1 // Base point for rating
+    let points = 1
     if (rating.review && rating.review.length >= 50) {
-      points += 2 // Additional points for review
+      points += 2
     }
     return points
   }
@@ -675,7 +709,6 @@ export class UserService {
     const updatedStats = { ...currentStats }
     updatedStats.totalBeersRated = Math.max(0, (updatedStats.totalBeersRated || 0) - 1)
 
-    // Update other statistics as needed
     if (removedRating.country) {
       const countryCount = updatedStats.countriesExplored.filter((c) => c === removedRating.country).length
       if (countryCount === 1) {
@@ -700,7 +733,6 @@ export class UserService {
       updatedStats.totalReviews = Math.max(0, updatedStats.totalReviews - 1)
     }
 
-    // Recalculate average rating
     const totalRatings = updatedStats.totalBeersRated || 0
     if (totalRatings > 0) {
       const totalRatingSum = (currentStats.averageRating || 0) * (totalRatings + 1) - removedRating.rating
@@ -714,7 +746,7 @@ export class UserService {
 
   private updateContinentStatistics(stats: UserStatistics, country: string): void {
     const continents: { [key: string]: string[] } = {
-      Europe: ["Czechia", "Germany", "France", "Italy", "Spain", "United Kingdom", ],
+      Europe: ["Czechia", "Germany", "France", "Italy", "Spain", "United Kingdom"],
       NorthAmerica: ["United States of America", "Canada", "Mexico"],
       SouthAmerica: ["Brazil", "Argentina", "Colombia"],
       Asia: ["China", "Japan", "India"],
@@ -730,27 +762,29 @@ export class UserService {
     }
   }
 
+  // NOTE: these four helpers are currently unused (always return false / a
+  // hardcoded list) and the stats fields they'd feed (rareBeersRated,
+  // craftBeersRated, highHopBeersRated, highAltitudeCountriesExplored) are
+  // initialized but never actually incremented anywhere. Left in place since
+  // removing them might be a breaking change if referenced elsewhere (e.g.
+  // achievement.service.ts), but worth deciding: either wire these up to
+  // real beer-data lookups, or remove them + the corresponding dashboard UI
+  // so you're not displaying permanently-zero stats.
   private isHighAltitudeCountry(country: string): boolean {
-    const highAltitudeCountries = ["Bolivia", "Peru", "Nepal", "Bhutan"] // Add more high-altitude countries
+    const highAltitudeCountries = ["Bolivia", "Peru", "Nepal", "Bhutan"]
     return highAltitudeCountries.includes(country)
   }
 
   private isRareBeer(beerId: string): boolean {
-    // Implement logic to check if a beer is rare based on beerId
-    // This might involve fetching data from a database or external API
-    return false // Replace with actual logic
+    return false
   }
 
   private isCraftBeer(beerId: string): boolean {
-    // Implement logic to check if a beer is craft based on beerId
-    // This might involve fetching data from a database or external API
-    return false // Replace with actual logic
+    return false
   }
 
   private isHighHopBeer(beerId: string): boolean {
-    // Implement logic to check if a beer is high hop based on beerId
-    // This might involve fetching data from a database or external API
-    return false // Replace with actual logic
+    return false
   }
 
   private checkNewlyUnlockedAchievements(oldAchievements: UserAchievement[], newAchievements: UserAchievement[]): void {
@@ -765,4 +799,3 @@ export class UserService {
     })
   }
 }
-

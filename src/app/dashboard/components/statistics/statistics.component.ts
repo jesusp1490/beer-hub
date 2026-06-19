@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, ViewChild, ElementRef } from "@angular/core"
+import { Component, Input, OnChanges, AfterViewInit, ViewChild, ElementRef } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { Chart, ChartConfiguration, registerables } from "chart.js"
 import { UserStatistics } from "../../../models/user.model"
@@ -12,14 +12,34 @@ Chart.register(...registerables)
   templateUrl: "./statistics.component.html",
   styleUrls: ["./statistics.component.scss"],
 })
-export class StatisticsComponent implements OnChanges {
+export class StatisticsComponent implements OnChanges, AfterViewInit {
   @Input() userStats: UserStatistics | null = null
   @ViewChild("beerStylesChart") beerStylesChartRef!: ElementRef
 
   beerStylesChart: Chart | null = null
 
+  // FIX: previously this component only tried to draw the chart from
+  // ngOnChanges(). But @ViewChild refs aren't populated until
+  // ngAfterViewInit — and ngOnChanges fires BEFORE that, on the very first
+  // input binding. If userStats arrived on that first binding (the common
+  // case, since the parent usually already has the data), beerStylesChartRef
+  // was still undefined and the chart silently never drew, until some later,
+  // unrelated change happened to re-trigger ngOnChanges. We now track
+  // whether the view is ready and draw as soon as both the view AND the data
+  // are available, regardless of which one arrives first.
+  private viewReady = false
+
   ngOnChanges(): void {
-    if (this.userStats && this.beerStylesChartRef) {
+    this.tryRenderChart()
+  }
+
+  ngAfterViewInit(): void {
+    this.viewReady = true
+    this.tryRenderChart()
+  }
+
+  private tryRenderChart(): void {
+    if (this.userStats && this.viewReady && this.beerStylesChartRef) {
       this.createBeerStylesChart()
     }
   }
@@ -104,9 +124,8 @@ export class StatisticsComponent implements OnChanges {
   private generateColors(count: number): string[] {
     const baseColor = [255, 167, 38] // A shade of orange
     return Array.from({ length: count }, (_, i) => {
-      const shade = 1 - (i / count) * 0.6 // Adjust this value to change color variation
+      const shade = 1 - (i / count) * 0.6
       return `rgba(${baseColor[0] * shade}, ${baseColor[1] * shade}, ${baseColor[2] * shade}, 0.7)`
     })
   }
 }
-
