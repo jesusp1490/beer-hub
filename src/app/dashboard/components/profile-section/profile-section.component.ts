@@ -41,8 +41,14 @@ interface ProfileField {
     MatNativeDateModule,
     MatSelectModule,
     MatInputModule,
-    ChangePasswordComponent,
-    NewBeerRequestComponent,
+    // FIX: ChangePasswordComponent and NewBeerRequestComponent were
+    // previously listed here, but neither is ever used as a template tag
+    // (e.g. <app-change-password>) — both are only opened dynamically via
+    // MatDialog.open(ChangePasswordComponent, ...) in the methods below.
+    // Standalone components don't need to be in a parent's `imports` array
+    // just to be opened as a dialog; Angular creates them on demand. Their
+    // class imports above (the `import { ... } from ...` lines) are still
+    // needed since MatDialog.open() takes the class itself as an argument.
     RankingSectionComponent,
   ],
 })
@@ -106,7 +112,7 @@ export class ProfileSectionComponent implements OnInit, OnChanges {
 
   convertTimestamp(timestamp: Timestamp | null | undefined): string | null {
     if (timestamp instanceof Timestamp) {
-      return timestamp.toDate().toISOString().split("T")[0] // Format as YYYY-MM-DD
+      return timestamp.toDate().toISOString().split("T")[0]
     } else if (timestamp === null || timestamp === undefined) {
       return null
     } else {
@@ -121,7 +127,6 @@ export class ProfileSectionComponent implements OnInit, OnChanges {
   onEditField(field: string, value: string | Date): void {
     this.editingField = null
     if (field === "displayName") {
-      // Split the full name into firstName and lastName
       const [firstName = "", ...lastNameParts] = (value as string).trim().split(" ")
       const lastName = lastNameParts.join(" ")
 
@@ -130,7 +135,6 @@ export class ProfileSectionComponent implements OnInit, OnChanges {
         this.editField.emit({ field: "lastName", value: lastName })
       }
     } else if (field === "dob") {
-      // Emit the Date object directly
       this.editField.emit({ field, value: value as Date })
     } else {
       this.editField.emit({ field, value: value as string })
@@ -174,4 +178,3 @@ export class ProfileSectionComponent implements OnInit, OnChanges {
     }
   }
 }
-

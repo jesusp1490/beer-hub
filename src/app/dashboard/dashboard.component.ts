@@ -9,13 +9,13 @@ import { UserStatistics, UserProfile, RatedBeer, FavoriteBeer } from "../models/
 import { Subject, of } from "rxjs"
 import { takeUntil, take, switchMap } from "rxjs/operators"
 import { ProfileSectionComponent } from "./components/profile-section/profile-section.component"
-import { RankingSectionComponent } from "./components/ranking-section/ranking-section.component"
 import { StatisticsComponent } from "./components/statistics/statistics.component"
 import { LeaderboardComponent } from "./components/leaderboard/leaderboard.component"
 import { ChallengesComponent } from "./components/challenges/challenges.component"
 import { Timestamp } from "firebase/firestore"
 import { NotificationPanelComponent } from "./components/notification-panel/notification-panel.component"
 import { AchievementsSectionComponent } from "./components/achievements-section/achievements-section.component"
+// NEW: the missing rated/favorite beers view discussed earlier.
 import { RatedFavoriteBeersComponent } from "./components/rated-favorite-beers/rated-favorite-beers.component"
 import { Router } from "@angular/router"
 
@@ -29,12 +29,12 @@ import { Router } from "@angular/router"
     MatIconModule,
     MatButtonModule,
     ProfileSectionComponent,
-    RankingSectionComponent,
     StatisticsComponent,
     LeaderboardComponent,
     ChallengesComponent,
     NotificationPanelComponent,
     AchievementsSectionComponent,
+    // NEW
     RatedFavoriteBeersComponent,
   ],
 })

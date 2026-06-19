@@ -186,6 +186,10 @@ export class BeerService {
               rating,
               ratedAt: firebase.firestore.FieldValue.serverTimestamp(),
               beerType: beerData.beerType,
+              // NEW: needed so the challenge-progress Cloud Function trigger
+              // (onCreate on this same path) can evaluate country-based
+              // challenges without an extra Firestore read per rating.
+              countryId: beerData.countryId,
             })
 
             // Recalculate total ratings and average

@@ -1,0 +1,7 @@
+{
+  "eslint.workingDirectories": [
+    { "directory": "functions", "changeProcessCWD": true }
+  ],
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true
+}

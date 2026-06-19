@@ -77,6 +77,10 @@ export interface UserAchievement {
   description: string
   icon: string
   category: string
+  // NEW: see achievement.interface.ts for the full explanation. Kept
+  // optional here so existing stored achievement snapshots (saved before
+  // this field existed) don't fail type-checking when read back.
+  metric?: string
   levels: AchievementLevel[]
   currentLevel: number
   progress: number
@@ -98,6 +102,7 @@ export interface Achievement {
   description: string
   icon: string
   category: string
+  metric?: string
   levels: AchievementLevel[]
 }
 
@@ -156,4 +161,3 @@ export interface FavoriteBeer {
   beerLabelUrl?: string
   beerImageUrl?: string
 }
-
