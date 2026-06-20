@@ -45,13 +45,14 @@
 
       <!-- Leaderboard -->
       <div class="grid-item leaderboard">
-        <h2>Leaderboard</h2>
-        <app-leaderboard></app-leaderboard>
+        <app-leaderboard
+          [globalLeaderboard]="globalLeaderboard"
+          [countryLeaderboard]="countryLeaderboard"
+        ></app-leaderboard>
       </div>
 
       <!-- Challenges -->
       <div class="grid-item challenges">
-        <h2>Challenges</h2>
         <app-challenges></app-challenges>
       </div>
 

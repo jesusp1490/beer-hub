@@ -16,4 +16,3 @@ export class LeaderboardComponent {
   @Input() globalLeaderboard: LeaderboardEntry[] = []
   @Input() countryLeaderboard: LeaderboardEntry[] = []
 }
-

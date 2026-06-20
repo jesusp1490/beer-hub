@@ -1,27 +1,56 @@
-.leaderboard-section {
-    .leaderboard-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 1rem;
+@import 'src/styles/_variables.scss';
 
-        th,
-        td {
-            padding: 0.5rem;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
 
-        th {
-            font-weight: bold;
-            background-color: #f0f0f0;
-        }
+:host {
+    display: block;
+}
 
-        tr:nth-child(even) {
-            background-color: #f8f8f8;
-        }
+mat-card {
+    background-color: $color-card-background;
+    color: $color-text-light;
+    box-shadow: none;
+}
 
-        tr:hover {
-            background-color: #e8e8e8;
-        }
+mat-card-title {
+    color: $color-primary;
+    font-size: 1.25rem;
+}
+
+::ng-deep .mat-mdc-tab-label-container {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+::ng-deep .mdc-tab__text-label {
+    color: $color-text-secondary;
+}
+
+::ng-deep .mdc-tab--active .mdc-tab__text-label {
+    color: $color-primary !important;
+}
+
+::ng-deep .mdc-tab-indicator__content--underline {
+    border-color: $color-primary !important;
+}
+
+mat-list {
+    background: transparent;
+}
+
+mat-list-item {
+    color: $color-text-light;
+
+    &:nth-child(odd) {
+        background-color: rgba(255, 255, 255, 0.03);
     }
+}
+
+.empty-leaderboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    color: $color-text-secondary;
+    text-align: center;
+    font-size: 0.85rem;
 }

@@ -1,4 +1,5 @@
 import type { Timestamp } from "@angular/fire/firestore"
+import type { Challenge } from "./challenge.model"
 
 export interface UserProfile {
   uid: string
@@ -113,15 +114,6 @@ export interface UserRank {
   points: number
   progress: number
   pointsToNextRank: number
-}
-
-export interface Challenge {
-  id: string
-  name: string
-  description: string
-  imageUrl: string
-  reward: number
-  completed: boolean
 }
 
 export interface RatedBeer {

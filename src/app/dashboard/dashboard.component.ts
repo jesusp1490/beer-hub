@@ -5,7 +5,7 @@ import { MatButtonModule } from "@angular/material/button"
 import { UserService } from "../services/user.service"
 import { AuthService } from "../services/auth.service"
 import { BeerService } from "../services/beer.service"
-import { UserStatistics, UserProfile, RatedBeer, FavoriteBeer } from "../models/user.model"
+import { UserStatistics, UserProfile, RatedBeer, FavoriteBeer, LeaderboardEntry } from "../models/user.model"
 import { Subject, of } from "rxjs"
 import { takeUntil, take, switchMap } from "rxjs/operators"
 import { ProfileSectionComponent } from "./components/profile-section/profile-section.component"
@@ -47,6 +47,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   favoriteBeers: FavoriteBeer[] | null = null
   beersLoading = false
 
+  // NEW: backing data for the leaderboard, previously never fetched at all
+  // — <app-leaderboard> was rendered with no inputs bound.
+  globalLeaderboard: LeaderboardEntry[] = []
+  countryLeaderboard: LeaderboardEntry[] = []
+
   private destroy$ = new Subject<void>()
 
   constructor(
@@ -64,6 +69,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // now maintained correctly at the source via transactions.
         this.loadUserProfile()
         this.loadRatedAndFavoriteBeers()
+        this.loadLeaderboards()
       } else {
         this.router.navigate(["/"])
       }
@@ -75,6 +81,44 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.destroy$.complete()
   }
 
+  // NEW: fetches both leaderboards. Country leaderboard waits for the
+  // user's profile to load first, since it needs userProfile.country —
+  // that's why this re-runs from loadUserProfile's subscription too, not
+  // just once on init.
+  private loadLeaderboards(): void {
+    this.userService
+      .getLeaderboard()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (entries) => {
+          this.globalLeaderboard = entries
+        },
+        error: (error) => {
+          console.error("Error loading global leaderboard:", error)
+          this.globalLeaderboard = []
+        },
+      })
+  }
+
+  private loadCountryLeaderboard(country: string | null): void {
+    if (!country) {
+      this.countryLeaderboard = []
+      return
+    }
+    this.userService
+      .getCountryLeaderboard(country)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (entries) => {
+          this.countryLeaderboard = entries
+        },
+        error: (error) => {
+          console.error("Error loading country leaderboard:", error)
+          this.countryLeaderboard = []
+        },
+      })
+  }
+
   private loadUserProfile(): void {
     this.userService
       .getCurrentUserProfile()
@@ -83,6 +127,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         next: (profile) => {
           this.userProfile = profile
           this.userStats = profile?.statistics || null
+          this.loadCountryLeaderboard(profile?.country || null)
         },
         error: (error) => {
           console.error("Error loading user profile:", error)

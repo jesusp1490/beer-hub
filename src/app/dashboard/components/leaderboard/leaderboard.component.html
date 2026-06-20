@@ -5,7 +5,10 @@
   <mat-card-content>
     <mat-tab-group>
       <mat-tab label="Global">
-        <mat-list>
+        <div *ngIf="globalLeaderboard.length === 0" class="empty-leaderboard">
+          <p>No ranked users yet — be the first!</p>
+        </div>
+        <mat-list *ngIf="globalLeaderboard.length > 0">
           <mat-list-item *ngFor="let entry of globalLeaderboard; let i = index">
             <span mat-line>
               <strong>{{ i + 1 }}. {{ entry.displayName }}</strong>
@@ -15,7 +18,10 @@
         </mat-list>
       </mat-tab>
       <mat-tab label="Country">
-        <mat-list>
+        <div *ngIf="countryLeaderboard.length === 0" class="empty-leaderboard">
+          <p>No ranked users from your country yet.</p>
+        </div>
+        <mat-list *ngIf="countryLeaderboard.length > 0">
           <mat-list-item *ngFor="let entry of countryLeaderboard; let i = index">
             <span mat-line>
               <strong>{{ i + 1 }}. {{ entry.displayName }}</strong>
@@ -27,4 +33,3 @@
     </mat-tab-group>
   </mat-card-content>
 </mat-card>
-

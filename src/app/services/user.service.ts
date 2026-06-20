@@ -568,6 +568,33 @@ export class UserService {
     )
   }
 
+  // NEW: country-scoped leaderboard, complementing the existing global one.
+  // Used by the dashboard's "Country" tab — previously LeaderboardComponent
+  // had a @Input for this but nothing ever populated it.
+  getCountryLeaderboard(country: string): Observable<LeaderboardEntry[]> {
+    if (!country) {
+      return of([])
+    }
+    const query = this.firestore.collection("users", (ref) =>
+      ref.where("country", "==", country).orderBy("statistics.points", "desc").limit(10),
+    )
+    return query.valueChanges({ idField: "userId" }).pipe(
+      map((users: any[]) =>
+        users.map((user) => ({
+          userId: user.userId,
+          displayName: user.displayName || "Anonymous",
+          photoURL: user.photoURL || "",
+          rank: this.calculateRank(user.statistics?.points || 0),
+          points: user.statistics?.points || 0,
+        })),
+      ),
+      catchError((error) => {
+        console.error("Error fetching country leaderboard:", error)
+        return of([])
+      }),
+    )
+  }
+
   addReward(userId: string, reward: Reward): Promise<void> {
     return this.firestore.doc(`users/${userId}`).update({
       rewards: arrayUnion(reward),

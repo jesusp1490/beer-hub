@@ -1,12 +1,41 @@
 <div class="challenges-section">
-  <h3>Active Challenges</h3>
-  <div class="challenges-list">
-    <div *ngFor="let challenge of challenges" class="challenge-item">
-      <h4>{{ challenge.name }}</h4>
-      <p>{{ challenge.description }}</p>
-      <mat-progress-bar [value]="challenge.progress"></mat-progress-bar>
-      <span class="progress-text">{{ challenge.progress }}%</span>
+  <h2>Active Challenges</h2>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <p>Loading challenges...</p>
+  </div>
+
+  <div *ngIf="!isLoading && challenges.length === 0" class="empty-state">
+    <mat-icon>flag</mat-icon>
+    <p>No active challenges right now.</p>
+    <p class="hint">New challenges are assigned automatically — check back soon.</p>
+  </div>
+
+  <div class="challenges-list" *ngIf="!isLoading && challenges.length > 0">
+    <div
+      *ngFor="let challenge of challenges"
+      class="challenge-item"
+      [class.completed]="challenge.completed"
+    >
+      <div class="challenge-header">
+        <h4>{{ challenge.name }}</h4>
+        <mat-icon *ngIf="challenge.completed" class="completed-icon">check_circle</mat-icon>
+      </div>
+
+      <p class="challenge-description">{{ challenge.description }}</p>
+
+      <mat-progress-bar
+        [value]="getProgressPercent(challenge)"
+        [color]="challenge.completed ? 'accent' : 'primary'"
+      ></mat-progress-bar>
+
+      <div class="challenge-footer">
+        <span class="progress-text">{{ challenge.progress }} / {{ challenge.threshold }}</span>
+        <span class="days-remaining" *ngIf="!challenge.completed">
+          {{ getDaysRemaining(challenge) }} day{{ getDaysRemaining(challenge) === 1 ? '' : 's' }} left
+        </span>
+        <span class="reward-text" *ngIf="challenge.completed">+{{ challenge.rewardXP }} XP earned</span>
+      </div>
     </div>
   </div>
 </div>
-
