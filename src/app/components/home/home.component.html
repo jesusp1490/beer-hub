@@ -1,5 +1,4 @@
 <div class="home-container">
-
   <section class="hero" *ngIf="!isMobileView">
     <video autoplay loop muted playsinline class="hero-video">
       <source src="../../../assets/Hero-video.mp4" type="video/mp4">
@@ -67,7 +66,6 @@
           <div *ngIf="!featuredBeer" class="no-results">
             <p>No rated beers yet.</p>
           </div>
-
           <a *ngIf="featuredBeer" class="featured-beer" [routerLink]="['/beers', featuredBeer.id]">
             <div class="beer-img">
               <img [src]="featuredBeer.beerLabelUrl" [alt]="featuredBeer.name">
@@ -77,7 +75,13 @@
               <h3>{{ featuredBeer.name }}</h3>
               <p class="brand">{{ featuredBeer.brand }}</p>
               <p class="beer-type"><i class="fas fa-beer"></i> {{ featuredBeer.beerType }}</p>
-              <div class="rating"><i class="fas fa-star"></i> {{ featuredBeer.averageRating | number:'1.1-1' }} average</div>
+            </div>
+            <div class="featured-beer-rating">
+              <div class="rating-circle">
+                <span class="rating-value">{{ featuredBeer.averageRating | number:'1.1-1' }}</span>
+                <span class="rating-stars"><i class="fas fa-star"></i></span>
+              </div>
+              <span class="view-details">View details &rsaquo;</span>
             </div>
           </a>
 
