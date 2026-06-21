@@ -58,7 +58,6 @@ export class ProfileSectionComponent implements OnInit, OnChanges {
   @Output() changePassword = new EventEmitter<void>()
   @Output() requestNewBeer = new EventEmitter<void>()
   @Output() logout = new EventEmitter<void>()
-  @Output() uploadProfilePicture = new EventEmitter<File>()
 
   profileFields: ProfileField[] = []
   editingField: string | null = null
@@ -169,12 +168,5 @@ export class ProfileSectionComponent implements OnInit, OnChanges {
   onLogout(): void {
     this.logout.emit()
     this.router.navigate(["/"])
-  }
-
-  onFileSelected(event: Event): void {
-    const element = event.currentTarget as HTMLInputElement
-    if (element.files && element.files.length > 0) {
-      this.uploadProfilePicture.emit(element.files[0])
-    }
   }
 }

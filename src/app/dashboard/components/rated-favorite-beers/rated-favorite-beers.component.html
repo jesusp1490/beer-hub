@@ -20,54 +20,77 @@
     </button>
   </div>
 
-  <!-- Loading state -->
   <div class="loading-state" *ngIf="loading">
     <p>Loading your beers...</p>
   </div>
 
   <!-- Rated beers tab -->
-  <div class="beers-grid" *ngIf="!loading && activeTab === 'rated'">
-    <div class="empty-state" *ngIf="!ratedBeers || ratedBeers.length === 0">
-      <mat-icon>star_border</mat-icon>
-      <p>You haven't rated any beers yet.</p>
-      <p class="hint">Explore the map and rate a beer to see it here.</p>
+  <ng-container *ngIf="!loading && activeTab === 'rated'">
+    <div class="beers-grid">
+      <div class="empty-state" *ngIf="!ratedBeers || ratedBeers.length === 0">
+        <mat-icon>star_border</mat-icon>
+        <p>You haven't rated any beers yet.</p>
+        <p class="hint">Explore the map and rate a beer to see it here.</p>
+      </div>
+
+      <div class="beer-card" *ngFor="let beer of pagedRatedBeers">
+        <a [routerLink]="['/beers', beer.beerId]" class="beer-link">
+          <img [src]="beer.beerImageUrl || beer.beerLabelUrl || 'assets/default-beer.png'" [alt]="beer.name">
+          <div class="beer-info">
+            <h4>{{ beer.name }}</h4>
+            <div class="beer-rating">
+              <mat-icon>star</mat-icon>
+              <span>{{ beer.rating }}/5</span>
+            </div>
+          </div>
+        </a>
+        <button mat-icon-button class="remove-button" (click)="onRemoveRating(beer.beerId)" aria-label="Remove rating">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
     </div>
 
-    <div class="beer-card" *ngFor="let beer of ratedBeers">
-      <a [routerLink]="['/beers', beer.beerId]" class="beer-link">
-        <img [src]="beer.beerImageUrl || beer.beerLabelUrl || 'assets/default-beer.png'" [alt]="beer.name">
-        <div class="beer-info">
-          <h4>{{ beer.name }}</h4>
-          <div class="beer-rating">
-            <mat-icon>star</mat-icon>
-            <span>{{ beer.rating }}/5</span>
-          </div>
-        </div>
-      </a>
-      <button mat-icon-button class="remove-button" (click)="onRemoveRating(beer.beerId)" aria-label="Remove rating">
-        <mat-icon>close</mat-icon>
+    <div class="pagination" *ngIf="ratedBeers && ratedBeers.length > pageSize">
+      <button mat-icon-button (click)="prevPage()" [disabled]="ratedPage === 0" aria-label="Previous page">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <span class="page-indicator">{{ ratedPage + 1 }} / {{ ratedTotalPages }}</span>
+      <button mat-icon-button (click)="nextPage()" [disabled]="ratedPage >= ratedTotalPages - 1" aria-label="Next page">
+        <mat-icon>chevron_right</mat-icon>
       </button>
     </div>
-  </div>
+  </ng-container>
 
   <!-- Favorites tab -->
-  <div class="beers-grid" *ngIf="!loading && activeTab === 'favorites'">
-    <div class="empty-state" *ngIf="!favoriteBeers || favoriteBeers.length === 0">
-      <mat-icon>favorite_border</mat-icon>
-      <p>You haven't favorited any beers yet.</p>
-      <p class="hint">Tap the heart icon on a beer's page to save it here.</p>
+  <ng-container *ngIf="!loading && activeTab === 'favorites'">
+    <div class="beers-grid">
+      <div class="empty-state" *ngIf="!favoriteBeers || favoriteBeers.length === 0">
+        <mat-icon>favorite_border</mat-icon>
+        <p>You haven't favorited any beers yet.</p>
+        <p class="hint">Tap the heart icon on a beer's page to save it here.</p>
+      </div>
+
+      <div class="beer-card" *ngFor="let beer of pagedFavoriteBeers">
+        <a [routerLink]="['/beers', beer.beerId]" class="beer-link">
+          <img [src]="beer.beerImageUrl || beer.beerLabelUrl || 'assets/default-beer.png'" [alt]="beer.name">
+          <div class="beer-info">
+            <h4>{{ beer.name }}</h4>
+          </div>
+        </a>
+        <button mat-icon-button class="remove-button" (click)="onRemoveFavorite(beer.beerId)" aria-label="Remove favorite">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
     </div>
 
-    <div class="beer-card" *ngFor="let beer of favoriteBeers">
-      <a [routerLink]="['/beers', beer.beerId]" class="beer-link">
-        <img [src]="beer.beerImageUrl || beer.beerLabelUrl || 'assets/default-beer.png'" [alt]="beer.name">
-        <div class="beer-info">
-          <h4>{{ beer.name }}</h4>
-        </div>
-      </a>
-      <button mat-icon-button class="remove-button" (click)="onRemoveFavorite(beer.beerId)" aria-label="Remove favorite">
-        <mat-icon>close</mat-icon>
+    <div class="pagination" *ngIf="favoriteBeers && favoriteBeers.length > pageSize">
+      <button mat-icon-button (click)="prevPage()" [disabled]="favoritesPage === 0" aria-label="Previous page">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <span class="page-indicator">{{ favoritesPage + 1 }} / {{ favoritesTotalPages }}</span>
+      <button mat-icon-button (click)="nextPage()" [disabled]="favoritesPage >= favoritesTotalPages - 1" aria-label="Next page">
+        <mat-icon>chevron_right</mat-icon>
       </button>
     </div>
-  </div>
+  </ng-container>
 </div>

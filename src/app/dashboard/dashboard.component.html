@@ -1,49 +1,74 @@
 <div class="dashboard-container">
-  <!-- Left Sidebar -->
-  <div class="profile-section">
-    <app-profile-section [userProfile]="userProfile" (editField)="onEditField($event)"
-      (changePassword)="onChangePassword()" (requestNewBeer)="onRequestNewBeer()" (logout)="onLogout()"
-      (uploadProfilePicture)="onUploadProfilePicture($event)">
-    </app-profile-section>
+  <!-- HERO HEADER -->
+  <div class="hero" *ngIf="userProfile">
+    <div class="hero-avatar">
+      <img *ngIf="userProfile.photoURL" [src]="userProfile.photoURL" [alt]="userProfile.username || 'Profile picture'">
+      <span *ngIf="!userProfile.photoURL">{{ (userProfile.username || userProfile.displayName || '?').charAt(0).toUpperCase() }}</span>
+      <button class="hero-avatar-edit" (click)="heroFileInput.click()" aria-label="Change profile picture">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <input
+        #heroFileInput
+        type="file"
+        hidden
+        accept="image/*"
+        (change)="onHeroFileSelected($event)"
+      >
+    </div>
+
+    <div class="hero-identity">
+      <h1>{{ userProfile.username || userProfile.displayName || 'Beer explorer' }}</h1>
+      <div class="hero-rank-pill" *ngIf="userProfile.rank">
+        <span>{{ userProfile.rank.icon }}</span>
+        <span>{{ userProfile.rank.name }} &middot; Level {{ userProfile.rank.level }}</span>
+      </div>
+      <div class="rank-progress-track" *ngIf="userProfile.rank">
+        <div class="rank-progress-fill" [style.width.%]="userProfile.rank.progress"></div>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="value">{{ userStats?.totalBeersRated || 0 }}</div>
+        <div class="label">Rated beers</div>
+      </div>
+      <div class="hero-stat">
+        <div class="value">{{ userStats?.uniqueCountriesCount || 0 }}</div>
+        <div class="label">Countries</div>
+      </div>
+      <div class="hero-stat">
+        <div class="value">{{ userStats?.uniqueStylesCount || 0 }}</div>
+        <div class="label">Beer types</div>
+      </div>
+    </div>
   </div>
 
-  <!-- Main Content -->
-  <div class="main-content">
-    <!-- Top Stats Bar -->
-    <div class="stats-bar">
-      <div class="stat-card">
-        <h3>Total Rated Beers</h3>
-        <p>{{userStats?.totalBeersRated || 0}}</p>
-      </div>
-      <div class="stat-card">
-        <h3>Countries Explored</h3>
-        <p>{{userStats?.uniqueCountriesCount || 0}}</p>
-      </div>
-      <div class="stat-card">
-        <h3>Beer Types</h3>
-        <p>{{userStats?.uniqueStylesCount || 0}}</p>
-      </div>
+  <div class="dashboard-body">
+    <!-- Sidebar: editable profile fields, full rank progression, actions.
+         Avatar/name/current-rank are now shown ONLY in the hero above —
+         see the corresponding cleanup in profile-section/ranking-section. -->
+    <div class="profile-section">
+      <app-profile-section [userProfile]="userProfile" (editField)="onEditField($event)"
+        (changePassword)="onChangePassword()" (requestNewBeer)="onRequestNewBeer()" (logout)="onLogout()">
+      </app-profile-section>
     </div>
 
-    <!-- NEW: Rated / Favorite Beers Section -->
-    <div class="grid-item rated-favorite-beers">
-      <app-rated-favorite-beers
-        [ratedBeers]="ratedBeers"
-        [favoriteBeers]="favoriteBeers"
-        [loading]="beersLoading"
-        (removeRating)="removeBeerRating($event)"
-        (removeFavorite)="removeFavoriteBeer($event)"
-      ></app-rated-favorite-beers>
-    </div>
-
-    <!-- Grid Layout -->
-    <div class="dashboard-grid">
-      <!-- Statistics Section -->
-      <div class="grid-item statistics">
-        <app-statistics [userStats]="userStats"></app-statistics>
+    <!-- Main asymmetric grid -->
+    <div class="main-grid">
+      <div class="grid-item rated-favorite-beers">
+        <app-rated-favorite-beers
+          [ratedBeers]="ratedBeers"
+          [favoriteBeers]="favoriteBeers"
+          [loading]="beersLoading"
+          (removeRating)="removeBeerRating($event)"
+          (removeFavorite)="removeFavoriteBeer($event)"
+        ></app-rated-favorite-beers>
       </div>
 
-      <!-- Leaderboard -->
+      <div class="grid-item achievements span-2 row-2">
+        <app-achievements-section [userProfile]="userProfile!" *ngIf="userProfile"></app-achievements-section>
+      </div>
+
       <div class="grid-item leaderboard">
         <app-leaderboard
           [globalLeaderboard]="globalLeaderboard"
@@ -51,14 +76,12 @@
         ></app-leaderboard>
       </div>
 
-      <!-- Challenges -->
       <div class="grid-item challenges">
         <app-challenges></app-challenges>
       </div>
 
-      <!-- Achievements -->
-      <div class="grid-item achievements">
-        <app-achievements-section [userProfile]="userProfile!" *ngIf="userProfile"></app-achievements-section>
+      <div class="grid-item statistics span-2">
+        <app-statistics [userStats]="userStats"></app-statistics>
       </div>
     </div>
   </div>

@@ -14,13 +14,60 @@ $color-text-secondary: #a0a0a0;
 $color-tag-background: #333333;
 $color-hover: #424242;
 
+// NEW: a small amber ramp, used for gradients and glows instead of flat
+// single-color fills. Keeps everything anchored to $color-primary so a
+// future palette change still only requires editing one variable.
+$color-primary-light: #ffc166;
+$color-primary-dark: #e8920f;
+$color-amber-glow: rgba(255, 167, 38, 0.25);
+
+// NEW: medal tones, lifted from the achievement-card gradients that were
+// already the best-looking thing on the dashboard — reused intentionally
+// so "shiny/earned" things share one visual language site-wide.
+$color-bronze: #cd7f32;
+$color-bronze-light: #e6b17f;
+$color-silver: #c0c0c0;
+$color-silver-light: #e6e6e6;
+$color-gold: #ffd700;
+$color-gold-light: #ffec8b;
+
 // Border
 $border-radius: 4px;
+// NEW: a small scale instead of one flat value, so cards/badges/pills can
+// read as distinct elevation levels rather than uniform boxes.
+$border-radius-sm: 6px;
+$border-radius-md: 12px;
+$border-radius-lg: 20px;
+$border-radius-pill: 999px;
+
+// NEW: card surface tokens — a subtle gradient instead of a flat fill, plus
+// a hairline border that catches just enough light to separate cards from
+// the page background without needing a hard drop shadow everywhere.
+$surface-gradient: linear-gradient(145deg, #232323 0%, #1a1a1a 100%);
+$surface-border: 1px solid rgba(255, 255, 255, 0.06);
+$surface-border-hover: 1px solid rgba(255, 167, 38, 0.25);
+
+// NEW: elevation shadows — three levels instead of none, used to give the
+// dashboard depth (resting cards vs. hovered/active cards vs. the hero).
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+$shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+$shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.45);
+$shadow-glow: 0 0 32px rgba(255, 167, 38, 0.12);
 
 // Spacing
 $spacing-small: 0.5rem;
 $spacing-medium: 1rem;
 $spacing-large: 2rem;
+// NEW
+$spacing-xlarge: 3rem;
+
+// NEW: motion tokens, so entrance animations across the dashboard share
+// one consistent feel instead of each component inventing its own timing
+// (beer-details.component.ts already has slide-in/stagger animations —
+// this gives the dashboard a matching vocabulary).
+$transition-fast: 0.15s ease;
+$transition-base: 0.3s ease;
+$transition-slow: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 
 // Breakpoints
 $breakpoint-phone: 480px;
@@ -60,4 +107,18 @@ $breakpoint-extra-large-desktop: 1920px;
     }
 }
 
+@mixin card-surface($interactive: false) {
+    background: $surface-gradient;
+    border: $surface-border;
+    border-radius: $border-radius-md;
+    box-shadow: $shadow-sm;
+    transition: border-color $transition-base, box-shadow $transition-base, transform $transition-base;
 
+    @if $interactive {
+        &:hover {
+            border: $surface-border-hover;
+            box-shadow: $shadow-md;
+            transform: translateY(-2px);
+        }
+    }
+}

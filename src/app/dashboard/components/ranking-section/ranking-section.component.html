@@ -1,22 +1,3 @@
-<div class="current-rank-card" *ngIf="currentRank">
-  <div class="rank-header">
-    <div class="rank-icon">{{ currentRank.icon }}</div>
-    <div class="rank-info">
-      <h3>{{ currentRank.name }}</h3>
-      <p>Level {{ currentRank.level }}</p>
-    </div>
-  </div>
-  <div class="progress-info">
-    <mat-progress-bar
-      mode="determinate"
-      [value]="progress"
-    ></mat-progress-bar>
-    <p class="progress-text">
-      {{ remainingXP }} points to next rank
-    </p>
-  </div>
-</div>
-
 <mat-expansion-panel class="rank-progression">
   <mat-expansion-panel-header>
     <mat-panel-title>Rank Progression</mat-panel-title>
@@ -43,4 +24,3 @@
     </div>
   </div>
 </mat-expansion-panel>
-

@@ -1,41 +1,44 @@
+@import 'src/styles/_variables.scss';
+
 .rated-favorite-beers-container {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 1rem;
+    height: 100%;
 }
 
 .tabs-header {
     display: flex;
-    gap: 8px;
+    gap: 0.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 8px;
+    padding-bottom: 0.5rem;
+    flex-shrink: 0;
 }
 
 .tab-button {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 0.4rem;
     background: none;
     border: none;
-    color: #a0a0a0;
-    font-family: "Montserrat", sans-serif;
-    font-size: 14px;
-    padding: 8px 12px;
-    border-radius: 6px;
+    color: $color-text-secondary;
+    font-family: $font-family-primary;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: $border-radius-sm;
     cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition: background-color $transition-fast, color $transition-fast;
 
     &:hover {
         background-color: rgba(255, 255, 255, 0.05);
     }
 
     &.active {
-        color: #ffa726;
-        background-color: rgba(255, 167, 38, 0.1);
+        color: $color-primary;
+        background-color: $color-amber-glow;
     }
 
     .count {
-        color: inherit;
         opacity: 0.7;
     }
 }
@@ -46,36 +49,40 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 32px 16px;
-    color: #a0a0a0;
+    padding: 2rem 1rem;
+    color: $color-text-secondary;
     text-align: center;
 
     mat-icon {
-        font-size: 32px;
-        height: 32px;
-        width: 32px;
-        margin-bottom: 8px;
+        font-size: 28px;
+        height: 28px;
+        width: 28px;
+        margin-bottom: 0.5rem;
         opacity: 0.6;
     }
 
     .hint {
-        font-size: 12px;
+        font-size: 0.75rem;
         opacity: 0.7;
     }
 }
 
+// FIX: pagination (see component.ts) replaces the previous internal-scroll
+// approach — each page shows a fixed, manageable number of beers, so
+// thumbnails can be a readable size without the panel growing unbounded.
 .beers-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+    gap: 0.75rem;
+    min-height: 95px;
 }
 
 .beer-card {
     position: relative;
     background-color: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
+    border-radius: $border-radius-sm;
     overflow: hidden;
-    transition: transform 0.15s ease;
+    transition: transform $transition-fast;
 
     &:hover {
         transform: translateY(-2px);
@@ -88,21 +95,26 @@
     color: inherit;
 
     img {
+        // FIX: switched from `aspect-ratio: 1` to an explicit fixed height.
+        // aspect-ratio wasn't rendering reliably here (thumbnails collapsed to
+        // thin strips) — a fixed height + object-fit: cover is more
+        // predictable across browsers/renderers.
+        display: block;
         width: 100%;
-        aspect-ratio: 1;
+        height: 95px;
         object-fit: cover;
         background-color: rgba(255, 255, 255, 0.05);
     }
 }
 
 .beer-info {
-    padding: 8px;
+    padding: 0.5rem;
 
     h4 {
-        margin: 0 0 4px;
-        font-size: 13px;
+        margin: 0 0 0.25rem;
+        font-size: 0.75rem;
         font-weight: 600;
-        color: #e0e0e0;
+        color: $color-text-light;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -112,14 +124,38 @@
 .beer-rating {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 12px;
-    color: #ffa726;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    color: $color-primary;
 
     mat-icon {
-        font-size: 14px;
-        height: 14px;
-        width: 14px;
+        font-size: 12px;
+        height: 12px;
+        width: 12px;
+    }
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-shrink: 0;
+
+    .page-indicator {
+        font-size: 0.75rem;
+        color: $color-text-secondary;
+        min-width: 40px;
+        text-align: center;
+    }
+
+    button {
+        color: $color-text-secondary;
+
+        &:not([disabled]):hover {
+            color: $color-primary;
+        }
     }
 }
 
@@ -127,12 +163,27 @@
     position: absolute;
     top: 4px;
     right: 4px;
-    background-color: rgba(0, 0, 0, 0.5);
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    padding: 0 !important;
+    line-height: 22px !important;
+    background-color: rgba(0, 0, 0, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+
+    ::ng-deep .mat-mdc-button-touch-target {
+        width: 22px;
+        height: 22px;
+    }
 
     mat-icon {
-        font-size: 16px;
-        height: 16px;
-        width: 16px;
-        color: #e0e0e0;
+        font-size: 13px;
+        height: 13px;
+        width: 13px;
+        line-height: 13px;
+        color: $color-text-light;
     }
 }

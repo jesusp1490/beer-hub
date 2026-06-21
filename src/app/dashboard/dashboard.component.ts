@@ -236,6 +236,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
       })
   }
 
+  // NEW: handler for the hero avatar's file input — photo upload now lives
+  // exclusively in the hero, not duplicated in the sidebar.
+  onHeroFileSelected(event: Event): void {
+    const element = event.target as HTMLInputElement
+    if (element.files && element.files.length > 0) {
+      this.onUploadProfilePicture(element.files[0])
+      element.value = ""
+    }
+  }
+
   removeBeerRating(beerId: string): void {
     this.userService
       .getCurrentUser()

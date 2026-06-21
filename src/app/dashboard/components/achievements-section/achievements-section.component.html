@@ -1,7 +1,10 @@
 <div class="achievements-container">
-  <button (click)="toggleAllAchievements()" class="toggle-button">
-    {{ showAllAchievements ? 'Show Unlocked' : 'Show All' }}
-  </button>
+  <div class="achievements-header">
+    <h2>Achievements</h2>
+    <button (click)="toggleAllAchievements()" class="toggle-button">
+      {{ showAllAchievements ? 'Show Unlocked' : 'Show All' }}
+    </button>
+  </div>
 
   <div class="achievements-category" *ngFor="let category of ['Rating', 'Beer Type', 'Exploration']">
     <button class="category-toggle" (click)="toggleCategory(category)">
@@ -20,14 +23,13 @@
             [matTooltip]="getNextLevelDescription(achievement)">
 
           <div class="achievement-header">
-            <h3 class="achievement-title">{{ achievement.name }}</h3>
-            <div class="icons">
-              <span class="main-icon">{{ achievement.icon }}</span>
-              <span class="level-icon" *ngIf="achievement.currentLevel > 0">
-                {{ getLevelIcon(achievement.currentLevel) }}
-              </span>
-            </div>
+            <span class="main-icon">{{ achievement.icon }}</span>
+            <span class="level-badge" *ngIf="achievement.currentLevel > 0">
+              {{ getLevelIcon(achievement.currentLevel) }}
+            </span>
           </div>
+
+          <h3 class="achievement-title">{{ achievement.name }}</h3>
 
           <p class="achievement-description">
             {{ getCurrentLevelDescription(achievement) }}
@@ -47,4 +49,3 @@
     </div>
   </div>
 </div>
-

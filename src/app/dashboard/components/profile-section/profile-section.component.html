@@ -1,25 +1,4 @@
 <div class="profile-section-container">
-  <!-- Profile Picture and User Info -->
-  <div class="profile-picture-container">
-    <div class="profile-picture">
-      <img [src]="userProfile?.photoURL || 'assets/default-avatar.png'" alt="Profile Picture">
-    </div>
-    <button class="edit-picture-button" (click)="fileInput.click()">
-      <mat-icon>edit</mat-icon>
-    </button>
-    <input
-      #fileInput
-      type="file"
-      hidden
-      accept="image/*"
-      (change)="onFileSelected($event)"
-    >
-  </div>
-
-  <div class="user-info">
-    <h2 class="username">{{ userProfile?.username || 'Username' }}</h2>
-    <p class="rank-name">{{ userProfile?.rank?.name || 'Hop Private' }}</p>
-  </div>
 
   <!-- Profile Fields -->
   <div class="profile-fields">
@@ -55,7 +34,9 @@
     </div>
   </div>
 
-  <!-- Rank Card -->
+  <!-- Rank Card: now shows ONLY the full rank-progression list. The
+       current-rank summary card is removed from here too — it's the hero's
+       job now. See ranking-section.component.html for the matching cleanup. -->
   <app-ranking-section [userProfile]="userProfile"></app-ranking-section>
 
   <!-- Action Buttons -->
@@ -74,4 +55,3 @@
     </button>
   </div>
 </div>
-
