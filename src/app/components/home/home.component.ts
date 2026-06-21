@@ -1,45 +1,57 @@
-import { Component, OnInit, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { switchMap, takeUntil } from 'rxjs/operators';
 import { BeerService } from '../../services/beer.service';
 import { AuthService } from '../../services/auth.service';
 import { Beer } from '../beers/beers.interface';
 import { Brand } from '../country/brand.interface';
-import { Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+
+type HomeTab = 'best-rated' | 'favorites' | 'latest' | 'search-results';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit {
-  activeTab: 'best-rated' | 'favorites' | 'latest' | 'search-results' = 'best-rated';
-  bestRatedBeers$: Observable<Beer[]>;
-  popularBrands$: Observable<Brand[]>;
-  favoriteBeers$: Observable<Beer[]>;
-  latestBeers$: Observable<Beer[]>;
-  isLoggedIn$: Observable<boolean>;
+export class HomeComponent implements OnInit, OnDestroy {
+  activeTab: HomeTab = 'best-rated';
+  private lastBrowseTab: 'best-rated' | 'favorites' | 'latest' = 'best-rated';
+
+  bestRatedBeers: Beer[] = [];
+  popularBrands: Brand[] = [];
+  favoriteBeers: Beer[] = [];
+  latestBeers: Beer[] = [];
   filteredBeers: Beer[] = [];
-  isMobileView: boolean = false;
+
+  isLoadingBestRated = false;
+  isLoadingBrands = false;
+  isLoadingFavorites = false;
+  isLoadingLatest = false;
+
+  private favoritesLoaded = false;
+  private latestLoaded = false;
+
+  isMobileView = false;
 
   @ViewChild('searchResults') searchResultsElement: ElementRef | undefined;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private beerService: BeerService,
     private authService: AuthService,
     private router: Router
-  ) {
-    this.isLoggedIn$ = this.authService.isLoggedIn();
-    this.bestRatedBeers$ = this.beerService.getRandomBestRatedBeers();
-    this.popularBrands$ = this.beerService.getRandomPopularBrands();
-    this.latestBeers$ = this.beerService.getLatestBeers();
-    this.favoriteBeers$ = this.isLoggedIn$.pipe(
-      switchMap(isLoggedIn => isLoggedIn ? this.beerService.getUserFavoriteBeers() : this.beerService.getPopularFavoriteBeers())
-    );
-  }
+  ) {}
 
   ngOnInit(): void {
     this.checkScreenSize();
+    this.loadBestRated();
+    this.loadPopularBrands();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   @HostListener('window:resize', ['$event'])
@@ -51,10 +63,93 @@ export class HomeComponent implements OnInit {
     this.isMobileView = window.innerWidth < 768;
   }
 
+  private loadBestRated(): void {
+    this.isLoadingBestRated = true;
+    this.beerService.getRandomBestRatedBeers()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (beers) => {
+          this.bestRatedBeers = beers;
+          this.isLoadingBestRated = false;
+        },
+        error: (error) => {
+          console.error('Error loading best rated beers:', error);
+          this.bestRatedBeers = [];
+          this.isLoadingBestRated = false;
+        },
+      });
+  }
+
+  private loadPopularBrands(): void {
+    this.isLoadingBrands = true;
+    this.beerService.getRandomPopularBrands()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (brands) => {
+          this.popularBrands = brands;
+          this.isLoadingBrands = false;
+        },
+        error: (error) => {
+          console.error('Error loading popular brands:', error);
+          this.popularBrands = [];
+          this.isLoadingBrands = false;
+        },
+      });
+  }
+
+  private loadFavorites(): void {
+    if (this.favoritesLoaded) return;
+    this.isLoadingFavorites = true;
+    this.authService.isLoggedIn()
+      .pipe(
+        switchMap((isLoggedIn) =>
+          isLoggedIn ? this.beerService.getUserFavoriteBeers() : this.beerService.getPopularFavoriteBeers()
+        ),
+        takeUntil(this.destroy$),
+      )
+      .subscribe({
+        next: (beers) => {
+          this.favoriteBeers = beers;
+          this.favoritesLoaded = true;
+          this.isLoadingFavorites = false;
+        },
+        error: (error) => {
+          console.error('Error loading favorite beers:', error);
+          this.favoriteBeers = [];
+          this.isLoadingFavorites = false;
+        },
+      });
+  }
+
+  private loadLatest(): void {
+    if (this.latestLoaded) return;
+    this.isLoadingLatest = true;
+    this.beerService.getLatestBeers()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (beers) => {
+          this.latestBeers = beers;
+          this.latestLoaded = true;
+          this.isLoadingLatest = false;
+        },
+        error: (error) => {
+          console.error('Error loading latest beers:', error);
+          this.latestBeers = [];
+          this.isLoadingLatest = false;
+        },
+      });
+  }
+
   setActiveTab(tab: 'best-rated' | 'favorites' | 'latest'): void {
     this.activeTab = tab;
+    this.lastBrowseTab = tab;
+
     if (tab === 'best-rated') {
-      this.bestRatedBeers$ = this.beerService.getRandomBestRatedBeers();
+      this.loadBestRated();
+    } else if (tab === 'favorites') {
+      this.loadFavorites();
+    } else if (tab === 'latest') {
+      this.loadLatest();
     }
   }
 
@@ -62,6 +157,10 @@ export class HomeComponent implements OnInit {
     this.filteredBeers = results;
     this.activeTab = 'search-results';
     this.scrollToSearchResults();
+  }
+
+  backToBrowse(): void {
+    this.setActiveTab(this.lastBrowseTab);
   }
 
   scrollToSearchResults(): void {
@@ -80,15 +179,11 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/brands', brandId, 'beers']);
   }
 
-  getBeerTypeIcon(beerType: string): string {
-    return 'beer';
-  }
-
   refreshRandomBeers(): void {
-    this.bestRatedBeers$ = this.beerService.getRandomBestRatedBeers();
+    this.loadBestRated();
   }
 
   refreshRandomBrands(): void {
-    this.popularBrands$ = this.beerService.getRandomPopularBrands();
+    this.loadPopularBrands();
   }
 }

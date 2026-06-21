@@ -1,6 +1,6 @@
 <div class="filter-container">
   <h2>Search for your beer</h2>
-  <form [formGroup]="filtersForm" (ngSubmit)="applyFilters()">
+  <form [formGroup]="filtersForm">
     <div class="input-group">
       <input formControlName="searchTerm" placeholder="Search by name" class="form-control">
     </div>
@@ -36,15 +36,17 @@
     <div class="abv-range-container">
       <h3>ABV Range</h3>
       <label for="abvMin">Min ABV: {{ filtersForm.get('abvMin')?.value }}%</label>
-      <mat-slider min="0" max="20" step="0.1" [displayWith]="formatLabel">
+      <mat-slider min="0" max="20" step="0.1" discrete [displayWith]="formatLabel">
         <input matSliderThumb formControlName="abvMin">
       </mat-slider>
       <label for="abvMax">Max ABV: {{ filtersForm.get('abvMax')?.value }}%</label>
-      <mat-slider min="0" max="20" step="0.1" [displayWith]="formatLabel">
+      <mat-slider min="0" max="20" step="0.1" discrete [displayWith]="formatLabel">
         <input matSliderThumb formControlName="abvMax">
       </mat-slider>
     </div>
 
-    <button mat-raised-button color="primary" type="submit">Apply Filters</button>
+    <button type="button" class="clear-filters-button" (click)="clearFilters()">
+      Clear Filters
+    </button>
   </form>
 </div>

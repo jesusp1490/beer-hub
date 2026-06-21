@@ -26,6 +26,18 @@
     object-fit: cover;
 }
 
+// NEW: mobile fallback hero — previously mobile got NO hero at all (the
+// whole section was hidden to avoid autoplay video on mobile data/battery).
+// This keeps that same instinct (no video on mobile) but still shows the
+// headline, on a simple gradient instead of nothing.
+.hero-mobile {
+    height: 35vh;
+    background: linear-gradient(145deg, $color-card-background, $color-background-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .hero-content {
     position: relative;
     z-index: 1;
@@ -53,6 +65,18 @@
         max-width: 600px;
         margin: 0 auto;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+}
+
+.hero-mobile .hero-content {
+    background-color: transparent;
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    p {
+        font-size: 1rem;
     }
 }
 
@@ -89,6 +113,77 @@
             color: $color-secondary;
             margin-top: 1.5rem;
         }
+    }
+}
+
+// NEW: tabs for Best Rated / Favorites / Latest. Previously the component
+// supported all three but the template only ever rendered Best Rated —
+// these were entirely unreachable before.
+.browse-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.5rem;
+
+    button {
+        background: none;
+        border: none;
+        color: $color-text-secondary;
+        font-family: $font-family-primary;
+        font-weight: 600;
+        font-size: 0.95rem;
+        padding: 0.5rem 1rem;
+        border-radius: $border-radius;
+        cursor: pointer;
+        transition: background-color 0.2s, color 0.2s;
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        &.active {
+            color: $color-primary;
+            background-color: rgba(255, 167, 38, 0.1);
+        }
+    }
+}
+
+.loading-spinner {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+// NEW: back-to-browse + result count, shown above search results.
+// Previously there was no way back to browsing once a search ran.
+.search-results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+
+    .back-to-browse {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: none;
+        border: none;
+        color: $color-primary;
+        font-family: $font-family-primary;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        padding: 0.5rem 0;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    .result-count {
+        color: $color-text-secondary;
+        font-size: 0.85rem;
     }
 }
 
@@ -221,6 +316,22 @@
 
     .main-content {
         padding: 1rem;
+    }
+
+    .browse-tabs {
+        overflow-x: auto;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    .search-results-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
 
     .beer-grid,

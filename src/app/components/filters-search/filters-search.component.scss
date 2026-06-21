@@ -57,12 +57,13 @@
 
         .beer-types-accordion {
             font-family: $font-family-primary;
+
             .beer-types-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
                 gap: $spacing-small;
                 margin-top: $spacing-small;
-                
+
             }
         }
     }
@@ -79,6 +80,18 @@
             color: $color-secondary;
         }
 
+        // NEW: live min/max readout above the slider — the slider's own
+        // [displayWith] bubble only shows while actively dragging, so this
+        // gives a persistent at-a-glance value the rest of the time.
+        .abv-values {
+            display: flex;
+            justify-content: space-between;
+            font-family: $font-family-primary;
+            font-weight: 600;
+            font-size: $font-size-small;
+            color: $color-text-light;
+        }
+
         label {
             font-family: $font-family-primary;
             font-weight: 600;
@@ -86,25 +99,32 @@
             color: $color-text-light;
         }
 
-        .mat-slider {
+        .mat-slider,
+        mat-slider {
             width: 100%;
         }
     }
 
-    button[type="submit"] {
+    // FIX: renamed from button[type="submit"] since the redundant "Apply
+    // Filters" submit button was replaced with a "Clear Filters" reset
+    // action (type="button") — filtering already auto-applies live via
+    // the form's debounced valueChanges, so a duplicate apply button did
+    // nothing the form wasn't already doing.
+    .clear-filters-button {
         font-family: $font-family-primary;
         font-weight: 700;
-        background-color: $color-primary;
-        color: $color-background-dark;
-        border: none;
+        background-color: transparent;
+        color: $color-primary;
+        border: 1px solid $color-primary;
         padding: $spacing-medium $spacing-large;
         font-size: $font-size-base;
         border-radius: $border-radius;
         cursor: pointer;
-        transition: background-color 0.3s, transform 0.1s;
+        transition: background-color 0.3s, color 0.3s, transform 0.1s;
 
         &:hover {
-            background-color: $color-secondary;
+            background-color: $color-primary;
+            color: $color-background-dark;
         }
 
         &:active {
@@ -167,6 +187,21 @@
 
     .mat-mdc-checkbox .mdc-form-field {
         color: $color-text-light !important;
+    }
+
+    // NEW: theme the dual-thumb range slider to match the rest of the
+    // filter sidebar's amber palette — Material's default slider uses its
+    // theme's primary color otherwise, which wouldn't match.
+    .mat-mdc-slider {
+        --mdc-slider-handle-color: #{$color-primary};
+        --mdc-slider-focus-handle-color: #{$color-primary};
+        --mdc-slider-hover-handle-color: #{$color-primary};
+        --mdc-slider-active-track-color: #{$color-primary};
+        --mdc-slider-inactive-track-color: rgba(255, 255, 255, 0.2);
+        --mdc-slider-with-tick-marks-active-container-color: #{$color-background-dark};
+        --mdc-slider-with-tick-marks-inactive-container-color: #{$color-primary};
+        --mdc-slider-label-container-color: #{$color-primary};
+        --mdc-slider-label-label-text-color: #{$color-background-dark};
     }
 }
 
