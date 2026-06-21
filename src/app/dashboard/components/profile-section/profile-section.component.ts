@@ -143,6 +143,7 @@ export class ProfileSectionComponent implements OnInit, OnChanges {
   onChangePassword(): void {
     const dialogRef = this.dialog.open(ChangePasswordComponent, {
       width: "400px",
+      panelClass: "app-dialog-dark",
       data: { userId: this.userProfile?.uid },
     })
 
@@ -156,6 +157,7 @@ export class ProfileSectionComponent implements OnInit, OnChanges {
   onRequestNewBeer(): void {
     const dialogRef = this.dialog.open(NewBeerRequestComponent, {
       width: "500px",
+      panelClass: "app-dialog-dark",
     })
 
     dialogRef.afterClosed().subscribe((result) => {

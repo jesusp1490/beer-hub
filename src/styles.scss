@@ -59,3 +59,9 @@ body {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.app-dialog-dark {
+    --mdc-dialog-container-color: #1e1e1e;
+    --mdc-dialog-subhead-color: #ffa726;
+    --mdc-dialog-supporting-text-color: #e0e0e0;
+}
