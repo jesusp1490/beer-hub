@@ -1,18 +1,19 @@
-import { Component, OnInit, HostListener } from "@angular/core"
+import { Component, OnInit, OnDestroy, HostListener } from "@angular/core"
 import { Router } from "@angular/router"
 import { AuthService } from "../../services/auth.service"
-import { Observable } from "rxjs"
+import { Observable, Subject } from "rxjs"
 
 @Component({
   selector: "app-navbar",
   templateUrl: "./navbar.component.html",
   styleUrls: ["./navbar.component.scss"],
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
   user$: Observable<any>
-  selectedLanguage = "en"
   isMenuOpen = false
   isUserMenuOpen = false
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     private authService: AuthService,
@@ -22,9 +23,12 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.user$.subscribe((user) => {
-      console.log("Current user:", user)
-    })
+
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   goToSignUp(): void {
@@ -49,14 +53,6 @@ export class NavbarComponent implements OnInit {
       this.closeMenu()
       this.closeUserMenu()
     })
-  }
-
-  changeLanguage(event: Event): void {
-    const select = event.target as HTMLSelectElement
-    const language = select.value
-    this.selectedLanguage = language
-
-    console.log(`Language changed to: ${language}`)
   }
 
   toggleMenu(): void {
@@ -91,4 +87,3 @@ export class NavbarComponent implements OnInit {
     }
   }
 }
-

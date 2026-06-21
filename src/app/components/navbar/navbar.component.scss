@@ -2,10 +2,11 @@
 
 .navbar {
   background-color: $color-background-dark;
-  padding: 0.2rem;
+  padding: 0.6rem 0.2rem;
   font-family: $font-family-primary;
   position: relative;
   z-index: 1000;
+  box-shadow: $shadow-sm;
 }
 
 .navbar-container {
@@ -81,7 +82,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: $color-background-dark;
+    background: $surface-gradient;
     padding: 5rem $spacing-medium $spacing-medium;
     z-index: 5;
     overflow-y: auto;
@@ -125,11 +126,31 @@
   color: $color-text-light;
   text-decoration: none;
   font-size: $font-size-base;
-  transition: color 0.3s ease;
+  font-weight: 600;
+  position: relative;
+  transition: color $transition-fast;
+
+  // NEW: a small animated underline on hover/active instead of just a
+  // color change — small touch consistent with the rest of the rework's
+  // "things should feel alive" direction.
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0;
+    height: 2px;
+    background: $color-primary;
+    transition: width $transition-fast;
+  }
 
   &:hover,
   &.active {
     color: $color-primary;
+
+    &::after {
+      width: 100%;
+    }
   }
 
   @media (max-width: 768px) {
@@ -154,17 +175,28 @@
   }
 }
 
+// FIX: previously a flat $color-secondary fill — now matches the
+// gradient/lift language used everywhere else in the rework.
 .navbar-button {
-  background-color: $color-secondary;
-  color: $color-text-light;
+  background: linear-gradient(135deg, $color-primary-light, $color-primary-dark);
+  color: #1a1a1a;
+  font-weight: 700;
   border: none;
-  padding: $spacing-small $spacing-medium;
-  border-radius: $border-radius;
+  padding: 0.6rem 1.3rem;
+  border-radius: $border-radius-pill;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-size: 0.9rem;
+  transition: transform $transition-fast, box-shadow $transition-fast;
 
   &:hover {
-    background-color: $color-primary;
+    transform: translateY(-1px);
+    box-shadow: $shadow-sm;
+  }
+
+  &.navbar-button-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: $color-text-light;
   }
 
   @media (max-width: 768px) {
@@ -180,6 +212,12 @@
   border-radius: 50%;
   cursor: pointer;
   object-fit: cover;
+  border: 2px solid rgba(255, 167, 38, 0.3);
+  transition: border-color $transition-fast;
+
+  &:hover {
+    border-color: $color-primary;
+  }
 }
 
 @media (min-width: 769px) and (max-width: 1023px) {
@@ -228,26 +266,33 @@
   position: relative;
 }
 
+// FIX: previously a flat $color-background-dark dropdown with a generic
+// shadow — restyled to match the card-surface language used everywhere
+// else in the rework.
 .user-dropdown {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 8px);
   right: 0;
-  background-color: $color-background-dark;
-  border-radius: $border-radius;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: $surface-gradient;
+  border: $surface-border;
+  border-radius: $border-radius-sm;
+  box-shadow: $shadow-md;
   z-index: 1000;
-  min-width: 150px;
+  min-width: 160px;
+  overflow: hidden;
 }
 
 .dropdown-item {
   display: block;
-  padding: $spacing-small $spacing-medium;
+  padding: 0.7rem 1rem;
   color: $color-text-light;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-size: 0.9rem;
+  transition: background-color $transition-fast, color $transition-fast;
 
   &:hover {
-    background-color: $color-primary;
+    background-color: rgba(255, 167, 38, 0.1);
+    color: $color-primary;
   }
 }

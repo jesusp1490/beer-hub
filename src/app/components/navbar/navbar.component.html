@@ -4,7 +4,7 @@
       <a class="navbar-logo" routerLink="/">
         <img src="https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2FBH-logo.webp?alt=media&token=73720b7f-bb1e-444f-82e4-919d064cd7d6" alt="BeerHub Logo">
       </a>
-      
+
       <button class="hamburger-menu" (click)="toggleMenu()" [class.active]="isMenuOpen">
         <span></span>
         <span></span>
@@ -22,10 +22,10 @@
         <div class="navbar-actions">
           <ng-container *ngIf="user$ | async as user; else loggedOut">
             <div class="user-menu">
-              <img 
-                [src]="user.photoURL || 'assets/user-baseImg.png'" 
-                class="user-avatar" 
-                (click)="toggleUserMenu()" 
+              <img
+                [src]="user.photoURL || 'assets/user-baseImg.png'"
+                class="user-avatar"
+                (click)="toggleUserMenu()"
                 alt="User Avatar"
               />
               <div class="user-dropdown" *ngIf="isUserMenuOpen">
@@ -35,7 +35,7 @@
             </div>
           </ng-container>
           <ng-template #loggedOut>
-            <button class="navbar-button" (click)="goToLogin()">Log In</button>
+            <button class="navbar-button navbar-button-secondary" (click)="goToLogin()">Log In</button>
             <button class="navbar-button" (click)="goToSignUp()">Sign Up</button>
           </ng-template>
         </div>
@@ -43,4 +43,3 @@
     </div>
   </div>
 </nav>
-

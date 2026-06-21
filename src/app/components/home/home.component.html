@@ -1,29 +1,36 @@
 <div class="home-container">
-  <!-- FIX: mobile users previously got NO hero at all (the whole section
-       was hidden via *ngIf="!isMobileView", presumably to avoid autoplay
-       video on mobile data/battery — reasonable instinct, but it meant
-       zero hero messaging on mobile). Now mobile gets a lightweight
-       static-image version of the same hero instead of nothing. -->
+
   <section class="hero" *ngIf="!isMobileView">
     <video autoplay loop muted playsinline class="hero-video">
       <source src="../../../assets/Hero-video.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
+    <div class="hero-gradient"></div>
     <div class="hero-content">
+      <div class="hero-eyebrow">BeerHub &middot; Global craft beer discovery</div>
       <h1>Discover Your Perfect Beer</h1>
       <p>Explore our vast collection of craft beers from around the world</p>
+      <div class="hero-ctas">
+        <a routerLink="/map" class="btn-primary">Explore the map</a>
+        <button class="btn-secondary" (click)="scrollToFilters()">Search beers</button>
+      </div>
     </div>
   </section>
 
   <section class="hero hero-mobile" *ngIf="isMobileView">
     <div class="hero-content">
+      <div class="hero-eyebrow">BeerHub</div>
       <h1>Discover Your Perfect Beer</h1>
       <p>Explore our vast collection of craft beers from around the world</p>
+      <div class="hero-ctas">
+        <a routerLink="/map" class="btn-primary">Explore the map</a>
+        <button class="btn-secondary" (click)="scrollToFilters()">Search beers</button>
+      </div>
     </div>
   </section>
 
   <div class="content-wrapper">
-    <aside class="filter-sidebar" [class.mobile-filter]="isMobileView">
+    <aside class="filter-sidebar" [class.mobile-filter]="isMobileView" #filterSidebar>
       <app-filter-search (searchResults)="onSearch($event)" (searchPerformed)="scrollToSearchResults()" (filtersCleared)="backToBrowse()"></app-filter-search>
     </aside>
 
@@ -56,30 +63,45 @@
           </svg>
         </div>
 
-        <div class="beer-grid" *ngIf="!isLoadingBestRated">
-          <div *ngIf="bestRatedBeers.length === 0" class="no-results">
+        <ng-container *ngIf="!isLoadingBestRated">
+          <div *ngIf="!featuredBeer" class="no-results">
             <p>No rated beers yet.</p>
           </div>
-          <div *ngFor="let beer of bestRatedBeers" class="beer-card" (click)="onViewBeerDetails(beer.id)">
-            <div class="beer-label">
-              <img [src]="beer.beerLabelUrl" [alt]="beer.name">
+
+          <a *ngIf="featuredBeer" class="featured-beer" [routerLink]="['/beers', featuredBeer.id]">
+            <div class="beer-img">
+              <img [src]="featuredBeer.beerLabelUrl" [alt]="featuredBeer.name">
             </div>
-            <div class="beer-info">
-              <h3>{{ beer.name }}</h3>
-              <!-- FIX: previously {{ beer.brandId }} — a raw Firestore
-                   document ID, not a readable name. -->
-              <p class="brand">{{ beer.brand }}</p>
-              <p class="beer-type">
-                <i class="fas fa-beer"></i>
-                {{ beer.beerType }}
-              </p>
-              <div class="rating">
-                <i class="fas fa-star"></i>
-                <span>{{ beer.averageRating | number:'1.1-1' }}</span>
+            <div class="featured-beer-info">
+              <div class="medal-badge">🏆 #1 Top rated</div>
+              <h3>{{ featuredBeer.name }}</h3>
+              <p class="brand">{{ featuredBeer.brand }}</p>
+              <p class="beer-type"><i class="fas fa-beer"></i> {{ featuredBeer.beerType }}</p>
+              <div class="rating"><i class="fas fa-star"></i> {{ featuredBeer.averageRating | number:'1.1-1' }} average</div>
+            </div>
+          </a>
+
+          <div class="beer-grid">
+            <div *ngFor="let beer of restOfBestRated; let i = index" class="beer-card" (click)="onViewBeerDetails(beer.id)">
+              <div class="beer-label">
+                <span class="rank-pill">#{{ i + 2 }}</span>
+                <img [src]="beer.beerLabelUrl" [alt]="beer.name">
+              </div>
+              <div class="beer-info">
+                <h3>{{ beer.name }}</h3>
+                <p class="brand">{{ beer.brand }}</p>
+                <p class="beer-type">
+                  <i class="fas fa-beer"></i>
+                  {{ beer.beerType }}
+                </p>
+                <div class="rating">
+                  <i class="fas fa-star"></i>
+                  <span>{{ beer.averageRating | number:'1.1-1' }}</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </ng-container>
       </section>
 
       <!-- Favorites -->
@@ -162,7 +184,7 @@
         </div>
       </section>
 
-      <!-- Popular Brands: shown alongside every browse tab, not search results -->
+      <!-- Popular Brands -->
       <section class="popular-brands" *ngIf="activeTab !== 'search-results'">
         <div class="section-header">
           <h2>Popular Brands</h2>
@@ -194,14 +216,9 @@
       <!-- Search results -->
       <div #searchResults *ngIf="activeTab === 'search-results'">
         <div class="search-results-header">
-          <!-- NEW: previously there was no way back to browsing once a
-               search ran — only option was running another search or
-               reloading the page. -->
           <button class="back-to-browse" (click)="backToBrowse()">
             <i class="fas fa-arrow-left"></i> Back to browse
           </button>
-          <!-- NEW: a result count costs nothing and helps users gauge
-               whether their filter was too narrow. -->
           <span class="result-count">
             {{ filteredBeers.length }} beer{{ filteredBeers.length === 1 ? '' : 's' }} found
           </span>

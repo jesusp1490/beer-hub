@@ -16,6 +16,7 @@ type HomeTab = 'best-rated' | 'favorites' | 'latest' | 'search-results';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   activeTab: HomeTab = 'best-rated';
+
   private lastBrowseTab: 'best-rated' | 'favorites' | 'latest' = 'best-rated';
 
   bestRatedBeers: Beer[] = [];
@@ -34,7 +35,11 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   isMobileView = false;
 
+  featuredBeer: Beer | null = null;
+  restOfBestRated: Beer[] = [];
+
   @ViewChild('searchResults') searchResultsElement: ElementRef | undefined;
+  @ViewChild('filterSidebar') filterSidebarElement: ElementRef | undefined;
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -70,11 +75,15 @@ export class HomeComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (beers) => {
           this.bestRatedBeers = beers;
+          this.featuredBeer = beers.length > 0 ? beers[0] : null;
+          this.restOfBestRated = beers.slice(1);
           this.isLoadingBestRated = false;
         },
         error: (error) => {
           console.error('Error loading best rated beers:', error);
           this.bestRatedBeers = [];
+          this.featuredBeer = null;
+          this.restOfBestRated = [];
           this.isLoadingBestRated = false;
         },
       });
@@ -177,6 +186,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   onViewBrandBeers(brandId: string): void {
     this.router.navigate(['/brands', brandId, 'beers']);
+  }
+
+  scrollToFilters(): void {
+    this.filterSidebarElement?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   refreshRandomBeers(): void {

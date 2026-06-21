@@ -9,8 +9,12 @@
 
 .hero {
     position: relative;
-    height: 60vh;
+    height: 64vh;
+    min-height: 420px;
     overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
 }
 
 .hero-video {
@@ -26,12 +30,18 @@
     object-fit: cover;
 }
 
-// NEW: mobile fallback hero — previously mobile got NO hero at all (the
-// whole section was hidden to avoid autoplay video on mobile data/battery).
-// This keeps that same instinct (no video on mobile) but still shows the
-// headline, on a simple gradient instead of nothing.
+.hero-gradient {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(to bottom,
+            rgba(18, 18, 18, 0.15) 0%,
+            rgba(18, 18, 18, 0.55) 55%,
+            rgba(18, 18, 18, 0.97) 100%);
+}
+
 .hero-mobile {
-    height: 35vh;
+    height: 38vh;
     background: linear-gradient(145deg, $color-card-background, $color-background-dark);
     display: flex;
     align-items: center;
@@ -40,44 +50,90 @@
 
 .hero-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    height: 100%;
     text-align: center;
     color: white;
-    background-color: rgba(0, 0, 0, 0.5);
-    padding: 2rem;
+    padding: 0 2rem 3rem;
+    max-width: 700px;
+}
 
-    h1 {
-        font-family: $font-family-primary;
-        font-weight: 700;
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    }
+.hero-eyebrow {
+    color: $color-primary-light;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+}
 
-    p {
-        font-family: $font-family-primary;
-        font-size: 1.2rem;
-        max-width: 600px;
-        margin: 0 auto;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+.hero-content h1 {
+    font-family: $font-family-primary;
+    font-weight: 800;
+    font-size: 3rem;
+    margin: 0 0 0.75rem;
+    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+.hero-content p {
+    font-family: $font-family-primary;
+    font-size: 1.05rem;
+    max-width: 520px;
+    margin: 0 auto 1.5rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+// NEW: two real CTAs instead of just passive hero text.
+.hero-ctas {
+    display: flex;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, $color-primary-light, $color-primary-dark);
+    color: #1a1a1a;
+    font-weight: 700;
+    padding: 0.8rem 1.6rem;
+    border-radius: $border-radius-pill;
+    box-shadow: $shadow-md;
+    border: none;
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: inline-block;
+    transition: transform $transition-fast, box-shadow $transition-fast;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadow-lg;
     }
 }
 
-.hero-mobile .hero-content {
-    background-color: transparent;
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #fff;
+    font-weight: 600;
+    padding: 0.8rem 1.6rem;
+    border-radius: $border-radius-pill;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color $transition-fast;
 
-    h1 {
-        font-size: 1.8rem;
+    &:hover {
+        background: rgba(255, 255, 255, 0.16);
     }
+}
 
-    p {
-        font-size: 1rem;
-    }
+.hero-mobile .hero-content h1 {
+    font-size: 1.8rem;
+}
+
+.hero-mobile .hero-content p {
+    font-size: 0.95rem;
 }
 
 .content-wrapper {
@@ -96,29 +152,19 @@
     padding: 2rem;
     width: 100%;
 
-    .best-rated {
-        h2 {
-            font-family: $font-family-primary;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: $color-secondary;
-        }
+    .best-rated h2,
+    .popular-brands h2 {
+        font-family: $font-family-primary;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: $color-text-light;
     }
 
-    .popular-brands {
-        h2 {
-            font-family: $font-family-primary;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: $color-secondary;
-            margin-top: 1.5rem;
-        }
+    .popular-brands h2 {
+        margin-top: 1.5rem;
     }
 }
 
-// NEW: tabs for Best Rated / Favorites / Latest. Previously the component
-// supported all three but the template only ever rendered Best Rated —
-// these were entirely unreachable before.
 .browse-tabs {
     display: flex;
     gap: 0.5rem;
@@ -131,12 +177,12 @@
         border: none;
         color: $color-text-secondary;
         font-family: $font-family-primary;
-        font-weight: 600;
+        font-weight: 700;
         font-size: 0.95rem;
         padding: 0.5rem 1rem;
-        border-radius: $border-radius;
+        border-radius: $border-radius-pill;
         cursor: pointer;
-        transition: background-color 0.2s, color 0.2s;
+        transition: background-color $transition-fast, color $transition-fast;
 
         &:hover {
             background-color: rgba(255, 255, 255, 0.05);
@@ -155,8 +201,6 @@
     padding: 2rem;
 }
 
-// NEW: back-to-browse + result count, shown above search results.
-// Previously there was no way back to browsing once a search ran.
 .search-results-header {
     display: flex;
     align-items: center;
@@ -187,26 +231,113 @@
     }
 }
 
+.featured-beer {
+    display: flex;
+    gap: 1.5rem;
+    background: $surface-gradient;
+    border: 1px solid rgba(255, 215, 0, 0.25);
+    border-radius: $border-radius-lg;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: $shadow-lg, 0 0 32px rgba(255, 215, 0, 0.08);
+    align-items: center;
+    text-decoration: none;
+    color: $color-text-light;
+    cursor: pointer;
+    transition: transform $transition-fast;
+
+    &:hover {
+        transform: translateY(-3px);
+    }
+
+    .beer-img {
+        width: 130px;
+        height: 170px;
+        border-radius: $border-radius-md;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: linear-gradient(160deg, #2a2a2a, #161616);
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+}
+
+.featured-beer-info {
+    h3 {
+        margin: 0 0 0.3rem;
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: $color-text-light;
+    }
+
+    .brand {
+        color: $color-primary-light;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .beer-type {
+        color: $color-text-secondary;
+        font-size: 0.85rem;
+        margin-bottom: 0.4rem;
+
+        i {
+            margin-right: 0.4rem;
+        }
+    }
+
+    .rating {
+        color: $color-gold;
+        font-weight: 700;
+        font-size: 0.95rem;
+
+        i {
+            margin-right: 0.3rem;
+        }
+    }
+}
+
+.medal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: linear-gradient(135deg, $color-gold, $color-gold-light);
+    color: #4a3800;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 0.3rem 0.7rem;
+    border-radius: $border-radius-pill;
+    margin-bottom: 0.5rem;
+}
+
 .beer-grid,
 .brand-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
+    gap: 1.2rem;
     width: 100%;
 }
 
 .beer-card,
 .brand-card {
-    background-color: $color-tag-background;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: $surface-gradient;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: $border-radius-md;
+    box-shadow: $shadow-sm;
     overflow: hidden;
-    transition: transform 0.3s;
+    transition: transform $transition-fast, box-shadow $transition-fast, border-color $transition-fast;
     cursor: pointer;
     width: 100%;
 
     &:hover {
-        transform: translateY(-5px);
+        transform: translateY(-4px);
+        box-shadow: $shadow-md;
+        border-color: rgba(255, 167, 38, 0.25);
     }
 }
 
@@ -217,6 +348,7 @@
     .beer-label {
         height: 200px;
         overflow: hidden;
+        position: relative;
 
         img {
             width: 100%;
@@ -231,6 +363,7 @@
         h3 {
             margin: 0 0 0.5rem;
             font-size: 1.1rem;
+            font-weight: 700;
         }
 
         .brand,
@@ -253,13 +386,29 @@
             display: flex;
             align-items: center;
             font-size: 0.9rem;
-            color: #f3b200;
+            color: $color-gold;
+            font-weight: 600;
 
             i {
                 margin-right: 0.3rem;
             }
         }
     }
+}
+
+// NEW: small rank badge (#2, #3...) on the regular grid cards, following
+// straight on from the featured #1 card above.
+.rank-pill {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.65);
+    color: $color-text-light;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.55rem;
+    border-radius: $border-radius-pill;
 }
 
 .brand-card {
@@ -269,6 +418,7 @@
         justify-content: center;
         align-items: center;
         padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
 
         img {
             max-width: 100%;
@@ -284,6 +434,7 @@
         h3 {
             margin: 0 0 0.5rem;
             font-size: 1.1rem;
+            font-weight: 700;
         }
 
         p {
@@ -332,6 +483,11 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
+    }
+
+    .featured-beer {
+        flex-direction: column;
+        text-align: center;
     }
 
     .beer-grid,
