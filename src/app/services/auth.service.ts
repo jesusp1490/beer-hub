@@ -5,6 +5,7 @@ import firebase from "firebase/compat/app"
 import { Observable, of } from "rxjs"
 import { switchMap, map, catchError, take } from "rxjs/operators"
 import { Router } from "@angular/router"
+import { Timestamp } from "@angular/fire/firestore"
 
 export interface User {
   uid: string
@@ -15,17 +16,20 @@ export interface User {
   country?: string
 }
 
+export interface SignUpData {
+  firstName?: string
+  lastName?: string
+  username?: string
+  country?: string
+  dob?: Timestamp | null
+}
+
 @Injectable({
   providedIn: "root",
 })
 export class AuthService {
   user$: Observable<User | null>
 
-  // NOTE: this is a client-side-only soft limiter for UX (e.g. disabling a
-  // sign-in button briefly after repeated failures). It resets on page
-  // refresh and is trivially bypassable, so it is NOT a security control.
-  // Real brute-force protection belongs server-side (Firebase Auth's built-in
-  // abuse protections, or App Check / a Cloud Function with persisted state).
   private lastAttempt = 0
   private attemptLimit = 3
   private readonly COOLDOWN_TIME = 60000 // 1 minute
@@ -129,11 +133,74 @@ export class AuthService {
     return true
   }
 
-  async signUp(email: string, password: string, userData: any): Promise<firebase.auth.UserCredential> {
+  private buildDefaultUserProfile(signUpData: SignUpData = {}): Record<string, any> {
+    const registrationDate = Timestamp.now()
+
+    return {
+      firstName: signUpData.firstName ?? null,
+      lastName: signUpData.lastName ?? null,
+      country: signUpData.country ?? null,
+      dob: signUpData.dob ?? null,
+
+      rank: {
+        name: "Beer Recruit",
+        icon: "🍺",
+        level: "I",
+        points: 0,
+        progress: 0,
+        pointsToNextRank: 19,
+      },
+
+      achievements: {},
+      level: 1,
+      progress: 0,
+      statistics: {
+        totalBeersRated: 0,
+        countriesExplored: [],
+        beerTypeStats: {},
+        mostActiveDay: { date: "", count: 0 },
+        registrationDate,
+        averageRating: 0,
+        favoriteBrewery: "",
+        points: 0,
+        lastRatingDate: registrationDate,
+        uniqueStylesCount: 0,
+        uniqueCountriesCount: 0,
+        totalReviews: 0,
+        totalReviewLikes: 0,
+        newBeerRequests: 0,
+        detailedReviews: 0,
+        reputationPoints: 0,
+        continentsExplored: [],
+        europeanCountriesExplored: [],
+        northAmericanCountriesExplored: [],
+        southAmericanCountriesExplored: [],
+        asianBeersRated: 0,
+        africanBeersRated: 0,
+        oceaniaBeersRated: 0,
+        highAltitudeCountriesExplored: [],
+        rareBeersRated: 0,
+        craftBeersRated: 0,
+        highHopBeersRated: 0,
+        totalBadgesEarned: 0,
+      },
+    }
+  }
+
+  async signUp(email: string, password: string, signUpData: SignUpData & { username?: string }): Promise<firebase.auth.UserCredential> {
     this.validateEmailAndPassword(email, password)
     try {
       const result = await this.afAuth.createUserWithEmailAndPassword(email, password)
-      await this.updateUserData(result.user, userData)
+      // Email signups are always "new" — pass isNewUser: true explicitly
+      // rather than relying on additionalUserInfo here, since that's
+      // really meant for federated providers like Google.
+      await this.updateUserData(result.user, signUpData, true)
+
+      // NEW: previously emailVerified was written as `false` and just left
+      // that way forever — no verification email was ever actually sent,
+      // so there was no path to ever become verified.
+      await result.user?.sendEmailVerification()
+
       return result
     } catch (error) {
       console.error("Error in signUp:", error)
@@ -165,7 +232,8 @@ export class AuthService {
     try {
       const provider = new firebase.auth.GoogleAuthProvider()
       const credential = await this.afAuth.signInWithPopup(provider)
-      await this.updateUserData(credential.user)
+      const isNewUser = credential.additionalUserInfo?.isNewUser ?? false
+      await this.updateUserData(credential.user, {}, isNewUser)
       return credential
     } catch (error) {
       console.error("Error signing in with Google:", error)
@@ -173,18 +241,29 @@ export class AuthService {
     }
   }
 
-  private async updateUserData(user: firebase.User | null, additionalData: any = {}): Promise<void> {
+  private async updateUserData(
+    user: firebase.User | null,
+    additionalData: SignUpData & { username?: string } = {},
+    isNewUser = false,
+  ): Promise<void> {
     if (!user) return
 
-    const userRef: AngularFirestoreDocument<User> = this.firestore.doc(`users/${user.uid}`)
-    const userData = this.sanitizeUserData({
+    const userRef: AngularFirestoreDocument = this.firestore.doc(`users/${user.uid}`)
+    const fallbackUsername = user.email ? user.email.split("@")[0] : `user${user.uid.slice(0, 6)}`
+
+    const baseData: Record<string, any> = {
       uid: user.uid,
       email: user.email,
       displayName: user.displayName,
       photoURL: user.photoURL,
       emailVerified: user.emailVerified,
+      username: additionalData.username || fallbackUsername,
       ...additionalData,
-    })
+    }
+
+    const fullData = isNewUser ? { ...this.buildDefaultUserProfile(additionalData), ...baseData } : baseData
+
+    const userData = this.sanitizeUserData(fullData)
 
     if (user.providerData[0]?.providerId === "google.com" && user.photoURL) {
       userData["googlePhotoURL"] = user.photoURL
@@ -203,12 +282,6 @@ export class AuthService {
     )
   }
 
-  // FIX: previously this manually cached the ID token in localStorage and
-  // refreshed it by hand. Firebase Auth already manages token lifecycle
-  // internally (caching + automatic refresh), and localStorage is more
-  // exposed to XSS than Firebase's own internal storage. We now just ask
-  // Firebase for a token directly — `getIdToken()` returns the cached token
-  // if still valid, or refreshes it transparently if not.
   async getAuthToken(): Promise<string | null> {
     const user = await this.afAuth.currentUser
     if (!user) return null
@@ -255,16 +328,12 @@ export class AuthService {
     })
   }
 
-  // FIX: this now also updates Firestore via updateUserData so the profile
-  // doc and the Auth login email stay in sync (see the corresponding fix in
-  // profile-section/dashboard for routing the "email" field through here
-  // instead of a generic Firestore field update).
   async updateEmail(newEmail: string): Promise<void> {
     const user = await this.afAuth.currentUser
     if (user) {
       try {
         await user.updateEmail(newEmail)
-        await this.updateUserData(user, { email: newEmail })
+        await this.updateUserData(user, {}, false)
       } catch (error) {
         console.error("Error updating email:", error)
         throw error

@@ -131,8 +131,9 @@ export class UserService {
       level: "I",
       points: 0,
       progress: 0,
-      name: "Novice",
-      pointsToNextRank: 10,
+      name: "Beer Recruit",
+      icon: "🍺",
+      pointsToNextRank: 19,
     }
   }
 
@@ -185,10 +186,6 @@ export class UserService {
       )
   }
 
-  // FIX: previously fired one Firestore read PER favorited beer (N+1 reads).
-  // Firestore's `in` query lets us fetch up to 30 documents by ID in a single
-  // query, so we batch favorite IDs into chunks of 30 instead. For a typical
-  // dashboard (a handful to a few dozen favorites) this turns N reads into 1-2.
   getUserFavoriteBeers(): Observable<FavoriteBeer[]> {
     return this.authService.user$.pipe(
       switchMap((user) => {
@@ -295,13 +292,6 @@ export class UserService {
     return points
   }
 
-  // FIX: previously this read the user doc, computed updated stats in JS, then
-  // wrote it back with a plain .update() — a classic read-then-write race.
-  // If two rating actions happen close together (e.g. rating a beer while an
-  // achievement check is also updating the doc), the second write could
-  // silently overwrite the first based on stale data. Wrapping the whole
-  // read+compute+write in a Firestore transaction guarantees the read and
-  // write are atomic relative to other writes to the same document.
   updateUserStatistics(userId: string, newRating: RatedBeer): Observable<void> {
     const userRef = this.firestore.doc(`users/${userId}`).ref
 
@@ -513,10 +503,6 @@ export class UserService {
     }
   }
 
-  // FIX: wrapped in a transaction so the rank read+write is atomic relative to
-  // other concurrent writes on the same user doc (e.g. addPoints firing at the
-  // same time). Previously this used valueChanges().pipe(take(1)) followed by
-  // a separate .update() call — also a read-then-write race.
   updateUserRank(userId: string, currentPoints?: number): Observable<UserRank> {
     const userRef = this.firestore.doc(`users/${userId}`).ref
 
@@ -568,9 +554,6 @@ export class UserService {
     )
   }
 
-  // NEW: country-scoped leaderboard, complementing the existing global one.
-  // Used by the dashboard's "Country" tab — previously LeaderboardComponent
-  // had a @Input for this but nothing ever populated it.
   getCountryLeaderboard(country: string): Observable<LeaderboardEntry[]> {
     if (!country) {
       return of([])
@@ -606,8 +589,6 @@ export class UserService {
     return Promise.resolve()
   }
 
-  // FIX: wrapped in a transaction — previously read-then-wrote the user doc
-  // outside a transaction, same race risk as addPoints/updateUserStatistics.
   recalculateUserPoints(userId: string): Observable<void> {
     const userRef = this.firestore.doc(`users/${userId}`).ref
 
@@ -639,9 +620,6 @@ export class UserService {
     )
   }
 
-  // FIX: wrapped in a transaction for the same reason as above. This is the
-  // method called every time a user rates a beer, requests a beer, etc., so
-  // it's also the one most likely to race against a concurrent action.
   addPoints(
     userId: string,
     action: "rate" | "request" | "add" | "review" | "challenge" | "achievement",

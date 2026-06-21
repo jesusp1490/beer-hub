@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AuthService } from '../../services/auth.service';
 import { MatInputModule } from '@angular/material/input';
@@ -38,6 +38,7 @@ export class LogInComponent implements OnInit {
   constructor(
     private afAuth: AngularFireAuth,
     private router: Router,
+    private route: ActivatedRoute,
     private authService: AuthService,
     private snackBar: MatSnackBar,
     private matIconRegistry: MatIconRegistry,
@@ -52,16 +53,21 @@ export class LogInComponent implements OnInit {
   ngOnInit(): void {
     this.authService.isLoggedIn().subscribe(loggedIn => {
       if (loggedIn) {
-        this.router.navigate(['/profile']);
+        this.navigateAfterAuth();
       }
     });
+  }
+
+  private navigateAfterAuth(): void {
+    const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+    this.router.navigateByUrl(returnUrl);
   }
 
   async login(): Promise<void> {
     this.isLoading = true;
     try {
       await this.authService.signIn(this.email, this.password);
-      this.router.navigate(['/profile']);
+      this.navigateAfterAuth();
       this.showSuccessMessage('Login successful!');
     } catch (error) {
       console.error(`Error: ${(error as any).message}`);
@@ -75,7 +81,7 @@ export class LogInComponent implements OnInit {
     this.isLoading = true;
     try {
       await this.authService.signInWithGoogle();
-      this.router.navigate(['/profile']);
+      this.navigateAfterAuth();
       this.showSuccessMessage('Google login successful!');
     } catch (error) {
       console.error(`Error: ${(error as any).message}`);

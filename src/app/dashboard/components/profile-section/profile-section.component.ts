@@ -41,14 +41,6 @@ interface ProfileField {
     MatNativeDateModule,
     MatSelectModule,
     MatInputModule,
-    // FIX: ChangePasswordComponent and NewBeerRequestComponent were
-    // previously listed here, but neither is ever used as a template tag
-    // (e.g. <app-change-password>) — both are only opened dynamically via
-    // MatDialog.open(ChangePasswordComponent, ...) in the methods below.
-    // Standalone components don't need to be in a parent's `imports` array
-    // just to be opened as a dialog; Angular creates them on demand. Their
-    // class imports above (the `import { ... } from ...` lines) are still
-    // needed since MatDialog.open() takes the class itself as an argument.
     RankingSectionComponent,
   ],
 })
@@ -87,7 +79,7 @@ export class ProfileSectionComponent implements OnInit, OnChanges {
 
       this.profileFields = [
         { key: "displayName", label: "Full Name", value: fullName, editable: true },
-        { key: "username", label: "Username", value: this.userProfile.username, editable: false },
+        { key: "username", label: "Username", value: this.userProfile.username, editable: true },
         { key: "email", label: "Email", value: this.userProfile.email, editable: true },
         { key: "country", label: "Country", value: this.userProfile.country, editable: true, type: "select" },
         {

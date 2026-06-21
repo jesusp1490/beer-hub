@@ -1,7 +1,5 @@
 import { Component, OnInit } from "@angular/core"
 import { FormsModule, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from "@angular/forms"
-import { AngularFireAuth } from "@angular/fire/compat/auth"
-import { AngularFirestore } from "@angular/fire/compat/firestore"
 import { CommonModule } from "@angular/common"
 import { MatInputModule } from "@angular/material/input"
 import { MatButtonModule } from "@angular/material/button"
@@ -15,6 +13,7 @@ import { Router, RouterModule } from "@angular/router"
 import { Timestamp } from "@angular/fire/firestore"
 import { MatSelectModule } from "@angular/material/select"
 import { getNames } from "country-list"
+import { AuthService } from "../../services/auth.service"
 
 @Component({
   selector: "app-sign-up",
@@ -45,8 +44,7 @@ export class SignUpComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private afAuth: AngularFireAuth,
-    private firestore: AngularFirestore,
+    private authService: AuthService,
     private snackBar: MatSnackBar,
     private router: Router,
   ) {}
@@ -57,7 +55,7 @@ export class SignUpComponent implements OnInit {
       lastName: ["", Validators.required],
       username: ["", Validators.required],
       email: ["", [Validators.required, Validators.email]],
-      password: ["", [Validators.required, Validators.minLength(6)]],
+      password: ["", [Validators.required, Validators.minLength(8)]],
       country: ["", Validators.required],
       dob: [null, Validators.required],
     })
@@ -68,45 +66,17 @@ export class SignUpComponent implements OnInit {
     if (this.signUpForm.valid) {
       try {
         const { email, password, firstName, lastName, username, country, dob } = this.signUpForm.value
-        const result = await this.afAuth.createUserWithEmailAndPassword(email, password)
-        const uid = result.user?.uid
 
-        if (uid) {
-          const registrationDate = Timestamp.now()
-          await this.firestore
-            .collection("users")
-            .doc(uid)
-            .set({
-              firstName,
-              lastName,
-              username,
-              country,
-              dob: dob ? Timestamp.fromDate(dob) : null,
-              email,
-              createdAt: registrationDate,
-              photoURL: null,
-              emailVerified: false,
-              rank: { name: "Novice", level: 1, points: 0, progress: 0, pointsToNextRank: 100 },
-              achievements: [],
-              level: 1,
-              progress: 0,
-              statistics: {
-                totalBeersRated: 0,
-                countriesExplored: [],
-                beerTypeStats: {},
-                registrationDate: registrationDate,
-                averageRating: 0,
-                favoriteBrewery: "",
-                points: 0,
-                lastRatingDate: null,
-                uniqueStylesCount: 0,
-                uniqueCountriesCount: 0,
-              },
-            })
+        await this.authService.signUp(email, password, {
+          firstName,
+          lastName,
+          username,
+          country,
+          dob: dob ? Timestamp.fromDate(dob) : null,
+        })
 
-          this.showSuccessMessage("Sign Up successful!")
-          this.router.navigate(["/profile"])
-        }
+        this.showSuccessMessage("Sign Up successful! Check your email to verify your account.")
+        this.router.navigate(["/dashboard"])
       } catch (error) {
         console.error(`Error: ${(error as any).message}`)
         this.showErrorMessage(`Registration failed: ${(error as any).message}`)
@@ -133,4 +103,3 @@ export class SignUpComponent implements OnInit {
     })
   }
 }
-
