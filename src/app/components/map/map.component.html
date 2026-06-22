@@ -7,12 +7,14 @@
     />
   </div>
   <div class="map-controls">
-    <button (click)="zoomToRegion('Asia')">Asia</button>
     <button (click)="zoomToRegion('Europe')">Europe</button>
+    <button (click)="zoomToRegion('Asia')">Asia</button>
     <button (click)="zoomToRegion('North America')">N. America</button>
+    <button (click)="zoomToRegion('South America')">S. America</button>
+    <button (click)="zoomToRegion('Africa')">Africa</button>
+    <button (click)="zoomToRegion('Oceania')">Oceania</button>
     <button (click)="toggleHeatMap()">{{ isHeatMap ? 'Normal' : 'Heat Map' }}</button>
     <button (click)="resetZoom()">Reset</button>
-    <button (click)="simulateDataChange()">Simulate</button>
   </div>
   <div class="legend">
     <h3>Beer Availability</h3>

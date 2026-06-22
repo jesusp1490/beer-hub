@@ -52,6 +52,9 @@ export class MapComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    if (this.tooltip) {
+      this.tooltip.remove();
+    }
   }
 
   @HostListener('window:resize', ['$event'])
@@ -96,9 +99,11 @@ export class MapComponent implements OnInit, OnDestroy {
       .attr('class', 'tooltip')
       .style('opacity', 0)
       .style('position', 'absolute')
-      .style('background-color', '#333333')
-      .style('padding', '10px')
-      .style('border-radius', '5px')
+      .style('background', 'linear-gradient(145deg, #232323 0%, #1a1a1a 100%)')
+      .style('border', '1px solid rgba(255, 167, 38, 0.3)')
+      .style('padding', '10px 14px')
+      .style('border-radius', '10px')
+      .style('box-shadow', '0 8px 24px rgba(0, 0, 0, 0.4)')
       .style('pointer-events', 'none');
   }
 
@@ -135,6 +140,7 @@ export class MapComponent implements OnInit, OnDestroy {
             this.countries = data.features; 
             this.filteredCountries = this.countries; 
             this.drawMap(this.filteredCountries, path);
+            this.updateLegend();
           }).catch(error => {
             console.error('Error loading GeoJSON:', error);
           });
@@ -152,7 +158,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this.colorScale = d3.scaleLinear<string>()
       .domain([minCount, maxCount])
-      .range(['#c7c7c7', '#606060'])
+      .range(['#2e2519', '#ffa726'])
       .interpolate(d3.interpolateRgb.gamma(2.2));
 
     this.heatMapColorScale = d3.scaleLinear<string>()
@@ -177,9 +183,20 @@ export class MapComponent implements OnInit, OnDestroy {
       .on('click', (event: any, d: any) => this.onCountrySelect(event, d));
   }
 
+  private getCountryKey(d: any): string {
+    return (d.properties?.name ?? '').trim().toLowerCase();
+  }
+
+  private getBeerCountForCountry(d: any): number {
+    const key = this.getCountryKey(d);
+    const match = Object.keys(this.countryBeerCounts).find(
+      (countryId) => countryId.trim().toLowerCase() === key
+    );
+    return match ? this.countryBeerCounts[match] : 0;
+  }
+
   private getCountryColor(d: any): string {
-    const countryName = d.properties.name;
-    const beerCount = this.countryBeerCounts[countryName] || 0;
+    const beerCount = this.getBeerCountForCountry(d);
     return this.isHeatMap ? this.heatMapColorScale(beerCount) : this.colorScale(beerCount);
   }
 
@@ -205,7 +222,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   private onMouseOver(event: any, d: any): void {
     const countryName = d.properties.name;
-    const beerCount = this.countryBeerCounts[countryName] || 0;
+    const beerCount = this.getBeerCountForCountry(d);
 
     d3.select(event.currentTarget)
       .transition()
@@ -280,26 +297,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
     const legendScale = this.isHeatMap ? this.heatMapColorScale : this.colorScale;
 
-    const legendGradient = this.svg.select('.legend-gradient');
-    if (legendGradient.empty()) {
-      this.svg.append('linearGradient')
-        .attr('id', 'legend-gradient')
-        .attr('x1', '0%')
-        .attr('y1', '0%')
-        .attr('x2', '100%')
-        .attr('y2', '0%')
-        .selectAll('stop')
-        .data(legendScale.ticks().map((t, i, n) => ({ offset: `${100*i/n.length}%`, color: legendScale(t) })))
-        .enter().append('stop')
-        .attr('offset', d => d.offset)
-        .attr('stop-color', d => d.color);
-    } else {
-      legendGradient.selectAll('stop')
-        .data(legendScale.ticks().map((t, i, n) => ({ offset: `${100*i/n.length}%`, color: legendScale(t) })))
-        .attr('offset', d => d.offset)
-        .attr('stop-color', d => d.color);
-    }
-
     d3.select('.legend-gradient')
       .style('background', 'linear-gradient(to right, ' + legendScale.range().join(',') + ')');
 
@@ -318,6 +315,15 @@ export class MapComponent implements OnInit, OnDestroy {
         break;
       case 'Asia':
         bounds = [[20, 0], [180, 60]];
+        break;
+      case 'South America':
+        bounds = [[-90, -60], [-30, 15]];
+        break;
+      case 'Africa':
+        bounds = [[-20, -40], [55, 40]];
+        break;
+      case 'Oceania':
+        bounds = [[110, -50], [180, 0]];
         break;
       default:
         return;
@@ -352,8 +358,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this.g.selectAll('path')
       .attr('opacity', (d: any) => {
-        const countryName = d.properties.name;
-        const beerCount = this.countryBeerCounts[countryName] || 0;
+        const beerCount = this.getBeerCountForCountry(d);
         return Math.abs(beerCount - hoverValue) < (maxCount - minCount) * 0.1 ? 1 : 0.3;
       });
   }
@@ -361,22 +366,5 @@ export class MapComponent implements OnInit, OnDestroy {
   onLegendLeave(): void {
     this.g.selectAll('path')
       .attr('opacity', 1);
-  }
-
-  simulateDataChange(): void {
-    Object.keys(this.countryBeerCounts).forEach(country => {
-      this.countryBeerCounts[country] = Math.floor(Math.random() * 1000);
-    });
-    this.updateColorScale();
-    this.animateDataChange();
-  }
-
-  private animateDataChange(): void {
-    this.g.selectAll('path')
-      .transition()
-      .duration(1000)
-      .attr('fill', (d: any) => this.getCountryColor(d));
-    
-    this.updateLegend();
   }
 }
