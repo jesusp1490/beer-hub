@@ -2,8 +2,7 @@
 
 .country-container {
   font-family: $font-family-primary;
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
   padding: 20px;
 
   .loading-spinner {
@@ -18,35 +17,52 @@
     }
   }
 
-  .content-container {
-    padding: 0;
-    // width: 100%;
+  .no-results {
+    text-align: center;
+    padding: 3rem 1rem;
+    font-size: 1.2rem;
+    color: $color-text-secondary;
   }
 
+  // NEW: bigger flag + "Explore" eyebrow + heading laid out side by side,
+  // closer in visual weight to the hero treatment used on the home page,
+  // instead of a plain centered h1 with a tiny flag icon next to it.
   .country-brands {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     flex-direction: column;
     margin-bottom: 30px;
 
     .country-title {
       display: flex;
       align-items: center;
-      justify-content: center;
-      text-align: center;
+      gap: 1.2rem;
       color: $color-text-light;
       margin-bottom: 10px;
 
+      .country-eyebrow {
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: $color-primary-light;
+        margin-bottom: 0.2rem;
+      }
+
       h1 {
         font-size: 2.5rem;
-        font-weight: bold;
+        font-weight: 800;
+        margin: 0;
       }
 
       .country-flag-image {
-        width: 50px;
-        margin-left: 10px;
-        margin-bottom: 10px;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: $shadow-md;
+        border: 2px solid rgba(255, 167, 38, 0.3);
       }
     }
 
@@ -54,19 +70,23 @@
       color: $color-text-secondary;
       font-size: 1.1rem;
       margin-bottom: 20px;
+      text-align: center;
     }
   }
 
+  // FIX: previously a bottom-border-only field — same dated look already
+  // replaced in the filter sidebar. Now a pill input matching the rest of
+  // the rework.
   .search-bar {
     width: 100%;
     max-width: 300px;
-    padding: 10px;
+    padding: 0.7rem 1.2rem;
     font-size: 1rem;
-    border: none;
-    border-bottom: 2px solid $color-primary;
-    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: $border-radius-pill;
+    background-color: rgba(255, 255, 255, 0.04);
     color: $color-text-light;
-    transition: border-color 0.3s ease;
+    transition: border-color $transition-fast;
 
     &::placeholder {
       color: $color-text-secondary;
@@ -74,7 +94,7 @@
 
     &:focus {
       outline: none;
-      border-color: $color-secondary;
+      border-color: $color-primary;
     }
   }
 
@@ -88,7 +108,7 @@
   .country-carousel {
     overflow: hidden;
     padding: 0 40px;
-    width: calc(100% - 80px);
+    width: 100%;
   }
 
   .country-carousel-track {
@@ -97,46 +117,85 @@
     gap: 30px;
   }
 
+  // NEW: previously just a bare logo floating directly on the dark page
+  // background with no surface, border, or hover treatment beyond a
+  // scale transform. Now wrapped in the same surface-gradient card
+  // language used for beer/brand cards on the home page, with a name and
+  // beer count underneath instead of relying on a hover tooltip alone.
   .country-carousel-item {
     text-align: center;
-    padding: 10px;
-    transition: transform 0.3s ease;
     cursor: pointer;
+    transition: transform $transition-fast;
 
     &:hover {
-      transform: scale(1.1);
+      transform: translateY(-4px);
+
+      .country-brand-card {
+        border-color: rgba(255, 167, 38, 0.3);
+        box-shadow: $shadow-md;
+      }
     }
+  }
+
+  .country-brand-card {
+    background: $surface-gradient;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: $border-radius-md;
+    box-shadow: $shadow-sm;
+    padding: 1.2rem;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color $transition-fast, box-shadow $transition-fast;
+    margin-bottom: 0.6rem;
   }
 
   .country-brand-logo {
     width: 100%;
     max-width: 130px;
-    height: auto;
+    height: 100%;
     object-fit: contain;
   }
 
+  .country-brand-name {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: $color-text-light;
+  }
+
+  .country-brand-count {
+    margin: 0.2rem 0 0;
+    font-size: 0.78rem;
+    color: $color-text-secondary;
+  }
+
+  // FIX: previously plain white circles (rgba(255,255,255,0.8)) — clashed
+  // with the amber-on-dark identity used everywhere else in the rework.
   .carousel-button {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: rgba(255, 255, 255, 0.8);
+    top: 80px;
+    background: $surface-gradient;
+    border: 1px solid rgba(255, 167, 38, 0.25);
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.3s ease;
+    transition: background-color $transition-fast, border-color $transition-fast;
     z-index: 10;
+    box-shadow: $shadow-sm;
 
     &:hover {
-      background-color: rgba(255, 255, 255, 1);
+      background: rgba(255, 167, 38, 0.12);
+      border-color: $color-primary;
     }
 
     &:disabled {
-      opacity: 0.5;
+      opacity: 0.4;
       cursor: not-allowed;
     }
 
@@ -169,11 +228,14 @@
 @media (min-width: 1441px) {
   .country-container {
     max-width: 100%;
-    margin-top: 50px;
 
     .country-carousel-track {
       grid-template-columns: repeat(5, 1fr);
       gap: 60px;
+    }
+
+    .country-brand-card {
+      height: 200px;
     }
 
     .country-brand-logo {
@@ -268,7 +330,8 @@
         }
 
         .country-flag-image {
-          width: 30px;
+          width: 44px;
+          height: 44px;
         }
       }
 
@@ -283,11 +346,15 @@
 
     .country-carousel {
       padding: 0 20px;
-      width: calc(100% - 40px);
+      width: 100%;
     }
 
     .country-carousel-track {
       gap: 15px;
+    }
+
+    .country-brand-card {
+      height: 100px;
     }
 
     .carousel-button {

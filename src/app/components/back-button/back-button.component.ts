@@ -11,23 +11,30 @@ import { Location } from "@angular/common"
   `,
   styles: [
     `
+    /* FIX: restyled to a more compact pill matching the amber identity
+       used elsewhere in the rework, instead of a bare unstyled link-like
+       button with default padding that contributed to the page feeling
+       like it had extra reserved space above it. */
     .back-button {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      background: none;
-      border: none;
+      gap: 0.4rem;
+      background: rgba(255, 167, 38, 0.08);
+      border: 1px solid rgba(255, 167, 38, 0.2);
+      border-radius: 999px;
       color: #ffa726;
       cursor: pointer;
-      font-size: 16px;
-      padding: 8px;
-      transition: color 0.3s ease;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
     .back-button:hover {
+      background: rgba(255, 167, 38, 0.16);
       color: #ff9100;
     }
     .material-icons {
-      font-size: 24px;
-      margin-right: 8px;
+      font-size: 18px;
     }
   `,
   ],
@@ -41,4 +48,3 @@ export class BackButtonComponent {
     this.location.back()
   }
 }
-

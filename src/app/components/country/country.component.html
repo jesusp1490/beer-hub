@@ -20,25 +20,41 @@
       </svg>
     </div>
 
+    <div *ngIf="!isLoading && notFound" class="no-results">
+      <p>Country not found.</p>
+    </div>
+
     <div *ngIf="!isLoading && countryName && countryFlagUrl" class="country-content">
       <div class="country-brands">
         <div class="country-title">
-          <h1>Brands from {{ countryName }}</h1>
           <img [src]="countryFlagUrl" alt="{{ countryName }} flag" class="country-flag-image" />
+          <div>
+            <div class="country-eyebrow">Explore</div>
+            <h1>Brands from {{ countryName }}</h1>
+          </div>
         </div>
         <p class="country-description">Select a brand to know more about their beers.</p>
 
         <input type="text" placeholder="Search brands" [ngModel]="searchTerm$ | async" (ngModelChange)="updateSearchTerm($event)" class="search-bar" />
       </div>
 
-      <div class="country-carousel-container">
+      <!-- NEW: previously a search with no results, or a country with no
+           brands at all, just showed an empty grid with no explanation. -->
+      <div *ngIf="filteredBrands.length === 0" class="no-results">
+        <p>No brands found.</p>
+      </div>
+
+      <div *ngIf="filteredBrands.length > 0" class="country-carousel-container">
         <button (click)="prevPage()" [disabled]="page === 0" class="carousel-button left" aria-label="Previous page"></button>
 
         <div class="country-carousel">
           <div class="country-carousel-track">
-            <div *ngFor="let brand of visibleBrands" class="country-carousel-item">
-              <img *ngIf="brand.logoUrl" [src]="brand.logoUrl" [alt]="brand.name"
-                class="country-brand-logo" (click)="selectBrand(brand.brandId)" [title]="brand.name" />
+            <div *ngFor="let brand of visibleBrands" class="country-carousel-item" (click)="selectBrand(brand.brandId)">
+              <div class="country-brand-card">
+                <img *ngIf="brand.logoUrl" [src]="brand.logoUrl" [alt]="brand.name" class="country-brand-logo" />
+              </div>
+              <p class="country-brand-name">{{ brand.name }}</p>
+              <p class="country-brand-count" *ngIf="brand.beersCount">{{ brand.beersCount }} beers</p>
             </div>
           </div>
         </div>

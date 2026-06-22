@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable, Subject, forkJoin, BehaviorSubject } from 'rxjs';
-import { takeUntil, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Subject, forkJoin, BehaviorSubject, Observable } from 'rxjs';
+import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Country } from './country.interface';
 import { Brand } from './brand.interface';
 
@@ -12,7 +12,6 @@ import { Brand } from './brand.interface';
   styleUrls: ['./country.component.scss']
 })
 export class CountryComponent implements OnInit, OnDestroy {
-  country$: Observable<Country | undefined>;
   countryName: string = '';
   countryFlagUrl: string = '';
   brands: Brand[] = [];
@@ -23,6 +22,7 @@ export class CountryComponent implements OnInit, OnDestroy {
   visibleBrands: Brand[] = [];
   searchTerm$ = new BehaviorSubject<string>('');
   isLoading: boolean = true;
+  notFound: boolean = false;
   private unsubscribe$ = new Subject<void>();
 
   constructor(
@@ -31,7 +31,6 @@ export class CountryComponent implements OnInit, OnDestroy {
     private router: Router,
   ) {
     this.countryId = this.route.snapshot.paramMap.get('country') || '';
-    this.country$ = this.firestore.doc<Country>(`countries/${this.countryId}`).valueChanges();
   }
 
   ngOnInit(): void {
@@ -52,9 +51,11 @@ export class CountryComponent implements OnInit, OnDestroy {
         if (country) {
           this.countryName = country.name;
           this.countryFlagUrl = country.flagUrl;
+          this.notFound = false;
           this.loadBrands(countryId);
         } else {
           console.error('Country not found');
+          this.notFound = true;
           this.isLoading = false;
         }
       });
@@ -73,28 +74,28 @@ export class CountryComponent implements OnInit, OnDestroy {
   }
 
   private preloadImages(): void {
-    const imageLoadPromises = this.visibleBrands.map(brand => {
-      return new Promise<void>((resolve) => {
-        const img = new Image();
-        img.onload = () => resolve();
-        img.onerror = () => resolve();
-        img.src = brand.logoUrl;
+    const imageLoadPromises = this.visibleBrands
+      .filter(brand => !!brand.logoUrl)
+      .map(brand => {
+        return new Promise<void>((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+          img.src = brand.logoUrl;
+        });
       });
-    });
 
-    forkJoin(imageLoadPromises).subscribe(() => {
-      this.isLoading = false;
-    });
+    forkJoin(imageLoadPromises.length ? imageLoadPromises : [Promise.resolve()])
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => {
+        this.isLoading = false;
+      });
   }
 
   private updateVisibleBrands(): void {
     const start = this.page * this.pageSize;
     const end = start + this.pageSize;
     this.visibleBrands = this.filteredBrands.slice(start, end);
-  
-    while (this.visibleBrands.length < this.pageSize) {
-      this.visibleBrands.push({} as Brand);
-    }
   }
 
   prevPage(): void {
@@ -113,7 +114,6 @@ export class CountryComponent implements OnInit, OnDestroy {
 
   selectBrand(brandId: string): void {
     if (brandId) {
-      console.log('Selected Brand ID:', brandId);
       const route = `/country/${this.countryId}/brands/${brandId}/beers`;
       this.router.navigate([route]);
     }
@@ -127,34 +127,21 @@ export class CountryComponent implements OnInit, OnDestroy {
     this.searchTerm$.pipe(
       debounceTime(300),
       distinctUntilChanged(),
-      switchMap(term => {
-        this.isLoading = true;
-        return this.filterBrands(term);
-      }),
       takeUntil(this.unsubscribe$)
-    ).subscribe(filteredBrands => {
-      this.filteredBrands = filteredBrands;
+    ).subscribe(term => {
+      this.filteredBrands = this.filterBrands(term);
       this.page = 0;
       this.updateVisibleBrands();
-      this.isLoading = false;
     });
   }
 
-  private filterBrands(term: string): Observable<Brand[]> {
-    return new Observable<Brand[]>(observer => {
-      const filtered = this.brands.filter(brand => 
-        brand.name.toLowerCase().includes(term.toLowerCase())
-      );
-      observer.next(filtered);
-      observer.complete();
-    });
+  private filterBrands(term: string): Brand[] {
+    return this.brands.filter(brand =>
+      brand.name.toLowerCase().includes(term.toLowerCase())
+    );
   }
 
   updateSearchTerm(term: string): void {
     this.searchTerm$.next(term);
-  }
-
-  goBack(): void {
-    
   }
 }

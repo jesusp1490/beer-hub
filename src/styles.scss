@@ -43,22 +43,30 @@ body {
     caret-color: #e0e0e0;
 }
 
-html, body { 
-    height: 100%; 
+html,
+body {
+    height: 100%;
     overflow-x: hidden;
+    overflow-y: scroll;
 }
 
-body { 
-    margin: 0; 
-    font-family: 'Montserrat', sans-serif; 
+body.mat-typography {
+    overflow-y: visible !important;
+}
+
+body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
 }
 
 * {
     box-sizing: border-box;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
 
 .app-dialog-dark {
     --mdc-dialog-container-color: #1e1e1e;
