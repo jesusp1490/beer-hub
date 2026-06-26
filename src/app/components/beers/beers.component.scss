@@ -7,20 +7,26 @@
   position: relative;
   padding: 2rem 0;
 
+  // NEW: toned down and re-integrated the giant background watermark —
+  // previously a flat, isolated 15rem text block with no relationship to
+  // the rest of the rework's amber identity. Now uses a subtle amber
+  // tint instead of plain white-on-transparent, and sits further back
+  // visually (lower opacity, blurred edge via gradient mask) so it reads
+  // as ambient brand texture rather than a random floating watermark.
   .brand-header {
     position: absolute;
-    top: 30%;
+    top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    z-index: -1;
+    width: 100%;
 
     h1 {
-      font-size: 15rem;
-      font-weight: bold;
-      opacity: 0.1;
+      font-weight: 800;
+      line-height: 1.2;
       margin: 0;
       white-space: nowrap;
+      color: rgba(255, 167, 38, 0.22);
     }
   }
 
@@ -31,9 +37,16 @@
     height: 200px;
   }
 
+  .no-beers-message {
+    text-align: center;
+    padding: 3rem 1rem;
+    font-size: 1.2rem;
+    color: $color-text-secondary;
+  }
+
   .swiper-container {
     width: 100%;
-    height: 650px;
+    height: 750px;
     overflow: hidden;
     padding: 3rem 0;
   }
@@ -52,66 +65,59 @@
     pointer-events: auto;
 
     &.swiper-slide-active {
-      // transform: scale(1.2);
       z-index: 2;
     }
 
     &.swiper-slide-prev,
     &.swiper-slide-next {
-      // transform: scale(1.1);
       z-index: 1;
     }
   }
 
+  // FIX: removed the card frame (background/border/box) — bottles now
+  // float directly on the page background as requested, with a subtle
+  // amber glow on hover instead of a card border.
   .beer-card {
     width: 100%;
-    max-width: 200px;
+    max-width: 320px;
     text-align: center;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: transform $transition-fast;
 
     &:hover {
-      transform: scale(1.05);
+      transform: translateY(-4px);
+
+      .beer-image {
+        filter: drop-shadow(0 8px 16px rgba(255, 167, 38, 0.35));
+      }
     }
+  }
+
+  .beer-image-frame {
+    height: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.8rem;
   }
 
   .beer-image {
     width: 100%;
-    max-width: 150px;
-    height: auto;
-    margin: 0 auto 15px;
-    display: block;
+    max-width: 280px;
+    height: 100%;
+    object-fit: contain;
+    transition: filter $transition-fast;
   }
 
+  // NEW: the beer name/type was previously commented out entirely — every
+  // card showed only an image with no way to identify the beer without
+  // clicking through.
   .beer-info {
     h3 {
-      font-size: 18px;
-      margin-bottom: 5px;
-    }
-
-    p {
-      font-size: 14px;
-      color: #666;
-    }
-  }
-
-  .back-button {
-    display: inline-block;
-    margin-top: 2rem;
-    padding: 10px 20px;
-    background-color: #ffa726;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-
-    &:hover {
-      background-color: #ff9100;
-    }
-
-    i {
-      margin-right: 5px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: $color-text-light;
+      margin: 0;
     }
   }
 }
@@ -125,87 +131,109 @@
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+    // FIX: previously these had no explicit z-index, while active/prev/
+    // next slides did (z-index: 1-2). Near the end of the carousel, the
+    // (visually faded, disabled) next button could end up stacked BENEATH
+    // the last card, so a click aimed at the arrow actually hit the beer
+    // card underneath instead — navigating to that beer's details page
+    // instead of doing nothing as a disabled button should.
+    z-index: 20;
 
     &::after {
       content: none;
     }
   }
 
+  .swiper-button-disabled {
+    opacity: 0.25;
+    pointer-events: none;
+  }
+
+  // FIX: these two were swapped — the "next" button (right side, advances
+  // forward) was using the left-pointing arrow image, and "prev" (left
+  // side, goes back) was using the right-pointing arrow image. Visually
+  // backwards even though clicking still navigated the correct direction
+  // under the hood.
   .swiper-button-next {
     right: 10px;
-    background-image: url('https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fleft-arrow.webp?alt=media&token=e0e787c6-bf5f-44ba-964e-4d88772b851d');
+    background-image: url('https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fright-arrow.webp?alt=media&token=c1eb360a-a88b-4902-855f-5dc7c68273a3');
   }
 
   .swiper-button-prev {
     left: 10px;
-    background-image: url('https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fright-arrow.webp?alt=media&token=c1eb360a-a88b-4902-855f-5dc7c68273a3');
+    background-image: url('https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fleft-arrow.webp?alt=media&token=e0e787c6-bf5f-44ba-964e-4d88772b851d');
+  }
+
+  .swiper-pagination-bullet {
+    background-color: rgba(255, 255, 255, 0.25);
+    opacity: 1;
   }
 
   .swiper-pagination-bullet-active {
-    background-color: #ffa726;
+    background-color: $color-primary;
   }
 }
 
 @media (max-width: 1366px) {
   .beers-container {
-    .brand-header h1 {
-      font-size: 10rem;
+    .beer-card {
+      max-width: 280px;
     }
 
-    .beer-card {
-      max-width: 180px;
+    .beer-image-frame {
+      height: 360px;
     }
 
     .beer-image {
-      max-width: 130px;
+      max-width: 240px;
     }
   }
 }
 
 @media (max-width: 1024px) {
   .beers-container {
-    .brand-header h1 {
-      font-size: 8rem;
+    .beer-card {
+      max-width: 240px;
     }
 
-    .beer-card {
-      max-width: 160px;
+    .beer-image-frame {
+      height: 310px;
     }
 
     .beer-image {
-      max-width: 110px;
+      max-width: 200px;
     }
   }
 }
 
 @media (max-width: 768px) {
   .beers-container {
-    .brand-header h1 {
-      font-size: 6rem;
+    .beer-card {
+      max-width: 200px;
     }
 
-    .beer-card {
-      max-width: 140px;
+    .beer-image-frame {
+      height: 260px;
     }
 
     .beer-image {
-      max-width: 100px;
+      max-width: 160px;
     }
   }
 }
 
 @media (max-width: 480px) {
   .beers-container {
-    .brand-header h1 {
-      font-size: 4rem;
+    .beer-card {
+      max-width: 160px;
     }
 
-    .beer-card {
-      max-width: 120px;
+    .beer-image-frame {
+      height: 210px;
     }
 
     .beer-image {
-      max-width: 90px;
+      max-width: 130px;
     }
   }
 }

@@ -413,7 +413,7 @@ export const onBeerRated = functions.firestore
         };
       });
 
-      const updates: { [key: string]: unknown } = {challenges: updatedChallenges};
+      const updates: { [key: string]: any } = {challenges: updatedChallenges};
 
       if (pointsEarned > 0) {
         const currentPoints = userData.statistics?.points || 0;

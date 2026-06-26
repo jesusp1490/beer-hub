@@ -22,7 +22,6 @@ export const routes: Routes = [
   { path: "beers", component: BeersComponent },
   { path: "beers/:id", component: BeerDetailsComponent },
   { path: "beer/:id", component: BeerDetailsComponent },
-  { path: "beers/:beerId", component: BeerDetailsComponent },
   { path: "brands/:brandId/beers", component: BeersComponent },
   { path: "country/:country", component: CountryComponent },
   { path: "country/:country/brands/:brandId", component: BeersComponent },

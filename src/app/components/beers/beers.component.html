@@ -1,7 +1,7 @@
 <app-page-layout [backButtonText]="'Back to Brands'">
   <div class="beers-container">
     <div class="brand-header">
-      <h1>{{ brandName }}</h1>
+      <h1 #brandWatermark>{{ brandName }}</h1>
     </div>
 
     <div *ngIf="isLoading" class="loading-spinner">
@@ -37,10 +37,12 @@
       <div class="swiper-wrapper">
         <div *ngFor="let beer of beers" class="swiper-slide">
           <div class="beer-card" (click)="selectBeer(beer.id)">
-            <img [src]="beer.beerImageUrl" [alt]="beer.name + ' image'" class="beer-image">
-            <!-- <div class="beer-info">
+            <div class="beer-image-frame">
+              <img [src]="beer.beerImageUrl" [alt]="beer.name + ' image'" class="beer-image">
+            </div>
+            <div class="beer-info">
               <h3>{{ beer.name }}</h3>
-            </div> -->
+            </div>
           </div>
         </div>
       </div>
@@ -49,8 +51,5 @@
       <div class="swiper-button-next"></div>
     </div>
 
-    <button class="back-button" (click)="goBack()">
-      <i class="fa-solid fa-arrow-left"></i> Back
-    </button>
   </div>
 </app-page-layout>

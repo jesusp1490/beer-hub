@@ -1,8 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from "@angular/core"
 import { ActivatedRoute, Router } from "@angular/router"
 import { AngularFirestore } from "@angular/fire/compat/firestore"
-import { Location } from "@angular/common"
-import { FormBuilder, FormGroup } from "@angular/forms"
 import { Subject } from "rxjs"
 import { takeUntil } from "rxjs/operators"
 import Swiper from "swiper"
@@ -17,11 +15,11 @@ import { Brand } from "../country/brand.interface"
 })
 export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild("swiperContainer") swiperContainer?: ElementRef
+  @ViewChild("brandWatermark") brandWatermark?: ElementRef<HTMLHeadingElement>
 
   brandName = ""
   beers: Beer[] = []
   brandId = ""
-  filtersForm: FormGroup
   private unsubscribe$ = new Subject<void>()
   isLoading = true
   swiper: Swiper | null = null
@@ -30,16 +28,7 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
     private route: ActivatedRoute,
     private firestore: AngularFirestore,
     private router: Router,
-    private location: Location,
-    private fb: FormBuilder,
-  ) {
-    this.filtersForm = this.fb.group({
-      searchTerm: [""],
-      beerType: [""],
-      abvRange: [10],
-      ingredient: [""],
-    })
-  }
+  ) {}
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntil(this.unsubscribe$)).subscribe((params) => {
@@ -67,12 +56,6 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private loadBrandData(brandId: string): void {
-    // FIX: this subscription previously had no takeUntil(this.unsubscribe$),
-    // unlike every other subscription in this component. Each brand visited
-    // left behind a live Firestore listener that never closed — over a
-    // session of browsing several brands, that's one leaked listener per
-    // brand. Also switched to the observer-object subscribe syntax (the
-    // positional next/error callback form is deprecated in current RxJS).
     this.firestore
       .collection<Brand>("brands")
       .doc(brandId)
@@ -82,6 +65,7 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
         next: (brand) => {
           if (brand) {
             this.brandName = brand.name
+            setTimeout(() => this.fitWatermark(), 0)
           } else {
             console.error("Brand not found")
           }
@@ -126,8 +110,7 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
         modules: [Navigation, Pagination],
         slidesPerView: slidesPerView,
         spaceBetween: 80,
-        loop: totalSlides > 5,
-        loopAdditionalSlides: 5,
+        loop: false,
         pagination: {
           el: ".swiper-pagination",
           clickable: true,
@@ -176,7 +159,23 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(["/beer", beerId])
   }
 
-  goBack(): void {
-    this.location.back()
+  private fitWatermark(): void {
+    const el = this.brandWatermark?.nativeElement
+    if (!el) return
+
+    const container = el.parentElement
+    if (!container) return
+
+    const maxFontSize = 14
+    el.style.fontSize = `${maxFontSize}rem`
+
+    const availableWidth = container.clientWidth * 0.92
+    const textWidth = el.scrollWidth
+
+    if (textWidth > 0 && availableWidth > 0) {
+      const scale = Math.min(1, availableWidth / textWidth)
+      const newSize = Math.max(2, maxFontSize * scale)
+      el.style.fontSize = `${newSize}rem`
+    }
   }
 }
