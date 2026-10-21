@@ -18,7 +18,7 @@
   ],
   "hosting": {
     "target": "beer-hub-new",
-    "public": "dist/beer-hub",
+    "public": "dist/beer-hub/browser",
     "ignore": [
       "firebase.json",
       "**/.*",
