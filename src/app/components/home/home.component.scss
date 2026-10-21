@@ -478,6 +478,12 @@
     }
 }
 
+a.beer-card,
+a.brand-card {
+    color: inherit;
+    text-decoration: none;
+}
+
 .no-results {
     text-align: center;
     padding: 2rem;

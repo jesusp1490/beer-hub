@@ -86,7 +86,7 @@
           </a>
 
           <div class="beer-grid">
-            <div *ngFor="let beer of restOfBestRated; let i = index" class="beer-card" (click)="onViewBeerDetails(beer.id)">
+            <a *ngFor="let beer of restOfBestRated; let i = index" class="beer-card" [routerLink]="['/beers', beer.id]">
               <div class="beer-label">
                 <span class="rank-pill">#{{ i + 2 }}</span>
                 <img [src]="beer.beerLabelUrl" [alt]="beer.name">
@@ -103,7 +103,7 @@
                   <span>{{ beer.averageRating | number:'1.1-1' }}</span>
                 </div>
               </div>
-            </div>
+            </a>
           </div>
         </ng-container>
       </section>
@@ -128,7 +128,7 @@
           <div *ngIf="favoriteBeers.length === 0" class="no-results">
             <p>No favorite beers yet.</p>
           </div>
-          <div *ngFor="let beer of favoriteBeers" class="beer-card" (click)="onViewBeerDetails(beer.id)">
+          <a *ngFor="let beer of favoriteBeers" class="beer-card" [routerLink]="['/beers', beer.id]">
             <div class="beer-label">
               <img [src]="beer.beerLabelUrl" [alt]="beer.name">
             </div>
@@ -144,7 +144,7 @@
                 <span>{{ beer.averageRating | number:'1.1-1' }}</span>
               </div>
             </div>
-          </div>
+          </a>
         </div>
       </section>
 
@@ -168,7 +168,7 @@
           <div *ngIf="latestBeers.length === 0" class="no-results">
             <p>No beers added recently.</p>
           </div>
-          <div *ngFor="let beer of latestBeers" class="beer-card" (click)="onViewBeerDetails(beer.id)">
+          <a *ngFor="let beer of latestBeers" class="beer-card" [routerLink]="['/beers', beer.id]">
             <div class="beer-label">
               <img [src]="beer.beerLabelUrl" [alt]="beer.name">
             </div>
@@ -184,7 +184,7 @@
                 <span>{{ beer.averageRating | number:'1.1-1' }}</span>
               </div>
             </div>
-          </div>
+          </a>
         </div>
       </section>
 
@@ -205,7 +205,7 @@
         </div>
 
         <div class="brand-grid" *ngIf="!isLoadingBrands">
-          <div *ngFor="let brand of popularBrands" class="brand-card" (click)="onViewBrandBeers(brand.id)">
+          <a *ngFor="let brand of popularBrands" class="brand-card" [routerLink]="['/brands', brand.id, 'beers']">
             <div class="brand-logo">
               <img [src]="brand.logoUrl" [alt]="brand.name">
             </div>
@@ -213,7 +213,7 @@
               <h3>{{ brand.name }}</h3>
               <p>{{ brand.beersCount }} beers</p>
             </div>
-          </div>
+          </a>
         </div>
       </section>
 
@@ -232,7 +232,7 @@
           <div *ngIf="filteredBeers.length === 0" class="no-results">
             <p>No beers found matching your search.</p>
           </div>
-          <div *ngFor="let beer of filteredBeers" class="beer-card" (click)="onViewBeerDetails(beer.id)">
+          <a *ngFor="let beer of filteredBeers" class="beer-card" [routerLink]="['/beers', beer.id]">
             <div class="beer-label">
               <img [src]="beer.beerLabelUrl" [alt]="beer.name">
             </div>
@@ -248,7 +248,7 @@
                 <span>{{ beer.averageRating | number:'1.1-1' }}</span>
               </div>
             </div>
-          </div>
+          </a>
         </div>
       </div>
     </main>
