@@ -1,0 +1,5 @@
+/
+/map
+/country/Belgium
+/brands/1870/beers
+/beers/1870-La-Rubia
