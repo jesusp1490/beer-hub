@@ -5,6 +5,7 @@ import { takeUntil, catchError, finalize } from "rxjs/operators"
 import { Beer } from "../beers/beers.interface"
 import { BeerService } from "../../services/beer.service"
 import { AuthService } from "../../services/auth.service"
+import { SeoService } from "../../services/seo.service"
 import { trigger, transition, style, animate, query, stagger } from "@angular/animations"
 
 @Component({
@@ -77,6 +78,7 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private beerService: BeerService,
     private authService: AuthService,
+    private seo: SeoService,
   ) {}
 
   ngOnInit(): void {
@@ -142,6 +144,12 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
   private handleBeerNotFound(): void {
     this.isLoading = false
     console.error("BeerDetailsComponent: Beer not found")
+    this.seo.update({
+      title: "Beer not found",
+      description: "The beer you are looking for does not exist or has been removed.",
+      path: this.router.url.split("?")[0],
+      noindex: true,
+    })
   }
 
   private updateUserRating(): void {
@@ -305,8 +313,26 @@ export class BeerDetailsComponent implements OnInit, OnDestroy {
           this.favoriteIconUrl = isFavorite
             ? "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Ffull-crown.webp?alt=media&token=d52cdf3b-f0b6-4432-a921-7a16bfd62803"
             : "https://firebasestorage.googleapis.com/v0/b/beer-hub.appspot.com/o/images%2Fmisc%2Fempty-corwn.webp?alt=media&token=50ff92d3-eb61-44eb-9e99-fd3b9f460e4b"
+          this.updateSeo()
         },
         error: (error) => console.error("BeerDetailsComponent: Error in subscribe of loadAdditionalData:", error),
       })
+  }
+
+  private updateSeo(): void {
+    if (!this.beer) return
+    const beer = this.beer
+    const brand = this.brandName || beer.brand
+    const origin = this.countryName ? ` from ${this.countryName}` : ""
+    const stats = [beer.ABV ? `${beer.ABV}% ABV` : "", beer.IBU ? `${beer.IBU} IBU` : ""]
+      .filter(Boolean)
+      .join(", ")
+
+    this.seo.update({
+      title: `${beer.name} - ${beer.beerType} by ${brand}`,
+      description: `${beer.name}: ${beer.beerType} by ${brand}${origin}.${stats ? " " + stats + "." : ""} ${beer.description ?? ""}`,
+      path: `/beers/${encodeURIComponent(beer.id)}`,
+      image: beer.beerImageUrl,
+    })
   }
 }

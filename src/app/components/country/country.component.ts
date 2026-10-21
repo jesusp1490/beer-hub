@@ -5,6 +5,7 @@ import { Subject, forkJoin, BehaviorSubject, Observable } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Country } from './country.interface';
 import { Brand } from './brand.interface';
+import { SeoService } from '../../services/seo.service';
 
 @Component({
   selector: 'app-country',
@@ -29,6 +30,7 @@ export class CountryComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private firestore: AngularFirestore,
     private router: Router,
+    private seo: SeoService,
   ) {
     this.countryId = this.route.snapshot.paramMap.get('country') || '';
   }
@@ -57,6 +59,12 @@ export class CountryComponent implements OnInit, OnDestroy {
           console.error('Country not found');
           this.notFound = true;
           this.isLoading = false;
+          this.seo.update({
+            title: 'Country not found',
+            description: 'The country you are looking for does not exist or has no beers yet.',
+            path: `/country/${encodeURIComponent(countryId)}`,
+            noindex: true,
+          });
         }
       });
   }
@@ -69,6 +77,7 @@ export class CountryComponent implements OnInit, OnDestroy {
         this.brands = brands;
         this.filteredBrands = brands;
         this.updateVisibleBrands();
+        this.updateSeo();
         this.preloadImages();
       });
   }
@@ -143,5 +152,19 @@ export class CountryComponent implements OnInit, OnDestroy {
 
   updateSearchTerm(term: string): void {
     this.searchTerm$.next(term);
+  }
+
+  private updateSeo(): void {
+    const names = this.brands.slice(0, 5).map((b) => b.name);
+    const list = names.length
+      ? ` Brands include ${names.join(', ')}${this.brands.length > names.length ? ' and more' : ''}.`
+      : '';
+
+    this.seo.update({
+      title: `Beer brands from ${this.countryName}`,
+      description: `Explore ${this.brands.length} beer brands from ${this.countryName} on BeerHub.${list}`,
+      path: `/country/${encodeURIComponent(this.countryId)}`,
+      image: this.countryFlagUrl,
+    });
   }
 }

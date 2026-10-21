@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
 import { BeerService } from '../../services/beer.service';
 import { AuthService } from '../../services/auth.service';
+import { SeoService } from '../../services/seo.service';
 import { Beer } from '../beers/beers.interface';
 import { Brand } from '../country/brand.interface';
 
@@ -47,10 +48,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     private beerService: BeerService,
     private authService: AuthService,
     private router: Router,
+    private seo: SeoService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
+    this.seo.update({
+      title: 'BeerHub - Discover craft beers from around the world',
+      description: 'Explore craft beers from around the world with BeerHub. Browse the best rated beers, popular brands and an interactive map of beer by country.',
+      path: '/',
+    });
     this.checkScreenSize();
     this.loadBestRated();
     this.loadPopularBrands();

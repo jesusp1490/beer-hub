@@ -7,6 +7,7 @@ import Swiper from "swiper"
 import { Navigation, Pagination } from "swiper/modules"
 import { Beer } from "./beers.interface"
 import { Brand } from "../country/brand.interface"
+import { SeoService } from "../../services/seo.service"
 
 @Component({
   selector: "app-beers",
@@ -18,6 +19,7 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild("brandWatermark") brandWatermark?: ElementRef<HTMLHeadingElement>
 
   brandName = ""
+  brandLogoUrl = ""
   beers: Beer[] = []
   brandId = ""
   private unsubscribe$ = new Subject<void>()
@@ -28,6 +30,7 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
     private route: ActivatedRoute,
     private firestore: AngularFirestore,
     private router: Router,
+    private seo: SeoService,
   ) {}
 
   ngOnInit(): void {
@@ -65,9 +68,17 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
         next: (brand) => {
           if (brand) {
             this.brandName = brand.name
+            this.brandLogoUrl = brand.logoUrl
             setTimeout(() => this.fitWatermark(), 0)
+            this.updateSeo()
           } else {
             console.error("Brand not found")
+            this.seo.update({
+              title: "Brand not found",
+              description: "The brand you are looking for does not exist or has been removed.",
+              path: `/brands/${encodeURIComponent(brandId)}/beers`,
+              noindex: true,
+            })
           }
         },
         error: (error) => {
@@ -86,6 +97,7 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
         next: (beers) => {
           this.beers = beers
           this.isLoading = false
+          this.updateSeo()
           setTimeout(() => {
             this.initSwiper()
           }, 0)
@@ -177,5 +189,20 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
       const newSize = Math.max(2, maxFontSize * scale)
       el.style.fontSize = `${newSize}rem`
     }
+  }
+
+  private updateSeo(): void {
+    if (!this.brandName) return
+    const names = this.beers.slice(0, 5).map((b) => b.name)
+    const list = names.length
+      ? ` Beers include ${names.join(", ")}${this.beers.length > names.length ? " and more" : ""}.`
+      : ""
+
+    this.seo.update({
+      title: `${this.brandName} beers`,
+      description: `Explore the beers from ${this.brandName} on BeerHub: types, ABV, ingredients and ratings.${list}`,
+      path: `/brands/${encodeURIComponent(this.brandId)}/beers`,
+      image: this.brandLogoUrl,
+    })
   }
 }

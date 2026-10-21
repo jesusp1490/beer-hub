@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import { geoMercator, geoPath } from 'd3-geo';
 import { Router } from '@angular/router';
 import { BeerService } from '../../services/beer.service';
+import { SeoService } from '../../services/seo.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -33,7 +34,8 @@ export class MapComponent implements OnInit, OnDestroy {
   constructor(
     private el: ElementRef,
     private router: Router,
-    private beerService: BeerService
+    private beerService: BeerService,
+    private seo: SeoService
   ) {
     this.zoom = d3.zoom()
       .scaleExtent([1, 3])
@@ -43,6 +45,11 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.seo.update({
+      title: 'Beer map - Explore beers by country',
+      description: 'Explore beers from around the world on an interactive map. Pick a country to discover its beer brands and the beers of each brand.',
+      path: '/map',
+    });
     this.checkScreenSize();
     this.setDimensions();
     this.createSvg();
