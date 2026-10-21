@@ -1,5 +1,5 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA, ErrorHandler } from "@angular/core"
-import { BrowserModule } from "@angular/platform-browser"
+import { BrowserModule, provideClientHydration } from "@angular/platform-browser"
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations"
 import { HttpClientModule, HttpClient } from "@angular/common/http"
 import { FormsModule, ReactiveFormsModule } from "@angular/forms"
@@ -115,9 +115,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     NotificationService,
     UserService,
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
+    provideClientHydration(),
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class AppModule {}
-

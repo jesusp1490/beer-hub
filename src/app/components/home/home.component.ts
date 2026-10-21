@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
@@ -45,7 +46,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private beerService: BeerService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
@@ -65,6 +67,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   checkScreenSize(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
     this.isMobileView = window.innerWidth < 768;
   }
 

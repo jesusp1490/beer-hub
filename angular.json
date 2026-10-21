@@ -22,7 +22,7 @@
                 "node_modules"
               ]
             },
-            "outputPath": "dist/beer-hub",
+            "outputPath": "dist/beer-hub/browser",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -72,7 +72,6 @@
           },
           "configurations": {
             "production": {
-              "outputPath": "dist/beer-hub",
               "budgets": [
                 {
                   "type": "initial",
@@ -147,6 +146,76 @@
             ],
             "scripts": []
           }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist/beer-hub/server",
+            "main": "server.ts",
+            "tsConfig": "tsconfig.server.json",
+            "fileReplacements": [
+              {
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/environment.prod.ts"
+              }
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "node_modules"
+              ]
+            },
+            "inlineStyleLanguage": "scss"
+          },
+          "configurations": {
+            "production": {
+              "outputHashing": "media",
+              "optimization": true,
+              "sourceMap": false,
+              "extractLicenses": true,
+              "vendorChunk": false
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "sourceMap": true,
+              "extractLicenses": false,
+              "vendorChunk": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve-ssr": {
+          "builder": "@angular-devkit/build-angular:ssr-dev-server",
+          "configurations": {
+            "development": {
+              "browserTarget": "beer-hub:build:development",
+              "serverTarget": "beer-hub:server:development"
+            },
+            "production": {
+              "browserTarget": "beer-hub:build:production",
+              "serverTarget": "beer-hub:server:production"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "prerender": {
+          "builder": "@angular-devkit/build-angular:prerender",
+          "options": {
+            "routes": [
+              "/"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "beer-hub:build:production",
+              "serverTarget": "beer-hub:server:production"
+            },
+            "development": {
+              "browserTarget": "beer-hub:build:development",
+              "serverTarget": "beer-hub:server:development"
+            }
+          },
+          "defaultConfiguration": "production"
         }
       }
     }
