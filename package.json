@@ -11,7 +11,8 @@
     "dev:ssr": "ng run beer-hub:serve-ssr",
     "serve:ssr": "node dist/beer-hub/server/main.js",
     "build:ssr": "ng build && ng run beer-hub:server",
-    "prerender": "ng run beer-hub:prerender"
+    "prerender": "ng run beer-hub:prerender",
+    "seo:generate": "node src/scripts/generate-seo-files.js"
   },
   "private": true,
   "dependencies": {

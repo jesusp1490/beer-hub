@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+
+Sitemap: https://beerhub.es/sitemap.xml

@@ -32,7 +32,9 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/assets",
-              "./src/assets/favicon.ico"
+              "./src/assets/favicon.ico",
+              "src/robots.txt",
+              "src/sitemap.xml"
             ],
             "styles": [
               "@angular/material/prebuilt-themes/indigo-pink.css",
