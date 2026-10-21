@@ -1,4 +1,11 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Inject,
+  PLATFORM_ID,
+} from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Subject, forkJoin, BehaviorSubject, Observable } from 'rxjs';
@@ -10,7 +17,7 @@ import { SeoService } from '../../services/seo.service';
 @Component({
   selector: 'app-country',
   templateUrl: './country.component.html',
-  styleUrls: ['./country.component.scss']
+  styleUrls: ['./country.component.scss'],
 })
 export class CountryComponent implements OnInit, OnDestroy {
   countryName: string = '';
@@ -31,6 +38,7 @@ export class CountryComponent implements OnInit, OnDestroy {
     private firestore: AngularFirestore,
     private router: Router,
     private seo: SeoService,
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) {
     this.countryId = this.route.snapshot.paramMap.get('country') || '';
   }
@@ -47,9 +55,11 @@ export class CountryComponent implements OnInit, OnDestroy {
 
   private loadCountryData(countryId: string): void {
     this.isLoading = true;
-    this.firestore.doc<Country>(`countries/${countryId}`).valueChanges()
+    this.firestore
+      .doc<Country>(`countries/${countryId}`)
+      .valueChanges()
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(country => {
+      .subscribe((country) => {
         if (country) {
           this.countryName = country.name;
           this.countryFlagUrl = country.flagUrl;
@@ -61,7 +71,8 @@ export class CountryComponent implements OnInit, OnDestroy {
           this.isLoading = false;
           this.seo.update({
             title: 'Country not found',
-            description: 'The country you are looking for does not exist or has no beers yet.',
+            description:
+              'The country you are looking for does not exist or has no beers yet.',
             path: `/country/${encodeURIComponent(countryId)}`,
             noindex: true,
           });
@@ -70,10 +81,13 @@ export class CountryComponent implements OnInit, OnDestroy {
   }
 
   private loadBrands(countryId: string): void {
-    this.firestore.collection<Brand>('brands', ref => ref.where('countryId', '==', countryId))
+    this.firestore
+      .collection<Brand>('brands', (ref) =>
+        ref.where('countryId', '==', countryId),
+      )
       .valueChanges()
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(brands => {
+      .subscribe((brands) => {
         this.brands = brands;
         this.filteredBrands = brands;
         this.updateVisibleBrands();
@@ -83,9 +97,13 @@ export class CountryComponent implements OnInit, OnDestroy {
   }
 
   private preloadImages(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      this.isLoading = false;
+      return;
+    }
     const imageLoadPromises = this.visibleBrands
-      .filter(brand => !!brand.logoUrl)
-      .map(brand => {
+      .filter((brand) => !!brand.logoUrl)
+      .map((brand) => {
         return new Promise<void>((resolve) => {
           const img = new Image();
           img.onload = () => resolve();
@@ -133,20 +151,22 @@ export class CountryComponent implements OnInit, OnDestroy {
   }
 
   private setupSearch(): void {
-    this.searchTerm$.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      takeUntil(this.unsubscribe$)
-    ).subscribe(term => {
-      this.filteredBrands = this.filterBrands(term);
-      this.page = 0;
-      this.updateVisibleBrands();
-    });
+    this.searchTerm$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntil(this.unsubscribe$),
+      )
+      .subscribe((term) => {
+        this.filteredBrands = this.filterBrands(term);
+        this.page = 0;
+        this.updateVisibleBrands();
+      });
   }
 
   private filterBrands(term: string): Brand[] {
-    return this.brands.filter(brand =>
-      brand.name.toLowerCase().includes(term.toLowerCase())
+    return this.brands.filter((brand) =>
+      brand.name.toLowerCase().includes(term.toLowerCase()),
     );
   }
 

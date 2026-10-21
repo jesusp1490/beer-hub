@@ -12,6 +12,7 @@ import { LogInComponent } from "./components/log-in/log-in.component"
 import { ForgotPasswordComponent } from "./components/forgot-password/forgot-password.component"
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AuthGuard } from './guards/auth.guard';
+import { beerPageResolver } from "./resolvers/beer-page.resolver";
 
 export const routes: Routes = [
   { path: "", redirectTo: "/home", pathMatch: "full" },
@@ -20,22 +21,24 @@ export const routes: Routes = [
   { path: "about", component: AboutComponent },
   { path: "contact", component: ContactComponent },
   { path: "beers", component: BeersComponent },
-  { path: "beers/:id", component: BeerDetailsComponent },
-  { path: "beer/:id", component: BeerDetailsComponent },
+  { path: "beers/:id", component: BeerDetailsComponent, resolve: { beerData: beerPageResolver } },
+  { path: "beer/:id", component: BeerDetailsComponent, resolve: { beerData: beerPageResolver } },
   { path: "brands/:brandId/beers", component: BeersComponent },
   { path: "country/:country", component: CountryComponent },
   { path: "country/:country/brands/:brandId", component: BeersComponent },
   { path: "country/:country/brands/:brandId/beers", component: BeersComponent },
-  { path: "country/:country/brands/:brandId/beers/:beerId", component: BeerDetailsComponent },
+  { path: "country/:country/brands/:brandId/beers/:beerId", component: BeerDetailsComponent, resolve: { beerData: beerPageResolver } },
   { path: "signup", component: SignUpComponent },
   { path: "login", component: LogInComponent },
   { path: "forgot-password", component: ForgotPasswordComponent },
   { path: "dashboard", component: DashboardComponent, canActivate: [AuthGuard] },
   { path: "**", redirectTo: "/home" },
+  
 ]
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { initialNavigation: "enabledBlocking" })],
   exports: [RouterModule],
 })
+
 export class AppRoutingModule {}

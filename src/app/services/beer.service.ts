@@ -1,4 +1,5 @@
-import { Injectable } from "@angular/core"
+import { Injectable, Inject, PLATFORM_ID } from "@angular/core"
+import { isPlatformBrowser } from "@angular/common"
 import { AngularFirestore } from "@angular/fire/compat/firestore"
 import { Observable, of, BehaviorSubject, from, forkJoin, throwError } from "rxjs"
 import { map, switchMap, tap, take, catchError } from "rxjs/operators"
@@ -18,11 +19,6 @@ export class BeerService {
   private cachedBrands$ = new BehaviorSubject<Brand[]>([])
   private cachedCountries$ = new BehaviorSubject<Country[]>([])
   private cachedCountryBeerCounts$ = new BehaviorSubject<{ [countryId: string]: number }>({})
-
-  // FIX: each cache gets its own "last fetched" timestamp instead of sharing
-  // one variable across beers/brands/countries. Previously, fetching one
-  // collection would mark ALL collections as "fresh", so a cache that had
-  // never actually been populated could be served as if it had.
   private lastFetchTimes = {
     beers: 0,
     brands: 0,
@@ -30,13 +26,18 @@ export class BeerService {
   }
   private cacheExpirationTime = 5 * 60 * 1000 // 5 minutes
 
-  constructor(
+    constructor(
     private firestore: AngularFirestore,
     private authService: AuthService,
     private userService: UserService,
-  ) {
-    this.initializeCache()
-  }
+    @Inject(PLATFORM_ID) private platformId: Object,
+    ) {
+      // En el servidor (SSR/prerender) no precargamos todas las colecciones:
+      // cada página pide solo lo que necesita.
+      if (isPlatformBrowser(this.platformId)) {
+        this.initializeCache()
+      }
+    }
 
   private initializeCache(): void {
     this.getBeers().pipe(take(1)).subscribe()
