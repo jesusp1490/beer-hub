@@ -305,6 +305,11 @@
     }
 }
 
+a.detail-link {
+    color: inherit;
+    text-decoration: none;
+}
+
 @media (max-width: 1200px) {
     .beer-details-container {
         .info-card {

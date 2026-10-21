@@ -24,4 +24,7 @@
       <span>High</span>
     </div>
   </div>
+    <nav class="country-links" aria-label="Countries with beers">
+    <a *ngFor="let country of countryLinks" [routerLink]="['/country', country]">{{ country }}</a>
+  </nav>
 </div>

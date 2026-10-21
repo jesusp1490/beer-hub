@@ -36,14 +36,14 @@
     <div *ngIf="!isLoading && beers.length > 0" class="swiper-container" #swiperContainer>
       <div class="swiper-wrapper">
         <div *ngFor="let beer of beers" class="swiper-slide">
-          <div class="beer-card" (click)="selectBeer(beer.id)">
+          <a class="beer-card" [routerLink]="['/beers', beer.id]">
             <div class="beer-image-frame">
               <img [src]="beer.beerImageUrl" [alt]="beer.name + ' image'" class="beer-image">
             </div>
             <div class="beer-info">
               <h3>{{ beer.name }}</h3>
             </div>
-          </div>
+          </a>
         </div>
       </div>
       <div class="swiper-pagination"></div>

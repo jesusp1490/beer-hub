@@ -29,14 +29,18 @@
     <div class="left-section">
       <div class="country-info" [@slideInFromLeft]="animationState.countryInfo">
         <img *ngIf="countryFlagUrl" [src]="countryFlagUrl" [alt]="countryName + ' flag'" class="country-flag" />
-        <span>{{ countryName || 'Country information not available' }}</span>
+        <span>
+          <a [routerLink]="beer.countryId ? ['/country', beer.countryId] : null" class="detail-link">{{ countryName || 'Country information not available' }}</a>
+        </span>
       </div>
       <div class="map-and-brand" [@slideInFromLeft]="animationState.brandInfo">
         <div class="country-map">
           <img *ngIf="countryMapUrl" [src]="countryMapUrl" [alt]="countryName + ' map'" class="map-image" />
           <p *ngIf="!countryMapUrl">Map not available</p>
         </div>
-        <img *ngIf="brandLogoUrl" [src]="brandLogoUrl" [alt]="brandName + ' logo'" class="brand-logo" />
+        <a *ngIf="brandLogoUrl" [routerLink]="beer.brandId ? ['/brands', beer.brandId, 'beers'] : null" class="detail-link">
+          <img [src]="brandLogoUrl" [alt]="brandName + ' logo'" class="brand-logo" />
+        </a>
         <p *ngIf="!brandLogoUrl">Brand logo not available</p>
       </div>
       <div class="beer-stats" [@slideInFromLeft]="animationState.stats">

@@ -49,13 +49,13 @@
 
         <div class="country-carousel">
           <div class="country-carousel-track">
-            <div *ngFor="let brand of visibleBrands" class="country-carousel-item" (click)="selectBrand(brand.brandId)">
+            <a *ngFor="let brand of visibleBrands" class="country-carousel-item" [routerLink]="['/brands', brand.brandId, 'beers']">
               <div class="country-brand-card">
                 <img *ngIf="brand.logoUrl" [src]="brand.logoUrl" [alt]="brand.name" class="country-brand-logo" />
               </div>
               <p class="country-brand-name">{{ brand.name }}</p>
               <p class="country-brand-count" *ngIf="brand.beersCount">{{ brand.beersCount }} beers</p>
-            </div>
+            </a>
           </div>
         </div>
 

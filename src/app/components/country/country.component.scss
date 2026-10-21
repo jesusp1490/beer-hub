@@ -225,6 +225,11 @@
   }
 }
 
+a.country-carousel-item {
+  color: inherit;
+  text-decoration: none;
+}
+
 @media (min-width: 1441px) {
   .country-container {
     max-width: 100%;

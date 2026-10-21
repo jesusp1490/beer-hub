@@ -26,6 +26,7 @@ export class MapComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   
   public isHeatMap: boolean = false;
+  public countryLinks: string[] = [];
   private heatMapColorScale!: d3.ScaleLinear<string, string>;
   private isMobile: boolean = false;
 
@@ -129,6 +130,9 @@ export class MapComponent implements OnInit, OnDestroy {
       .subscribe(
         beerCounts => {
           this.countryBeerCounts = beerCounts;
+          this.countryLinks = Object.keys(beerCounts)
+            .filter((id) => beerCounts[id] > 0)
+            .sort();
           this.updateColorScale();
 
           d3.json('assets/custom110m.geo.json').then((data: any) => {
