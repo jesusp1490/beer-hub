@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from "@angular/core"
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, Inject, PLATFORM_ID } from "@angular/core"
+import { isPlatformBrowser } from "@angular/common"
 import { ActivatedRoute, Router } from "@angular/router"
 import { AngularFirestore } from "@angular/fire/compat/firestore"
 import { Subject } from "rxjs"
@@ -8,6 +9,7 @@ import { Navigation, Pagination } from "swiper/modules"
 import { Beer } from "./beers.interface"
 import { Brand } from "../country/brand.interface"
 import { SeoService } from "../../services/seo.service"
+import { BrandPageData } from "../../resolvers/catalog.resolvers"
 
 @Component({
   selector: "app-beers",
@@ -31,17 +33,24 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
     private firestore: AngularFirestore,
     private router: Router,
     private seo: SeoService,
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) {}
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntil(this.unsubscribe$)).subscribe((params) => {
       this.brandId = params.get("brandId") ?? ""
-      if (this.brandId) {
-        this.loadBrandData(this.brandId)
-        this.loadBeers(this.brandId)
-      } else {
+      if (!this.brandId) {
         console.error("Invalid brandId")
         this.router.navigate(["/home"])
+        return
+      }
+
+      const resolved = this.route.snapshot.data["brandData"] as BrandPageData | undefined
+      if (resolved) {
+        this.applyResolvedData(resolved)
+      } else {
+        this.loadBrandData(this.brandId)
+        this.loadBeers(this.brandId)
       }
     })
   }
@@ -55,6 +64,34 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
     this.unsubscribe$.complete()
     if (this.swiper) {
       this.swiper.destroy()
+    }
+  }
+
+  private applyResolvedData(data: BrandPageData): void {
+    if (!data.brand) {
+      this.brandName = ""
+      this.beers = []
+      this.isLoading = false
+      this.seo.update({
+        title: "Brand not found",
+        description: "The brand you are looking for does not exist or has been removed.",
+        path: `/brands/${encodeURIComponent(this.brandId)}/beers`,
+        noindex: true,
+      })
+      return
+    }
+
+    this.brandName = data.brand.name
+    this.brandLogoUrl = data.brand.logoUrl
+    this.beers = data.beers
+    this.isLoading = false
+    this.updateSeo()
+
+    if (isPlatformBrowser(this.platformId)) {
+      setTimeout(() => {
+        this.fitWatermark()
+        this.initSwiper()
+      }, 0)
     }
   }
 
@@ -110,6 +147,8 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private initSwiper(): void {
+    if (!isPlatformBrowser(this.platformId)) return
+
     if (this.swiperContainer && this.swiperContainer.nativeElement) {
       if (this.swiper) {
         this.swiper.destroy()
@@ -172,6 +211,8 @@ export class BeersComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private fitWatermark(): void {
+    if (!isPlatformBrowser(this.platformId)) return
+
     const el = this.brandWatermark?.nativeElement
     if (!el) return
 

@@ -1,7 +1,16 @@
-import { Component, OnInit, ElementRef, OnDestroy, HostListener } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ElementRef,
+  OnDestroy,
+  HostListener,
+  Inject,
+  PLATFORM_ID,
+} from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import * as d3 from 'd3';
 import { geoMercator, geoPath } from 'd3-geo';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BeerService } from '../../services/beer.service';
 import { SeoService } from '../../services/seo.service';
 import { Subject } from 'rxjs';
@@ -10,22 +19,22 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.scss']
+  styleUrls: ['./map.component.scss'],
 })
 export class MapComponent implements OnInit, OnDestroy {
   private svg!: d3.Selection<SVGSVGElement, unknown, null, undefined>;
   private g!: d3.Selection<SVGGElement, unknown, null, undefined>;
   private width!: number;
   private height!: number;
-  private countries: any[] = []; 
-  private filteredCountries: any[] = []; 
+  private countries: any[] = [];
+  private filteredCountries: any[] = [];
   private searchText: string = '';
   private zoom: d3.ZoomBehavior<Element, unknown>;
   private tooltip!: d3.Selection<HTMLDivElement, unknown, HTMLElement, any>;
   private colorScale!: d3.ScaleLinear<string, string>;
   private countryBeerCounts: { [countryId: string]: number } = {};
   private destroy$ = new Subject<void>();
-  
+
   public isHeatMap: boolean = false;
   public countryLinks: string[] = [];
   private heatMapColorScale!: d3.ScaleLinear<string, string>;
@@ -34,10 +43,13 @@ export class MapComponent implements OnInit, OnDestroy {
   constructor(
     private el: ElementRef,
     private router: Router,
+    private route: ActivatedRoute,
     private beerService: BeerService,
-    private seo: SeoService
+    private seo: SeoService,
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) {
-    this.zoom = d3.zoom()
+    this.zoom = d3
+      .zoom()
       .scaleExtent([1, 3])
       .on('zoom', (event) => {
         this.g.attr('transform', event.transform);
@@ -47,9 +59,19 @@ export class MapComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.seo.update({
       title: 'Beer map - Explore beers by country',
-      description: 'Explore beers from around the world on an interactive map. Pick a country to discover its beer brands and the beers of each brand.',
+      description:
+        'Explore beers from around the world on an interactive map. Pick a country to discover its beer brands and the beers of each brand.',
       path: '/map',
     });
+
+    this.countryLinks =
+      (this.route.snapshot.data['countryLinks'] as string[] | undefined) ?? [];
+
+    // D3, el tooltip y el SVG solo existen en el navegador.
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     this.checkScreenSize();
     this.setDimensions();
     this.createSvg();
@@ -80,14 +102,17 @@ export class MapComponent implements OnInit, OnDestroy {
   private setDimensions(): void {
     const element = this.el.nativeElement.querySelector('.map-container');
     this.width = element.clientWidth;
-    this.height = this.isMobile ? window.innerHeight * 0.6 : element.clientHeight;
+    this.height = this.isMobile
+      ? window.innerHeight * 0.6
+      : element.clientHeight;
   }
 
   private createSvg(): void {
     const container = d3.select(this.el.nativeElement).select('.map-container');
     container.selectAll('svg').remove();
 
-    this.svg = container.append('svg')
+    this.svg = container
+      .append('svg')
       .attr('class', 'map-svg')
       .attr('viewBox', `0 0 ${this.width} ${this.height}`)
       .attr('preserveAspectRatio', 'xMidYMid meet');
@@ -98,12 +123,13 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private updateSvg(): void {
-    this.svg
-      .attr('viewBox', `0 0 ${this.width} ${this.height}`);
+    this.svg.attr('viewBox', `0 0 ${this.width} ${this.height}`);
   }
 
   private createTooltip(): void {
-    this.tooltip = d3.select('body').append('div')
+    this.tooltip = d3
+      .select('body')
+      .append('div')
       .attr('class', 'tooltip')
       .style('opacity', 0)
       .style('position', 'absolute')
@@ -116,7 +142,9 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private createProjection(): d3.GeoProjection {
-    const scale = this.isMobile ? (this.width / 6.4) * 0.7 : (this.width / 6.4) * 0.9;
+    const scale = this.isMobile
+      ? (this.width / 6.4) * 0.7
+      : (this.width / 6.4) * 0.9;
     return geoMercator()
       .scale(scale)
       .translate([this.width / 2, this.height / 1.5]);
@@ -132,33 +160,36 @@ export class MapComponent implements OnInit, OnDestroy {
     const projection = this.createProjection();
     const path = geoPath().projection(projection);
 
-    this.beerService.getCountryBeerCounts()
+    this.beerService
+      .getCountryBeerCounts()
       .pipe(takeUntil(this.destroy$))
       .subscribe(
-        beerCounts => {
+        (beerCounts) => {
           this.countryBeerCounts = beerCounts;
           this.countryLinks = Object.keys(beerCounts)
             .filter((id) => beerCounts[id] > 0)
             .sort();
           this.updateColorScale();
 
-          d3.json('assets/custom110m.geo.json').then((data: any) => {
-            if (!data) {
-              console.error('No map data loaded');
-              return;
-            }
+          d3.json('assets/custom110m.geo.json')
+            .then((data: any) => {
+              if (!data) {
+                console.error('No map data loaded');
+                return;
+              }
 
-            this.countries = data.features; 
-            this.filteredCountries = this.countries; 
-            this.drawMap(this.filteredCountries, path);
-            this.updateLegend();
-          }).catch(error => {
-            console.error('Error loading GeoJSON:', error);
-          });
+              this.countries = data.features;
+              this.filteredCountries = this.countries;
+              this.drawMap(this.filteredCountries, path);
+              this.updateLegend();
+            })
+            .catch((error) => {
+              console.error('Error loading GeoJSON:', error);
+            });
         },
-        error => {
+        (error) => {
           console.error('Error loading beer counts:', error);
-        }
+        },
       );
   }
 
@@ -167,21 +198,24 @@ export class MapComponent implements OnInit, OnDestroy {
     const maxCount = Math.max(...beerCounts, 1);
     const minCount = Math.min(...beerCounts, 0);
 
-    this.colorScale = d3.scaleLinear<string>()
+    this.colorScale = d3
+      .scaleLinear<string>()
       .domain([minCount, maxCount])
       .range(['#2e2519', '#ffa726'])
       .interpolate(d3.interpolateRgb.gamma(2.2));
 
-    this.heatMapColorScale = d3.scaleLinear<string>()
+    this.heatMapColorScale = d3
+      .scaleLinear<string>()
       .domain([minCount, maxCount])
       .range(['#FEE5D9', '#A50F15'])
       .interpolate(d3.interpolateRgb.gamma(2.2));
   }
 
   private drawMap(countries: any[], path: any): void {
-    this.g.selectAll('path').remove(); 
+    this.g.selectAll('path').remove();
 
-    this.g.selectAll('path')
+    this.g
+      .selectAll('path')
       .data(countries)
       .enter()
       .append('path')
@@ -201,20 +235,22 @@ export class MapComponent implements OnInit, OnDestroy {
   private getBeerCountForCountry(d: any): number {
     const key = this.getCountryKey(d);
     const match = Object.keys(this.countryBeerCounts).find(
-      (countryId) => countryId.trim().toLowerCase() === key
+      (countryId) => countryId.trim().toLowerCase() === key,
     );
     return match ? this.countryBeerCounts[match] : 0;
   }
 
   private getCountryColor(d: any): string {
     const beerCount = this.getBeerCountForCountry(d);
-    return this.isHeatMap ? this.heatMapColorScale(beerCount) : this.colorScale(beerCount);
+    return this.isHeatMap
+      ? this.heatMapColorScale(beerCount)
+      : this.colorScale(beerCount);
   }
 
   private updateTooltipPosition(event: any): void {
     const tooltipWidth = 150;
-    const tooltipHeight = 60; 
-    
+    const tooltipHeight = 60;
+
     let left = event.pageX + 10;
     let top = event.pageY - 28;
 
@@ -226,9 +262,7 @@ export class MapComponent implements OnInit, OnDestroy {
       top = event.pageY - tooltipHeight - 10;
     }
 
-    this.tooltip
-      .style('left', `${left}px`)
-      .style('top', `${top}px`);
+    this.tooltip.style('left', `${left}px`).style('top', `${top}px`);
   }
 
   private onMouseOver(event: any, d: any): void {
@@ -241,9 +275,7 @@ export class MapComponent implements OnInit, OnDestroy {
       .attr('fill', '#ff9100')
       .attr('filter', 'drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.5))');
 
-    this.tooltip.transition()
-      .duration(200)
-      .style('opacity', .9);
+    this.tooltip.transition().duration(200).style('opacity', 0.9);
     this.tooltip.html(`${countryName}<br>Beers: ${beerCount}`);
     this.updateTooltipPosition(event);
   }
@@ -255,9 +287,7 @@ export class MapComponent implements OnInit, OnDestroy {
       .attr('fill', this.getCountryColor(d))
       .attr('filter', 'none');
 
-    this.tooltip.transition()
-      .duration(500)
-      .style('opacity', 0);
+    this.tooltip.transition().duration(500).style('opacity', 0);
   }
 
   private onCountrySelect(event: any, d: any): void {
@@ -274,17 +304,22 @@ export class MapComponent implements OnInit, OnDestroy {
   onSearchChange(event: any): void {
     this.searchText = event.target.value.toLowerCase();
     this.filteredCountries = this.countries.filter((country: any) =>
-      country.properties.name.toLowerCase().includes(this.searchText)
+      country.properties.name.toLowerCase().includes(this.searchText),
     );
     this.updateProjection();
   }
 
   resetZoom(): void {
-    this.svg.transition().duration(750).call(
-      this.zoom.transform as any,
-      d3.zoomIdentity,
-      d3.zoomTransform(this.svg.node() as any).invert([this.width / 2, this.height / 2])
-    );
+    this.svg
+      .transition()
+      .duration(750)
+      .call(
+        this.zoom.transform as any,
+        d3.zoomIdentity,
+        d3
+          .zoomTransform(this.svg.node() as any)
+          .invert([this.width / 2, this.height / 2]),
+      );
   }
 
   toggleHeatMap(): void {
@@ -293,11 +328,12 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private updateMap(): void {
-    this.g.selectAll('path')
+    this.g
+      .selectAll('path')
       .transition()
       .duration(750)
       .attr('fill', (d: any) => this.getCountryColor(d));
-    
+
     this.updateLegend();
   }
 
@@ -306,35 +342,58 @@ export class MapComponent implements OnInit, OnDestroy {
     const maxCount = Math.max(...beerCounts, 1);
     const minCount = Math.min(...beerCounts, 0);
 
-    const legendScale = this.isHeatMap ? this.heatMapColorScale : this.colorScale;
+    const legendScale = this.isHeatMap
+      ? this.heatMapColorScale
+      : this.colorScale;
 
-    d3.select('.legend-gradient')
-      .style('background', 'linear-gradient(to right, ' + legendScale.range().join(',') + ')');
+    d3.select('.legend-gradient').style(
+      'background',
+      'linear-gradient(to right, ' + legendScale.range().join(',') + ')',
+    );
 
-    d3.select('.legend-labels')
-      .html(`<span>${minCount}</span><span>${maxCount}</span>`);
+    d3.select('.legend-labels').html(
+      `<span>${minCount}</span><span>${maxCount}</span>`,
+    );
   }
 
   zoomToRegion(region: string): void {
     let bounds: [[number, number], [number, number]];
     switch (region) {
       case 'Europe':
-        bounds = [[-20, -10], [70, 75]];
+        bounds = [
+          [-20, -10],
+          [70, 75],
+        ];
         break;
       case 'North America':
-        bounds = [[-170, -20], [-40, 75]];
+        bounds = [
+          [-170, -20],
+          [-40, 75],
+        ];
         break;
       case 'Asia':
-        bounds = [[20, 0], [180, 60]];
+        bounds = [
+          [20, 0],
+          [180, 60],
+        ];
         break;
       case 'South America':
-        bounds = [[-90, -60], [-30, 15]];
+        bounds = [
+          [-90, -60],
+          [-30, 15],
+        ];
         break;
       case 'Africa':
-        bounds = [[-20, -40], [55, 40]];
+        bounds = [
+          [-20, -40],
+          [55, 40],
+        ];
         break;
       case 'Oceania':
-        bounds = [[110, -50], [180, 0]];
+        bounds = [
+          [110, -50],
+          [180, 0],
+        ];
         break;
       default:
         return;
@@ -345,14 +404,26 @@ export class MapComponent implements OnInit, OnDestroy {
     const projectedPoints = [projection([x0, y0]), projection([x1, y1])];
 
     if (projectedPoints[0] && projectedPoints[1]) {
-      const [[px0, py0], [px1, py1]] = projectedPoints as [[number, number], [number, number]];
-      const scale = Math.min(8, 0.9 / Math.max((px1 - px0) / this.width, (py1 - py0) / this.height));
-      const translate = [this.width / 2 - scale * (px0 + px1) / 2, this.height / 2 - scale * (py0 + py1) / 2];
-
-      this.svg.transition().duration(750).call(
-        this.zoom.transform as any,
-        d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
+      const [[px0, py0], [px1, py1]] = projectedPoints as [
+        [number, number],
+        [number, number],
+      ];
+      const scale = Math.min(
+        8,
+        0.9 / Math.max((px1 - px0) / this.width, (py1 - py0) / this.height),
       );
+      const translate = [
+        this.width / 2 - (scale * (px0 + px1)) / 2,
+        this.height / 2 - (scale * (py0 + py1)) / 2,
+      ];
+
+      this.svg
+        .transition()
+        .duration(750)
+        .call(
+          this.zoom.transform as any,
+          d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale),
+        );
     }
   }
 
@@ -361,21 +432,21 @@ export class MapComponent implements OnInit, OnDestroy {
     const rect = legendElement.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const percentage = x / rect.width;
-    
+
     const beerCounts = Object.values(this.countryBeerCounts);
     const maxCount = Math.max(...beerCounts, 1);
     const minCount = Math.min(...beerCounts, 0);
     const hoverValue = minCount + percentage * (maxCount - minCount);
 
-    this.g.selectAll('path')
-      .attr('opacity', (d: any) => {
-        const beerCount = this.getBeerCountForCountry(d);
-        return Math.abs(beerCount - hoverValue) < (maxCount - minCount) * 0.1 ? 1 : 0.3;
-      });
+    this.g.selectAll('path').attr('opacity', (d: any) => {
+      const beerCount = this.getBeerCountForCountry(d);
+      return Math.abs(beerCount - hoverValue) < (maxCount - minCount) * 0.1
+        ? 1
+        : 0.3;
+    });
   }
 
   onLegendLeave(): void {
-    this.g.selectAll('path')
-      .attr('opacity', 1);
+    this.g.selectAll('path').attr('opacity', 1);
   }
 }
