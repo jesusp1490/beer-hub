@@ -96,7 +96,14 @@ async function main() {
 
     fs.writeFileSync(path.join(ROOT, 'routes.txt'), routes.join('\n') + '\n');
     fs.writeFileSync(path.join(ROOT, 'src', 'sitemap.xml'), sitemap);
-    fs.writeFileSync(path.join(ROOT, 'src', 'robots.txt'), robots);
+    
+    
+    const countryCounts = {};
+    for (const [id, n] of beersPerCountry) countryCounts[id] = n;
+    fs.writeFileSync(
+        path.join(ROOT, 'src', 'assets', 'country-beer-counts.json'),
+        JSON.stringify(countryCounts, null, 2) + '\n',
+    );
 
     console.log('');
     console.log('Hecho. Archivos generados:');

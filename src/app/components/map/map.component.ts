@@ -11,7 +11,6 @@ import { isPlatformBrowser } from '@angular/common';
 import * as d3 from 'd3';
 import { geoMercator, geoPath } from 'd3-geo';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BeerService } from '../../services/beer.service';
 import { SeoService } from '../../services/seo.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -44,7 +43,6 @@ export class MapComponent implements OnInit, OnDestroy {
     private el: ElementRef,
     private router: Router,
     private route: ActivatedRoute,
-    private beerService: BeerService,
     private seo: SeoService,
     @Inject(PLATFORM_ID) private platformId: Object,
   ) {
@@ -160,37 +158,30 @@ export class MapComponent implements OnInit, OnDestroy {
     const projection = this.createProjection();
     const path = geoPath().projection(projection);
 
-    this.beerService
-      .getCountryBeerCounts()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(
-        (beerCounts) => {
-          this.countryBeerCounts = beerCounts;
-          this.countryLinks = Object.keys(beerCounts)
-            .filter((id) => beerCounts[id] > 0)
-            .sort();
-          this.updateColorScale();
+    Promise.all([
+      d3.json('assets/country-beer-counts.json'),
+      d3.json('assets/custom110m.geo.json'),
+    ])
+      .then(([beerCounts, data]: any[]) => {
+        if (!data) {
+          console.error('No map data loaded');
+          return;
+        }
 
-          d3.json('assets/custom110m.geo.json')
-            .then((data: any) => {
-              if (!data) {
-                console.error('No map data loaded');
-                return;
-              }
+        this.countryBeerCounts = beerCounts || {};
+        this.countryLinks = Object.keys(this.countryBeerCounts)
+          .filter((id) => this.countryBeerCounts[id] > 0)
+          .sort();
+        this.updateColorScale();
 
-              this.countries = data.features;
-              this.filteredCountries = this.countries;
-              this.drawMap(this.filteredCountries, path);
-              this.updateLegend();
-            })
-            .catch((error) => {
-              console.error('Error loading GeoJSON:', error);
-            });
-        },
-        (error) => {
-          console.error('Error loading beer counts:', error);
-        },
-      );
+        this.countries = data.features;
+        this.filteredCountries = this.countries;
+        this.drawMap(this.filteredCountries, path);
+        this.updateLegend();
+      })
+      .catch((error) => {
+        console.error('Error loading map data:', error);
+      });
   }
 
   private updateColorScale(): void {

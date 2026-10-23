@@ -133,11 +133,6 @@ export class BeerService {
     return this.cachedBrands$.asObservable();
   }
 
-  // FIX: getBeerDetails previously recalculated averageRating/ratingsCount from
-  // scratch by reading the ENTIRE ratings subcollection on every single call.
-  // rateBeer() already maintains accurate averageRating/ratingsCount fields on
-  // the beer document transactionally — so we just trust those fields here.
-  // This turns an O(n) read (n = number of ratings) into a single doc read.
   getBeerDetails(beerId: string): Observable<Beer | undefined> {
     return this.firestore
       .doc<Beer>(`beers/${beerId}`)
@@ -193,9 +188,6 @@ export class BeerService {
               rating,
               ratedAt: firebase.firestore.FieldValue.serverTimestamp(),
               beerType: beerData.beerType,
-              // NEW: needed so the challenge-progress Cloud Function trigger
-              // (onCreate on this same path) can evaluate country-based
-              // challenges without an extra Firestore read per rating.
               countryId: beerData.countryId,
             });
 
@@ -540,38 +532,35 @@ export class BeerService {
   }
 
   getRandomBestRatedBeers(limit = 8): Observable<Beer[]> {
-    return this.getBeers().pipe(
-      map((beers) => {
-        const bestRated = beers
-          .filter(
-            (beer) =>
-              beer.averageRating !== undefined && beer.averageRating >= 4.0,
-          )
-          .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
-        return this.getRandomSubset(bestRated, limit);
-      }),
-    );
+    return this.firestore
+      .collection<Beer>("beers", (ref) =>
+        ref.where("averageRating", ">=", 4.0).orderBy("averageRating", "desc").limit(40),
+      )
+      .valueChanges({ idField: "id" })
+      .pipe(
+        take(1),
+        map((beers) => this.getRandomSubset(beers, limit)),
+        catchError((error) => {
+          console.error("Error fetching best rated beers:", error)
+          return of([])
+        }),
+      )
   }
 
   getRandomPopularBrands(limit = 8): Observable<Brand[]> {
-    return this.getBrands().pipe(
-      map((brands) => {
-        // FIX: sort() mutates in place. brands here is the array straight out of
-        // the cached BehaviorSubject, so sorting it directly was silently
-        // reordering the shared cache as a side effect. Now we sort a copy.
-        const sortedBrands = [...brands].sort(
-          (a, b) => b.beersCount - a.beersCount,
-        );
-        const topBrands = sortedBrands.slice(
-          0,
-          Math.min(50, sortedBrands.length),
-        );
-        return this.getRandomSubset(topBrands, limit);
-      }),
-    );
+    return this.firestore
+      .collection<Brand>("brands", (ref) => ref.orderBy("beersCount", "desc").limit(50))
+      .valueChanges({ idField: "id" })
+      .pipe(
+        take(1),
+        map((brands) => this.getRandomSubset(brands, limit)),
+        catchError((error) => {
+          console.error("Error fetching popular brands:", error)
+          return of([])
+        }),
+      )
   }
 
-  // FIX: same mutation issue — .sort() on the input array. Now sorts a copy.
   private getRandomSubset<T>(array: T[], n: number): T[] {
     const shuffled = [...array].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, n);
@@ -710,11 +699,6 @@ export class BeerService {
     );
   }
 
-  // FIX: previously returned `of(Promise.reject(...))`, which does NOT actually
-  // produce a rejected/errored observable — of() just emits the (unresolved)
-  // promise as a value. The `as Observable<never>` cast was masking that this
-  // didn't do what it looked like it did. throwError() is the correct way to
-  // surface this as an observable error.
   addBeer(beer: Partial<Beer>): Observable<string> {
     if (this.validateBeer(beer)) {
       return from(this.firestore.collection('beers').add(beer)).pipe(
