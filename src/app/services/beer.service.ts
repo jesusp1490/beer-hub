@@ -533,32 +533,37 @@ export class BeerService {
 
   getRandomBestRatedBeers(limit = 8): Observable<Beer[]> {
     return this.firestore
-      .collection<Beer>("beers", (ref) =>
-        ref.where("averageRating", ">=", 4.0).orderBy("averageRating", "desc").limit(40),
+      .collection<Beer>('beers', (ref) =>
+        ref
+          .where('averageRating', '>=', 4.0)
+          .orderBy('averageRating', 'desc')
+          .limit(40),
       )
-      .valueChanges({ idField: "id" })
+      .valueChanges({ idField: 'id' })
       .pipe(
         take(1),
         map((beers) => this.getRandomSubset(beers, limit)),
         catchError((error) => {
-          console.error("Error fetching best rated beers:", error)
-          return of([])
+          console.error('Error fetching best rated beers:', error);
+          return of([]);
         }),
-      )
+      );
   }
 
   getRandomPopularBrands(limit = 8): Observable<Brand[]> {
     return this.firestore
-      .collection<Brand>("brands", (ref) => ref.orderBy("beersCount", "desc").limit(50))
-      .valueChanges({ idField: "id" })
+      .collection<Brand>('brands', (ref) =>
+        ref.orderBy('beersCount', 'desc').limit(50),
+      )
+      .valueChanges({ idField: 'id' })
       .pipe(
         take(1),
         map((brands) => this.getRandomSubset(brands, limit)),
         catchError((error) => {
-          console.error("Error fetching popular brands:", error)
-          return of([])
+          console.error('Error fetching popular brands:', error);
+          return of([]);
         }),
-      )
+      );
   }
 
   private getRandomSubset<T>(array: T[], n: number): T[] {
@@ -594,18 +599,18 @@ export class BeerService {
   }
 
   getLatestBeers(): Observable<Beer[]> {
-    return this.getBeers().pipe(
-      map((beers) =>
-        beers
-          .filter((beer) => beer.addedDate !== undefined)
-          .sort((a, b) => {
-            const dateA = a.addedDate ? new Date(a.addedDate).getTime() : 0;
-            const dateB = b.addedDate ? new Date(b.addedDate).getTime() : 0;
-            return dateB - dateA;
-          })
-          .slice(0, 5),
-      ),
-    );
+    return this.firestore
+      .collection<Beer>('beers', (ref) =>
+        ref.orderBy('addedDate', 'desc').limit(5),
+      )
+      .valueChanges({ idField: 'id' })
+      .pipe(
+        take(1),
+        catchError((error) => {
+          console.error('Error fetching latest beers:', error);
+          return of([]);
+        }),
+      );
   }
 
   getFilteredBeers(filters: any): Observable<Beer[]> {
@@ -701,7 +706,7 @@ export class BeerService {
 
   addBeer(beer: Partial<Beer>): Observable<string> {
     if (this.validateBeer(beer)) {
-      return from(this.firestore.collection('beers').add(beer)).pipe(
+      return from(this.firestore.collection("beers").add({ ...beer, addedDate: new Date().toISOString() })).pipe(
         tap(() => this.refreshCache()),
         map((docRef) => docRef.id),
       );

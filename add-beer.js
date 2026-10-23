@@ -14,12 +14,37 @@ const db = admin.firestore();
 
 async function addBeer(beerData, customId) {
     try {
+        // Comprobamos que la marca y el pais existen antes de insertar.
+        // Asi evitamos casos como el brandId "Kona Brewing", que no tenia marca.
+        const brand = await db.collection('brands').doc(beerData.brandId).get();
+        if (!brand.exists) {
+            console.error(`brandId "${beerData.brandId}" no existe en "brands". No se añade la cerveza.`);
+            return;
+        }
+        const country = await db.collection('countries').doc(beerData.countryId).get();
+        if (!country.exists) {
+            console.error(`countryId "${beerData.countryId}" no existe en "countries". No se añade la cerveza.`);
+            return;
+        }
+
         let docRef;
         if (customId) {
             docRef = db.collection('beers').doc(customId);
-            await docRef.set(beerData);
+
+            // Si la cerveza ya existe, conservamos su addedDate (si lo tiene) para que
+            // volver a ejecutar el script no la haga pasar por "nueva".
+            const existing = await docRef.get();
+            const addedDate =
+                beerData.addedDate ||
+                (existing.exists ? existing.data().addedDate : new Date().toISOString());
+            const data = addedDate ? { ...beerData, addedDate } : beerData;
+
+            await docRef.set(data);
         } else {
-            docRef = await db.collection('beers').add(beerData);
+            docRef = await db.collection('beers').add({
+                addedDate: new Date().toISOString(),
+                ...beerData,
+            });
         }
         console.log("Beer added with ID: ", docRef.id);
     } catch (e) {
