@@ -101,7 +101,14 @@ export class FilterSearchComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(private fb: FormBuilder, private beerService: BeerService) {
-    this.filtersForm = this.fb.group({ ...this.defaultFilters });
+        this.filtersForm = this.fb.group({
+      searchTerm: [this.defaultFilters.searchTerm],
+      brand: [this.defaultFilters.brand],
+      beerTypes: [[] as string[]],
+      abvMin: [this.defaultFilters.abvMin],
+      abvMax: [this.defaultFilters.abvMax],
+      ingredient: [this.defaultFilters.ingredient],
+    });
   }
 
   ngOnInit(): void {
@@ -134,13 +141,13 @@ export class FilterSearchComponent implements OnInit, OnDestroy {
       });
   }
 
-  isChecked(type: string): boolean {
-    const beerTypes = this.filtersForm.get('beerTypes')?.value as string[];
+    isChecked(type: string): boolean {
+    const beerTypes = (this.filtersForm.get('beerTypes')?.value ?? []) as string[];
     return beerTypes.includes(type);
   }
 
   updateBeerTypes(event: any, type: string): void {
-    const beerTypes = [...(this.filtersForm.get('beerTypes')?.value as string[])];
+    const beerTypes = [...((this.filtersForm.get('beerTypes')?.value ?? []) as string[])];
     if (event.checked) {
       if (!beerTypes.includes(type)) {
         beerTypes.push(type);

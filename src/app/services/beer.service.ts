@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from "@angular/core"
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { HttpClient } from '@angular/common/http';
 import {
@@ -41,13 +41,13 @@ export class BeerService {
     countries: 0,
   };
   private cacheExpirationTime = 5 * 60 * 1000; // 5 minutes
+  private catalog$?: Observable<Beer[]>
 
-  constructor(
+    constructor(
     private firestore: AngularFirestore,
     private authService: AuthService,
     private userService: UserService,
-    private http: HttpClient,
-    private catalog$?: Observable<Beer[]>,
+    private injector: Injector,
   ) {}
 
   private initializeCache(): void {
@@ -627,7 +627,8 @@ export class BeerService {
   // los filtros no leen Firestore.
   private getCatalog(): Observable<Beer[]> {
     if (!this.catalog$) {
-      this.catalog$ = this.http.get<Beer[]>('assets/beer-catalog.json').pipe(
+      const http = this.injector.get(HttpClient)
+      this.catalog$ = http.get<Beer[]>("assets/beer-catalog.json").pipe(
         shareReplay(1),
         catchError((error) => {
           console.error('Error loading beer catalog:', error);
