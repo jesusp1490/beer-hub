@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { HttpClient } from '@angular/common/http';
 import {
   Observable,
   of,
@@ -8,7 +9,14 @@ import {
   forkJoin,
   throwError,
 } from 'rxjs';
-import { map, switchMap, tap, take, catchError } from 'rxjs/operators';
+import {
+  map,
+  switchMap,
+  tap,
+  take,
+  catchError,
+  shareReplay,
+} from 'rxjs/operators';
 import { Beer } from '../components/beers/beers.interface';
 import { Brand } from '../components/country/brand.interface';
 import { Country } from '../components/country/country.interface';
@@ -38,6 +46,8 @@ export class BeerService {
     private firestore: AngularFirestore,
     private authService: AuthService,
     private userService: UserService,
+    private http: HttpClient,
+    private catalog$?: Observable<Beer[]>,
   ) {}
 
   private initializeCache(): void {
@@ -613,8 +623,24 @@ export class BeerService {
       );
   }
 
+  // Catalogo estatico generado en el despliegue (src/assets/beer-catalog.json):
+  // los filtros no leen Firestore.
+  private getCatalog(): Observable<Beer[]> {
+    if (!this.catalog$) {
+      this.catalog$ = this.http.get<Beer[]>('assets/beer-catalog.json').pipe(
+        shareReplay(1),
+        catchError((error) => {
+          console.error('Error loading beer catalog:', error);
+          this.catalog$ = undefined;
+          return of([] as Beer[]);
+        }),
+      );
+    }
+    return this.catalog$;
+  }
+
   getFilteredBeers(filters: any): Observable<Beer[]> {
-    return this.getBeers().pipe(
+    return this.getCatalog().pipe(
       map((beers) =>
         beers.filter((beer) => {
           const matchesSearchTerm = filters.searchTerm
@@ -706,7 +732,11 @@ export class BeerService {
 
   addBeer(beer: Partial<Beer>): Observable<string> {
     if (this.validateBeer(beer)) {
-      return from(this.firestore.collection("beers").add({ ...beer, addedDate: new Date().toISOString() })).pipe(
+      return from(
+        this.firestore
+          .collection('beers')
+          .add({ ...beer, addedDate: new Date().toISOString() }),
+      ).pipe(
         tap(() => this.refreshCache()),
         map((docRef) => docRef.id),
       );

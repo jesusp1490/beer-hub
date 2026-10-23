@@ -105,6 +105,22 @@ async function main() {
         JSON.stringify(countryCounts, null, 2) + '\n',
     );
 
+    const catalog = beers.map((b) => ({
+        id: b.id,
+        name: b.name,
+        brand: b.brand,
+        brandId: b.brandId,
+        beerType: b.beerType,
+        ABV: b.ABV,
+        averageRating: b.averageRating,
+        beerLabelUrl: b.beerLabelUrl,
+        ingredients: (b.ingredients || []).map((i) => ({ name: i.name })),
+    }));
+    fs.writeFileSync(
+        path.join(ROOT, 'src', 'assets', 'beer-catalog.json'),
+        JSON.stringify(catalog),
+    );
+
     console.log('');
     console.log('Hecho. Archivos generados:');
     console.log('  routes.txt, src/sitemap.xml, src/robots.txt');
