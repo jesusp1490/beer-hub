@@ -17,6 +17,7 @@
     }
   ],
   "hosting": {
+    "trailingSlash": false,
     "target": "beer-hub-new",
     "public": "dist/beer-hub/browser",
     "ignore": [
