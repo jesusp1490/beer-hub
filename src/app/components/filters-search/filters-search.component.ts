@@ -126,8 +126,25 @@ export class FilterSearchComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+    private hasActiveFilters(f: any): boolean {
+    return (
+      !!f.searchTerm ||
+      !!f.brand ||
+      !!f.ingredient ||
+      (f.beerTypes?.length ?? 0) > 0 ||
+      f.abvMin > this.defaultFilters.abvMin ||
+      f.abvMax < this.defaultFilters.abvMax
+    );
+  }
+
   applyFilters(): void {
     const filters = this.filtersForm.value;
+
+    if (!this.hasActiveFilters(filters)) {
+      this.filtersCleared.emit();
+      return;
+    }
+
     this.beerService.getFilteredBeers(filters)
       .pipe(takeUntil(this.destroy$))
       .subscribe({

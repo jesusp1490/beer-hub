@@ -89,7 +89,7 @@
             <a *ngFor="let beer of restOfBestRated; let i = index" class="beer-card" [routerLink]="['/beers', beer.id]">
               <div class="beer-label">
                 <span class="rank-pill">#{{ i + 2 }}</span>
-                <img [src]="beer.beerLabelUrl" [alt]="beer.name">
+                <img [src]="beer.beerLabelUrl" [alt]="beer.name" loading="lazy">
               </div>
               <div class="beer-info">
                 <h3>{{ beer.name }}</h3>
@@ -130,7 +130,7 @@
           </div>
           <a *ngFor="let beer of favoriteBeers" class="beer-card" [routerLink]="['/beers', beer.id]">
             <div class="beer-label">
-              <img [src]="beer.beerLabelUrl" [alt]="beer.name">
+              <img [src]="beer.beerLabelUrl" [alt]="beer.name" loading="lazy">
             </div>
             <div class="beer-info">
               <h3>{{ beer.name }}</h3>
@@ -170,7 +170,7 @@
           </div>
           <a *ngFor="let beer of latestBeers" class="beer-card" [routerLink]="['/beers', beer.id]">
             <div class="beer-label">
-              <img [src]="beer.beerLabelUrl" [alt]="beer.name">
+              <img [src]="beer.beerLabelUrl" [alt]="beer.name" loading="lazy">
             </div>
             <div class="beer-info">
               <h3>{{ beer.name }}</h3>
@@ -207,7 +207,7 @@
         <div class="brand-grid" *ngIf="!isLoadingBrands">
           <a *ngFor="let brand of popularBrands" class="brand-card" [routerLink]="['/brands', brand.id, 'beers']">
             <div class="brand-logo">
-              <img [src]="brand.logoUrl" [alt]="brand.name">
+              <img [src]="brand.logoUrl" [alt]="brand.name" loading="lazy">
             </div>
             <div class="brand-info">
               <h3>{{ brand.name }}</h3>
@@ -234,7 +234,7 @@
           </div>
           <a *ngFor="let beer of filteredBeers" class="beer-card" [routerLink]="['/beers', beer.id]">
             <div class="beer-label">
-              <img [src]="beer.beerLabelUrl" [alt]="beer.name">
+              <img [src]="beer.beerLabelUrl" [alt]="beer.name" loading="lazy">
             </div>
             <div class="beer-info">
               <h3>{{ beer.name }}</h3>
